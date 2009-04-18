@@ -11,7 +11,9 @@ noinst_HEADERS = \
 	Point.h \
 	RNGenerator.h \
 	Stat.h \
-	ltqnorm.h
+	ltqnorm.h \
+	random.h \
+	counter.h
 
 libcluster_la_SOURCES = \
 	CLARA.C \
@@ -22,9 +24,10 @@ libcluster_la_SOURCES = \
 	ltqnorm.C
 
 #test program for matrix
-noinst_PROGRAMS = matrixTest pointClusterTest
+noinst_PROGRAMS = matrixTest pointClusterTest mirkin-test
 
 matrixTest_SOURCES = MatrixTest.C
+mirkin_test_SOURCES = mirkin_test.C
 pointClusterTest_SOURCES = PointClusterTest.C
 
 LDADD = libcluster.la

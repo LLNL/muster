@@ -1,7 +1,7 @@
 #ifndef CLUSTER_DATA_SET_H
 #define CLUSTER_DATA_SET_H
 
-
+#include <cmath>
 #include "matrix.h"
 #include "Dissimilarity.h"
 #include "RNGenerator.h"
@@ -79,7 +79,21 @@ public:
                 distances->get(i, j) = diss.getDissimilarity(objects[i], objects[j]);
             }
         }
+        return new ClusterDataSet(distances, objects.size());
+    }
 
+
+  /**
+   * Builds a dissimilarity matrix with points one unit away from each other in a straight line.
+   */
+    template <class T>
+    static ClusterDataSet *line(const vector<T>& objects) {
+        matrix<double> *distances = new matrix<double>(objects.size(), objects.size());
+        for (unsigned i=0; i < objects.size(); i++) {
+            for (unsigned j=0; j < objects.size(); j++) {
+                distances->get(i, j) = std::fabs(i-j);
+            }
+        }
         return new ClusterDataSet(distances, objects.size());
     }
 

@@ -112,7 +112,7 @@ public:
     /**
      * Returns clusters in the form of a newly allocated 
      * vector of sets of object indices.
-     * The caller will need to delete the clusterLis.
+     * The caller will need to delete the clusterList.
      */
     virtual clusterList *getClustering();
 
@@ -129,7 +129,17 @@ public:
     void printMedoids(ostream& out = cout);
     void printClusterIds(ostream& out = cout);
 
+    static void printClustering(clusterList& list, ostream& out = cout);
 };
+
+
+inline void printClustering(KMedoids::clusterList& list, ostream& out = cout) { 
+  KMedoids::printClustering(list, out);
+}
+
+/// Mirkin distance bt/w two clusterings.
+double mirkin_distance(KMedoids::clusterList& c1, KMedoids::clusterList& c2);
+
 
 #endif //K_MEDOIDS_H
 

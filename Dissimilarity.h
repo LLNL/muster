@@ -9,10 +9,11 @@
  */
 template <class T>
 struct Dissimilarity {
-    /**
-     * Takes the dissimilarity between two objects
-     */
-    virtual double getDissimilarity(T left, T right) const = 0;
+  /**
+   * Takes the dissimilarity between two objects
+   */
+  virtual double getDissimilarity(T left, T right) const = 0;
+  virtual ~Dissimilarity() { }
 };
 
 #endif // DISSIMILARITY_H

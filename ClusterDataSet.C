@@ -71,7 +71,7 @@ ClusterDataSet* ClusterDataSet::randomSubset(unsigned size) const {
     unsigned m = size;
     
     while (m > 0) {
-        if (rnGenerator(remaining) < m) {
+      if (rnGenerator(remaining) < (int)m) {
             *out = first;
             ++out;
             --m;

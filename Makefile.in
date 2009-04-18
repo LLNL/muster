@@ -34,7 +34,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = matrixTest$(EXEEXT) pointClusterTest$(EXEEXT)
+noinst_PROGRAMS = matrixTest$(EXEEXT) pointClusterTest$(EXEEXT) \
+	mirkin-test$(EXEEXT)
 subdir = cluster
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -78,6 +79,10 @@ am_matrixTest_OBJECTS = MatrixTest.$(OBJEXT)
 matrixTest_OBJECTS = $(am_matrixTest_OBJECTS)
 matrixTest_LDADD = $(LDADD)
 matrixTest_DEPENDENCIES = libcluster.la
+am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
+mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
+mirkin_test_LDADD = $(LDADD)
+mirkin_test_DEPENDENCIES = libcluster.la
 am_pointClusterTest_OBJECTS = PointClusterTest.$(OBJEXT)
 pointClusterTest_OBJECTS = $(am_pointClusterTest_OBJECTS)
 pointClusterTest_LDADD = $(LDADD)
@@ -95,9 +100,9 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcluster_la_SOURCES) $(matrixTest_SOURCES) \
-	$(pointClusterTest_SOURCES)
+	$(mirkin_test_SOURCES) $(pointClusterTest_SOURCES)
 DIST_SOURCES = $(libcluster_la_SOURCES) $(matrixTest_SOURCES) \
-	$(pointClusterTest_SOURCES)
+	$(mirkin_test_SOURCES) $(pointClusterTest_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -269,7 +274,9 @@ noinst_HEADERS = \
 	Point.h \
 	RNGenerator.h \
 	Stat.h \
-	ltqnorm.h
+	ltqnorm.h \
+	random.h \
+	counter.h
 
 libcluster_la_SOURCES = \
 	CLARA.C \
@@ -280,6 +287,7 @@ libcluster_la_SOURCES = \
 	ltqnorm.C
 
 matrixTest_SOURCES = MatrixTest.C
+mirkin_test_SOURCES = mirkin_test.C
 pointClusterTest_SOURCES = PointClusterTest.C
 LDADD = libcluster.la
 all: all-am
@@ -354,6 +362,9 @@ clean-noinstPROGRAMS:
 matrixTest$(EXEEXT): $(matrixTest_OBJECTS) $(matrixTest_DEPENDENCIES) 
 	@rm -f matrixTest$(EXEEXT)
 	$(CXXLINK) $(matrixTest_OBJECTS) $(matrixTest_LDADD) $(LIBS)
+mirkin-test$(EXEEXT): $(mirkin_test_OBJECTS) $(mirkin_test_DEPENDENCIES) 
+	@rm -f mirkin-test$(EXEEXT)
+	$(CXXLINK) $(mirkin_test_OBJECTS) $(mirkin_test_LDADD) $(LIBS)
 pointClusterTest$(EXEEXT): $(pointClusterTest_OBJECTS) $(pointClusterTest_DEPENDENCIES) 
 	@rm -f pointClusterTest$(EXEEXT)
 	$(CXXLINK) $(pointClusterTest_OBJECTS) $(pointClusterTest_LDADD) $(LIBS)
@@ -372,6 +383,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PointClusterTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RNGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ltqnorm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
