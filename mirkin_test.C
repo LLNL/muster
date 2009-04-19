@@ -6,7 +6,7 @@
 #include <sstream>
 using namespace std;
 
-#include "KMedoids.h"
+#include "kmedoids.h"
 #include "counter.h"
 using namespace cluster;
 

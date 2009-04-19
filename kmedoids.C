@@ -1,4 +1,4 @@
-#include "KMedoids.h"
+#include "kmedoids.h"
 using namespace cluster;
 
 #include <algorithm>

@@ -8,7 +8,7 @@ using namespace std;
 using boost::numeric::ublas::matrix;
 
 #include "dissimilarity.h"
-#include "KMedoids.h"
+#include "kmedoids.h"
 #include "color.h"
 using namespace cluster;
 

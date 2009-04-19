@@ -70,7 +70,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcluster_la_LIBADD =
-am_libcluster_la_OBJECTS = partition.lo KMedoids.lo RNGenerator.lo \
+am_libcluster_la_OBJECTS = partition.lo kmedoids.lo RNGenerator.lo \
 	ltqnorm.lo
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
@@ -78,7 +78,7 @@ am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
 mirkin_test_DEPENDENCIES = libcluster.la
-am_pointClusterTest_OBJECTS = PointClusterTest.$(OBJEXT)
+am_pointClusterTest_OBJECTS = point_cluster_test.$(OBJEXT)
 pointClusterTest_OBJECTS = $(am_pointClusterTest_OBJECTS)
 pointClusterTest_LDADD = $(LDADD)
 pointClusterTest_DEPENDENCIES = libcluster.la
@@ -259,24 +259,24 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
 noinst_HEADERS = \
-	KMedoids.h \
-	MersenneTwister.h \
-	RNGenerator.h \
-	Stat.h \
+	kmedoids.h \
 	ltqnorm.h \
 	random.h \
 	counter.h \
 	dissimilarity.h \
-	partition.h
+	partition.h\
+	MersenneTwister.h \
+	RNGenerator.h \
+	Stat.h
 
 libcluster_la_SOURCES = \
 	partition.C \
-	KMedoids.C \
+	kmedoids.C \
 	RNGenerator.C \
 	ltqnorm.C
 
 mirkin_test_SOURCES = mirkin_test.C
-pointClusterTest_SOURCES = PointClusterTest.C
+pointClusterTest_SOURCES = point_cluster_test.C
 LDADD = libcluster.la
 INCLUDES = $(BOOST_CPPFLAGS)
 all: all-am
@@ -361,12 +361,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KMedoids.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PointClusterTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RNGenerator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ltqnorm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partition.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_cluster_test.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
