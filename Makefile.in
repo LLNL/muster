@@ -34,8 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = matrixTest$(EXEEXT) pointClusterTest$(EXEEXT) \
-	mirkin-test$(EXEEXT)
+noinst_PROGRAMS = pointClusterTest$(EXEEXT) mirkin-test$(EXEEXT)
 subdir = cluster
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -71,14 +70,10 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcluster_la_LIBADD =
-am_libcluster_la_OBJECTS = CLARA.lo ClusterDataSet.lo KMedoids.lo \
-	Point.lo RNGenerator.lo ltqnorm.lo
+am_libcluster_la_OBJECTS = partition.lo KMedoids.lo RNGenerator.lo \
+	ltqnorm.lo
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
-am_matrixTest_OBJECTS = MatrixTest.$(OBJEXT)
-matrixTest_OBJECTS = $(am_matrixTest_OBJECTS)
-matrixTest_LDADD = $(LDADD)
-matrixTest_DEPENDENCIES = libcluster.la
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
@@ -99,10 +94,10 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libcluster_la_SOURCES) $(matrixTest_SOURCES) \
-	$(mirkin_test_SOURCES) $(pointClusterTest_SOURCES)
-DIST_SOURCES = $(libcluster_la_SOURCES) $(matrixTest_SOURCES) \
-	$(mirkin_test_SOURCES) $(pointClusterTest_SOURCES)
+SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
+	$(pointClusterTest_SOURCES)
+DIST_SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
+	$(pointClusterTest_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -264,32 +259,26 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
 noinst_HEADERS = \
-	CLARA.h \
-	ClusterDataSet.h \
-	Dissimilarity.h \
-	hash.h \
 	KMedoids.h \
-	matrix.h \
 	MersenneTwister.h \
-	Point.h \
 	RNGenerator.h \
 	Stat.h \
 	ltqnorm.h \
 	random.h \
-	counter.h
+	counter.h \
+	dissimilarity.h \
+	partition.h
 
 libcluster_la_SOURCES = \
-	CLARA.C \
-	ClusterDataSet.C \
+	partition.C \
 	KMedoids.C \
-	Point.C \
 	RNGenerator.C \
 	ltqnorm.C
 
-matrixTest_SOURCES = MatrixTest.C
 mirkin_test_SOURCES = mirkin_test.C
 pointClusterTest_SOURCES = PointClusterTest.C
 LDADD = libcluster.la
+INCLUDES = $(BOOST_CPPFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -359,9 +348,6 @@ clean-noinstPROGRAMS:
 	  echo " rm -f $$p $$f"; \
 	  rm -f $$p $$f ; \
 	done
-matrixTest$(EXEEXT): $(matrixTest_OBJECTS) $(matrixTest_DEPENDENCIES) 
-	@rm -f matrixTest$(EXEEXT)
-	$(CXXLINK) $(matrixTest_OBJECTS) $(matrixTest_LDADD) $(LIBS)
 mirkin-test$(EXEEXT): $(mirkin_test_OBJECTS) $(mirkin_test_DEPENDENCIES) 
 	@rm -f mirkin-test$(EXEEXT)
 	$(CXXLINK) $(mirkin_test_OBJECTS) $(mirkin_test_LDADD) $(LIBS)
@@ -375,15 +361,12 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CLARA.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ClusterDataSet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KMedoids.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MatrixTest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PointClusterTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RNGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ltqnorm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partition.Plo@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

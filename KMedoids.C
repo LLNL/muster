@@ -1,146 +1,107 @@
 #include "KMedoids.h"
+using namespace cluster;
 
 #include <algorithm>
-#include <stdexcept>
 #include <cassert>
+using namespace std;
 
 #include "counter.h"
 
-KMedoids::KMedoids(
-  ClusterDataSet& _data,
-  const unsigned _k
-) :
-  data(_data),
-  k(_k),
-  medoids(k),
-  clusterIds(data.size())
-{
-  if (k > data.size()) {
-    throw logic_error("Attempt to instantiate KMedoids with more clusters than data.");
-  }
-}
 
+namespace cluster {
 
-KMedoids::~KMedoids() {
-  //nothing necessary.
-}
-
-
-void KMedoids::assignRandomMedoids() {
-  //find k unique objects randomly
-  set<unsigned> uniqueMedoids;
-  while (uniqueMedoids.size() < k) {
-    uniqueMedoids.insert(data.getRandomIndex());
+  kmedoids::kmedoids() : partition() {
+    //nothing necessary.
   }
 
-  //copy unique medoids into the medoids vector.
-  copy(uniqueMedoids.begin(), uniqueMedoids.end(), medoids.begin());
-  assert(medoids.size() == k);
+  kmedoids::~kmedoids() {
+    //nothing necessary.
+  }
+
+
+  void kmedoids::init_medoids(size_t k) {
+    medoids.clear();
+    random_subset(cluster_ids.size(), k, back_inserter(medoids), random);
+    assert(medoids.size() == k);
+  }
+
+
+  /// Finds the cost of swapping object oh with medoid j.
+  /// PRE: object[oi] is the medoid with index cluster_id[oi] in medoids.
+  double kmedoids::cost(medoid_id mi, object_id oh, object_id oj, 
+                        const dissimilarity_matrix& distance) const {
+    //oi is the object id of medoid i, mi is the medoid id.
+    object_id oi = medoids[mi];
+  
+    double cost;
+    if (cluster_ids[oj] == mi) {
+      medoid_id mj2 = nearest_medoid(oj, matrix_distance(distance), mi).first;
+      object_id oj2 = medoids[mj2];
+      if (distance(oj, oj2) < distance(oj, oh)) {
+        cost = distance(oj, oj2) - distance(oj, oi);
+      } else {
+        cost = distance(oj, oh) - distance(oj, oi);            
+      }
     
-  //point the medoid objects at the right clusters
-  for (medoid_id mi = 0; mi < k; mi++) {
-    clusterIds[medoids[mi]] = mi;
-  }
-}
-
-
-bool KMedoids::isMedoid(unsigned objectId) {
-  //check if the object is its own cluster's medoid.
-  return medoids[clusterIds[objectId]] == objectId;
-}
-
-
-/**
- * Goes through all objects and assigns each to the 
- * cluster with the closest medoid.
- */
-void KMedoids::assignObjectsToClusters() {
-  for (object_id i=0; i < data.size(); i++) {
-    if (!isMedoid(i)) {
-      clusterIds[i] = data.nearest(i, medoids);
-    }
-  }
-}
-
-
-/**
- * Finds the cost w/respect to object j of swapping object oh with medoid i.
- */
-double KMedoids::cost(medoid_id mi, object_id oh, object_id oj) {
-  //oi is the object id of medoid i, mi is the medoid id.
-  object_id oi = medoids[mi];
-
-  double cost;
-  if (clusterIds[oj] == mi) {
-    medoid_id mj2 = data.nearest(oj, medoids, mi);
-    object_id oj2 = medoids[mj2];
-    if (data.distance(oj, oj2) < data.distance(oj, oh)) {
-      cost = data.distance(oj, oj2) - data.distance(oj, oi);
     } else {
-      cost = data.distance(oj, oh) - data.distance(oj, oi);            
+      medoid_id mj2 = cluster_ids[oj];
+      object_id oj2 = medoids[mj2];
+      if (distance(oj, oj2) < distance(oj, oh)) {
+        cost = 0.0;
+      } else {
+        cost = distance(oj, oh) - distance(oj, oj2);
+      }
     }
-
-  } else {
-    medoid_id mj2 = clusterIds[oj];
-    object_id oj2 = medoids[mj2];
-    if (data.distance(oj, oj2) < data.distance(oj, oh)) {
-      cost = 0.0;
-    } else {
-      cost = data.distance(oj, oh) - data.distance(oj, oj2);
-    }
+  
+    return cost;
   }
 
-  return cost;
-}
 
-
-
-/**
- * Total cost of swapping object h with medoid i.
- * Sums costs of this exchagne for all objects j.
- */
-double KMedoids::totalCost(medoid_id i, object_id h) {
-  double sum =0;
-
-  //pair each medoid w/all non-medoids and see what 
-  for (object_id j = 0; j < data.size(); j++) {
-    //skip medoids and self
-    if (isMedoid(j) || j == h) continue;  
-
-    //add cost of swapping object h with object j
-    sum += cost(i, h, j);
+  /// Total cost of swapping object h with medoid i.
+  /// Sums costs of this exchagne for all objects j.
+  double kmedoids::total_cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const {
+    double sum =0;
+    for (object_id j = 0; j < cluster_ids.size(); j++) {
+      if (is_medoid(j) || j == h) continue;   //skip medoids and self
+      sum += cost(i, h, j, distance);    //add cost of swapping object h with object j
+    }
+    return sum;
   }
-  return sum;
-}
 
 
+  void kmedoids::pam(dissimilarity_matrix distance, size_t k) {
+    if (k > distance.size1()) {
+      throw std::logic_error("Attempt to instantiate kmedoids with more clusters than data.");
+    }
 
-void KMedoids::findClusters() {
-  //randomly pick initial medoids
-  assignRandomMedoids();
+    if (distance.size1() != distance.size2()) {
+      throw std::logic_error("Error: distance matrix is now square!");
+    }
     
-  if (k == 1) {
-    //just bail out here if they only want one cluster.
-    assignObjectsToClusters();
+    // first get this the right size.
+    cluster_ids.resize(distance.size1());
 
-    //otherwise, find the clusters
-  } else while (true) {
-      //put objects in cluster w/nearest medoid
-      assignObjectsToClusters();
+    // size cluster_ids appropriately and randomly pick initial medoids
+    init_medoids(k);
 
+    // initial cluster setup
+    assign_objects_to_clusters(matrix_distance(distance));
+    if (k == 1) return;  // bail here if we only need one cluster.
+
+    while (true) {
       //vars to keep track of minimum
-      double minTotalCost = DISSIMILARITY_MAX;
+      double minTotalCost = DBL_MAX;
       medoid_id minMedoid = 0;
       object_id minObject = 0;
 
       //iterate over each medoid
       for (medoid_id i=0; i < k; i++) {
         //iterate over all non-medoid objects
-        for (object_id h = 0; h < data.size(); h++) {
-          if (isMedoid(h)) continue;
+        for (object_id h = 0; h < cluster_ids.size(); h++) {
+          if (is_medoid(h)) continue;
 
           //see if the total cost of swapping i & h was less than min
-          double curCost = totalCost(i,h);
+          double curCost = total_cost(i, h, distance);
           if (curCost < minTotalCost) {
             minTotalCost = curCost;
             minMedoid = i;
@@ -149,119 +110,17 @@ void KMedoids::findClusters() {
         }
       }
 
-      if (minTotalCost < 0) {
-        //replace a medoid if it gains us something
-        medoids[minMedoid] = minObject;
-        clusterIds[minObject] = minMedoid;
+      // bail if we can't gain anything more (we've converged)
+      if (minTotalCost >= 0) break;
 
-      } else {
-        //otherwise we're done swapping, so stop.
-        break;
-      }
-    }
-    
-  //associate each object w/the correct cluster one last time.
-  assignObjectsToClusters();
-}
+      //replace a medoid if it gains us something
+      medoids[minMedoid] = minObject;
+      cluster_ids[minObject] = minMedoid;
 
-
-
-const ClusterDataSet& KMedoids::getData() {
-  return data;
-}
-
-const vector<unsigned>& KMedoids::getMedoids() {
-  return medoids;
-}
-
-
-void KMedoids::getSuperSetMedoids(vector<unsigned>& dest) {
-  unsigned index = 0;
-  for (vector<unsigned>::iterator i = medoids.begin(); i != medoids.end(); i++) {
-    dest[index++] = data.getSuperSetIndex(*i);
-  }
-}
-
-
-KMedoids::clusterList *KMedoids::getClustering() {
-  //make a new list of empty clusters
-  cluster c;
-  clusterList *clusters = new clusterList(k, c);
-
-  //insert each object into the appropriate cluster.
-  for (unsigned object=0; object < data.size(); object++) {
-    (*clusters)[clusterIds[object]].insert(object);
-  }
-  return clusters;
-}
-
-
-void KMedoids::printClustering(ostream& out) {
-  auto_ptr<clusterList> clusters(getClustering());  // TODO: leak.  ack.
-  ::printClustering(*clusters);
-}
-
-
-void KMedoids::printClustering(clusterList& clusters, ostream& out) {
-  out << "id\tmembers" << endl;
-  for (unsigned i=0; i < clusters.size(); i++) {
-    out << i << "\t";
-    cluster& c = clusters[i];
-    for (cIterator object=c.begin(); object != c.end(); object++) {
-      out << *object << " ";
-    }
-    out << endl;
-  }
-}
-
-
-void KMedoids::printMedoids(ostream& out) {
-  for (medoid_id i=0; i < medoids.size(); i++) {
-    cout << i << " ";
-  }
-  cout << endl;
-  for (medoid_id i=0; i < medoids.size(); i++) {
-    cout << medoids[i] << " ";
-  }
-  cout << endl;
-}
-
-void KMedoids::printClusterIds(ostream& out) {
-  for (object_id i=0; i < clusterIds.size(); i++) {
-    cout << "    " << i << " -> " << clusterIds[i] << endl;
-  }
-}
-
-
-
-/// Mirkin distance bt/w two clusterings.
-double mirkin_distance(KMedoids::clusterList& c1, KMedoids::clusterList& c2) {
-  assert(c1.size() == c2.size());
-
-  size_t c1_sum2 = 0;
-  size_t n = 0;
-  for (size_t i=0; i < c1.size(); i++) {
-    c1_sum2 += c1[i].size() * c1[i].size();
-    n += c1[i].size();
-  }
-
-  size_t c2_sum2 = 0;
-  for (size_t i=0; i < c2.size(); i++) {
-    c2_sum2 += c2[i].size() * c2[i].size();    
-  }
-  
-
-  size_t c1c2_sum2 = 0;
-  for (size_t i=0; i < c1.size(); i++) {
-    for (size_t j=0; j < c2.size(); j++) {
-      size_t size;
-      set_intersection(c1[i].begin(), c1[i].end(), 
-                       c2[j].begin(), c2[j].end(),
-                       counter<unsigned>(size));
-      c1c2_sum2 += size * size;
+      //put objects in cluster w/nearest medoid
+      assign_objects_to_clusters(matrix_distance(distance));
     }
   }
 
-  return (c1_sum2 + c2_sum2 - (2 * c1c2_sum2)) / (double)(n*n);
-}
 
+} // namespace cluster  

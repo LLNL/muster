@@ -1,145 +1,204 @@
 #ifndef K_MEDOIDS_H
 #define K_MEDOIDS_H
 
-
 #include <vector>
 #include <set>
 #include <iostream>
-using namespace std;
+#include <stdexcept>
+#include <cfloat>
 
-#include "ClusterDataSet.h"
-#include "matrix.h"
+#include "random.h"
+#include "dissimilarity.h"
+#include "partition.h"
 
-/**
- * K-Mediod clustering method.  This selects q-grams to be medoids
- * at random and uses their distance function to cluster them.
- */
-class KMedoids {
-public:
-    typedef vector< set<unsigned> > clusterList;
-    typedef vector< set<unsigned> >::iterator clIterator;
-    typedef set<unsigned> cluster;
-    typedef set<unsigned>::iterator cIterator;
+namespace cluster {
 
-protected:
+  /// 
+  /// Implementation of classical clustering methods PAM and CLARA, from 
+  /// "Finding Groups in Data", by Kaufman and Rousseeuw.  
+  /// 
+  class kmedoids : public partition {
+  public:
+    RNGenerator random;             /// Random number generator for this algorithm
 
-    /** More descriptive types for indices referred to in code. */
-    typedef unsigned medoid_id;
-    typedef unsigned object_id;
+    kmedoids();
+    ~kmedoids();
+
+    /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
+    /// algorithm as described in Kaufman and Rousseeuw. 
+    /// Parameters:
+    ///   distance     dissimilarity matrix for all objects to cluster
+    ///   k            number of clusters to produce
+    void pam(dissimilarity_matrix distance, size_t k);
     
-    /** Data set we'll do clustering on. */
-    ClusterDataSet& data;
+    ///
+    /// CLARA clustering algorithm, as per Kaufman and Rousseuw and
+    /// R. Ng and J. Han, "Efficient and Effective Clustering Methods 
+    /// for Spatial Data Mining."
+    /// Parameters:
+    ///   objects        Objects to cluster
+    ///   dmetric        Distance metric to build dissimilarity matrices with
+    ///   k              Number of clusters to partition
+    ///   sample_size    defaults to 40+2*k, per Kaufman and Rousseeuw's recommendation
+    ///   iterations     Number of times to run PAM with sampled dataset
+    template <class T, class D>
+    void clara(std::vector<T> objects, D dmetric,
+               size_t k, size_t sample_size = 0, size_t iterations=5) {
 
-    /** Number of clusters we're searching for here. */
-    const unsigned k;
-
-    /** 
-     * Medoids for each cluster.  
-     * Maps medoid id (aka cluster id) to object id. 
-     */
-    vector<object_id> medoids;
-
-    /**
-     * Ids of clusters for each of the objects.  
-     * Maps object id to cluster id. 
-     */
-    vector<medoid_id> clusterIds;
-
-    /**
-     * Puts randomly medoids from the sample set into 
-     * medoids vector.
-     */
-    void assignRandomMedoids();
-
-    /**
-     * True iff object is one of our medoids.
-     */
-    bool isMedoid(unsigned object);
-
-    /**
-     * Finds the cost of swapping object Oh with medoid j.
-     * PRE: object[oi] is the medoid with index clusterIds[oi] in medoids.
-     */
-    inline double cost(unsigned oi, unsigned oh, unsigned oj);
-
-    /**
-     * Total cost of swapping object h with medoid i.
-     */
-    inline double totalCost(medoid_id i, object_id h);
-
-
-    /**
-     * Assign each object to the cluster with the closest medoid.
-     */
-    void assignObjectsToClusters();
-
-public:
-
-    /**
-     * Constructs a new instance of a KMedoids algorithm.
-     * @param dataSet data set to cluster on
-     * @param k number of medoids to search for
-     * @param distance matrix containing distances between objects
-     */
-    KMedoids(
-        ClusterDataSet& dataSet, 
-        const unsigned k
-    );
-
-    virtual ~KMedoids();
-
-    /** 
-     * Run the K-Medoids clustering algorithm with the provided number of clusters.
-     * @param k the number of clusters to find.
-     * 
-     * This method is not thread-safe.  Also, the vector passed in the constructor
-     * should not change while this is running.
-     */
-    virtual void findClusters();
-
-    /**
-     * Returns a read-only reference to the dataset in 
-     * this KMedoids instance.
-     */
-    const ClusterDataSet& getData();
-
-    /** 
-     * Returns a read-only view of the medoids we found. 
-     * PRE: {@link #findClusters()} has been called.
-     */
-    const vector<unsigned>& getMedoids();
+      if (!sample_size) sample_size = 40+2*k;
     
-    /**
-     * Returns clusters in the form of a newly allocated 
-     * vector of sets of object indices.
-     * The caller will need to delete the clusterList.
-     */
-    virtual clusterList *getClustering();
+      // Just run plain KMedoids once if sampling won't gain us anything
+      if (objects.size() <= sample_size) {
+        dissimilarity_matrix mat;
+        build_dissimilarity_matrix(objects, dmetric, mat);
+        pam(mat, k);
+        return;
+      }
 
-    /** 
-     * Writes out medoids' indices in this KMedoids' dataset's 
-     * superset to the provided vector.
-     */
-    void getSuperSetMedoids(vector<unsigned>& dest);
+      // get everything the right size before starting.
+      medoids.resize(k);
+      cluster_ids.resize(objects.size());
 
-    /**
-     * Prints clustering out to the provided object stream.
-     */
-    void printClustering(ostream& out = cout);
-    void printMedoids(ostream& out = cout);
-    void printClusterIds(ostream& out = cout);
+      // medoids and clusters for best partition so far.
+      partition best_partition;
 
-    static void printClustering(clusterList& list, ostream& out = cout);
-};
+      //run KMedoids on a sampled subset ITERATIONS times
+      double best_dissim = DBL_MAX;
+      for (size_t i = 0; i < iterations; i++) {
+        // Take a random sample of objects, store sample in a vector
+        vector<size_t> sample_to_full;
+        random_subset(objects.size(), sample_size, back_inserter(sample_to_full), random);
+      
+        // Build a distance matrix for PAM
+        dissimilarity_matrix distance;
+        build_dissimilarity_matrix(objects, sample_to_full, dmetric, distance);
+
+        // Actually run PAM on the subset
+        kmedoids subcall;
+        subcall.pam(distance, k);
+
+        // copy medoids from the subcall to local data, being sure to translate indices
+        for (size_t i=0; i < medoids.size(); i++) {
+          medoids[i] = sample_to_full[subcall.medoids[i]];
+        }
+
+        // sync up the cluster_ids matrix with the new medoids by assigning
+        // each object to its closest medoid.  Remember the quality of the clustering.
+        double avg_dissim = assign_objects_to_clusters(lazy_distance(objects, dmetric));
+
+        // keep the best clustering found so far around
+        if (avg_dissim < best_dissim) {
+          this->swap(best_partition);
+          best_dissim = avg_dissim;
+        } 
+      }
+      
+      this->swap(best_partition);
+    }    
+
+    private:
+    /// Assigns medoids randomly from the input objects.
+    void init_medoids(size_t k);
+
+    /// Finds the cost of swapping object oh with medoid j.
+    /// PRE: object[oi] is the medoid with index cluster_id[oi] in medoids.
+    double cost(medoid_id mi, object_id oh, object_id oj, const dissimilarity_matrix& distance) const;
+
+    /// Total cost of swapping object h with medoid i.
+    /// Sums costs of this exchagne for all objects j.
+    double total_cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const;
+
+    /// Assign each object to the cluster with the closest medoid.
+    /// Returns:
+    ///   Average dissimilarity of objects w/their medoids.
+    /// 
+    /// D should be a callable object that computes distances.  
+    ///   In PAM, it should use the distance matrix.  
+    ///   In CLARA, it should compute lazily.
+    template <class D>
+    double assign_objects_to_clusters(D distance) {
+      // first point the medoid objects at the right clusters
+      /*
+      for (medoid_id mi = 0; mi < medoids.size(); mi++) {
+        cluster_ids[medoids[mi]] = mi;
+      }
+      */
+
+      // now go through and assign each object to nearest medoid, keeping track of total 
+      // dissimilarity, too.
+      double sum = 0;
+      for (object_id i=0; i < cluster_ids.size(); i++) {
+        if (!is_medoid(i)) {
+          std::pair<medoid_id, double> nearest = nearest_medoid(i, distance);
+          cluster_ids[i] = nearest.first;
+          sum += nearest.second;
+        }
+      }
+
+      return sum / cluster_ids.size();
+    }
+
+    /// Finds the nearest medoid to the object oi.
+    /// Returns:
+    ///   - Index of the nearest medoid to oi
+    ///   - distance from oi to this medoid.
+    ///   
+    /// D should be a callable object that computes distances.  
+    ///   In PAM, it should use the distance matrix.  
+    ///   In CLARA, it should compute lazily.
+    template <class D>
+    std::pair<medoid_id, double> nearest_medoid(
+      object_id oi, D distance, medoid_id exclude=std::numeric_limits<size_t>::max()
+    ) const {
+      medoid_id nearest = 0;
+      double min_distance = DBL_MAX;
+      
+      for (size_t i=0; i < medoids.size(); i++) {
+        if (i == exclude) continue;
+        double d = distance(oi, medoids[i]);
+        if (d < min_distance) {
+          min_distance = d;
+          nearest = i;
+        }
+      }
+      return std::make_pair(nearest, min_distance);
+    }
 
 
-inline void printClustering(KMedoids::clusterList& list, ostream& out = cout) { 
-  KMedoids::printClustering(list, out);
-}
+    /// Functor for computing distance lazily from an object array and
+    /// a distance metric.  Use this for CLARA, where we don't want to
+    /// precompute the entire distance matrix.
+    template <class T, class D>
+    struct lazy_distance_functor {
+      const std::vector<T>& objects;
+      D dissimilarity;
 
-/// Mirkin distance bt/w two clusterings.
-double mirkin_distance(KMedoids::clusterList& c1, KMedoids::clusterList& c2);
+      lazy_distance_functor(const std::vector<T>& objs, D d)
+        : objects(objs), dissimilarity(d) { }
 
+      double operator()(size_t i, size_t j) {
+        return dissimilarity(objects[i], objects[j]);
+      }
+    };
+
+    /// Type-inferred syntactic sugar for constructing lazy_distance_functors.
+    template <class T, class D>
+    lazy_distance_functor<T,D> lazy_distance(const std::vector<T>& objs, D dist) {
+      return lazy_distance_functor<T,D>(objs, dist);
+    }
+
+    /// Simple adapter for passing a matrix by reference to the template
+    /// functions above.  Avoids wholesale copy of distance matrix.
+    struct matrix_distance {
+      const dissimilarity_matrix& mat;
+      matrix_distance(const dissimilarity_matrix& m) : mat(m) { }
+      double operator()(size_t i, size_t j) { return mat(i,j); }
+    };
+  };
+
+
+} // namespace cluster
 
 #endif //K_MEDOIDS_H
 
+  

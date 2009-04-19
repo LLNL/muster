@@ -8,9 +8,9 @@ using namespace std;
 
 #include "KMedoids.h"
 #include "counter.h"
+using namespace cluster;
 
-
-void makeClusterings(KMedoids::clusterList& c1, KMedoids::clusterList& c2) {
+void makeClusterings(cluster_list& c1, cluster_list& c2) {
   const char *clusters1[] = {
     "1 3 5 7 9",
     "2 4",
@@ -36,40 +36,10 @@ void makeClusterings(KMedoids::clusterList& c1, KMedoids::clusterList& c2) {
 
 
 int main(int argc, char **argv) {
-  KMedoids::clusterList c1, c2;
+  cluster_list c1, c2;
   makeClusterings(c1, c2);
 
-  printClustering(c1);
-  cout << endl;
-
-  printClustering(c2);
-  cout << endl;
-  
+  cout << c1 << endl;
+  cout << c2 << endl;
   cout << mirkin_distance(c1, c2) << endl;
-
-  exit(1);
-
-  set<size_t> s1;
-  set<size_t> s2;
-
-  set<size_t> *target = &s1;
-  for (int i=1; i < argc; i++) {
-    if (!strcmp(argv[i], ",")) {
-      target = &s2;
-    } else {
-      target->insert(strtol(argv[i], NULL, 0));
-    }
-  }
-  
-  copy(s1.begin(), s1.end(), ostream_iterator<size_t>(cout));
-  cout << endl;
-  copy(s2.begin(), s2.end(), ostream_iterator<size_t>(cout));
-  cout << endl;
-  
-  size_t count;
-  set<size_t> real;
-  set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(), counter<size_t>(count));
-  set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(), inserter(real, real.begin()));
-  cout << count << endl;
-  cout << real.size() << endl;
 }
