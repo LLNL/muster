@@ -34,7 +34,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = pointClusterTest$(EXEEXT) mirkin-test$(EXEEXT)
+noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT)
 subdir = cluster
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
@@ -78,10 +78,10 @@ am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
 mirkin_test_DEPENDENCIES = libcluster.la
-am_pointClusterTest_OBJECTS = point_cluster_test.$(OBJEXT)
-pointClusterTest_OBJECTS = $(am_pointClusterTest_OBJECTS)
-pointClusterTest_LDADD = $(LDADD)
-pointClusterTest_DEPENDENCIES = libcluster.la
+am_point_cluster_test_OBJECTS = point_cluster_test.$(OBJEXT)
+point_cluster_test_OBJECTS = $(am_point_cluster_test_OBJECTS)
+point_cluster_test_LDADD = $(LDADD)
+point_cluster_test_DEPENDENCIES = libcluster.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -95,9 +95,9 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
-	$(pointClusterTest_SOURCES)
+	$(point_cluster_test_SOURCES)
 DIST_SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
-	$(pointClusterTest_SOURCES)
+	$(point_cluster_test_SOURCES)
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -276,7 +276,7 @@ libcluster_la_SOURCES = \
 	ltqnorm.C
 
 mirkin_test_SOURCES = mirkin_test.C
-pointClusterTest_SOURCES = point_cluster_test.C
+point_cluster_test_SOURCES = point_cluster_test.C
 LDADD = libcluster.la
 INCLUDES = $(BOOST_CPPFLAGS)
 all: all-am
@@ -351,9 +351,9 @@ clean-noinstPROGRAMS:
 mirkin-test$(EXEEXT): $(mirkin_test_OBJECTS) $(mirkin_test_DEPENDENCIES) 
 	@rm -f mirkin-test$(EXEEXT)
 	$(CXXLINK) $(mirkin_test_OBJECTS) $(mirkin_test_LDADD) $(LIBS)
-pointClusterTest$(EXEEXT): $(pointClusterTest_OBJECTS) $(pointClusterTest_DEPENDENCIES) 
-	@rm -f pointClusterTest$(EXEEXT)
-	$(CXXLINK) $(pointClusterTest_OBJECTS) $(pointClusterTest_LDADD) $(LIBS)
+point-cluster-test$(EXEEXT): $(point_cluster_test_OBJECTS) $(point_cluster_test_DEPENDENCIES) 
+	@rm -f point-cluster-test$(EXEEXT)
+	$(CXXLINK) $(point_cluster_test_OBJECTS) $(point_cluster_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

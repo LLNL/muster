@@ -18,10 +18,10 @@ libcluster_la_SOURCES = \
 	ltqnorm.C
 
 #test program for matrix
-noinst_PROGRAMS = pointClusterTest mirkin-test
+noinst_PROGRAMS = point-cluster-test mirkin-test
 
 mirkin_test_SOURCES = mirkin_test.C
-pointClusterTest_SOURCES = point_cluster_test.C
+point_cluster_test_SOURCES = point_cluster_test.C
 
 LDADD = libcluster.la
 
