@@ -120,41 +120,43 @@ struct point_distance {
 /// Test using points instead of QGrams to make sure clustering 
 /// algorithms work.
 int main(int argc, char **argv) { 
-    //vector of test points
-    vector<point> points;
+  //vector of test points
+  vector<point> points;
+  
+  size_t clusters = 5;
+  if (argc > 1) {
+    clusters = strtol(argv[1], NULL, 0);    
+  }
 
-    size_t clusters = 5;
-    if (argc > 1) {
-      clusters = strtol(argv[1], NULL, 0);    
-    }
-
-    //put 5-pt crosses inthe vector, offset by increasing distances
-    point middle(1,1);
-    point up(0,1), down(0,-1), left(-1,0), right(1,0);
-    for (size_t i=0; i < clusters; i++) {
-      points.push_back(middle);
-      points.push_back(middle + up);
-      points.push_back(middle + down);
-      points.push_back(middle + left);
-      points.push_back(middle + right);
+  //put 5-pt crosses inthe vector, offset by increasing distances
+  point middle(1,1);
+  point up(0,1), down(0,-1), left(-1,0), right(1,0);
+  for (size_t i=0; i < clusters; i++) {
+    points.push_back(middle);
+    points.push_back(middle + up);
+    points.push_back(middle + down);
+    points.push_back(middle + left);
+    points.push_back(middle + right);
       
-      middle += (point(2*i+4, 0));
-    }
+    middle += (point(i+4, 0));
+  }
+
+  cout << "Testing with " << points.size() << " points for 1 to " << clusters << " clusters." << endl;
 
 
-    dissimilarity_matrix distance;
-    build_dissimilarity_matrix(points, point_distance(), distance);
+  dissimilarity_matrix distance;
+  build_dissimilarity_matrix(points, point_distance(), distance);
 
-    kmedoids km;
-    kmedoids clara;
+  kmedoids km;
+  kmedoids clara;
+  cout << "foo"<< endl;
+  for (int k = 1; k <= clusters; k++) {
+    km.pam(distance, k);
+    clara.clara(points, point_distance(), k);
 
-    for (int k = 1; k <= clusters; k++) {
-      km.pam(distance, k);
-      clara.clara(points, point_distance(), k);
-
-      cout << "k: " << k << ", Mirkin distance: " << mirkin_distance(km, clara) << endl;
-      draw("PAM", points, km);
-      draw("CLARA", points, clara);
-      cout << endl;
-    }
+    cout << "k: " << k << ", Mirkin distance: " << mirkin_distance(km, clara) << endl;
+    draw("PAM", points, km);
+    draw("CLARA", points, clara);
+    cout << endl;
+  }
 }

@@ -21,7 +21,9 @@ namespace cluster {
   public:
     RNGenerator random;             /// Random number generator for this algorithm
 
-    kmedoids();
+    /// Constructor.  Can optionally specify number of objects to be clustered.
+    /// and this will start out with all of them in one cluster.
+    kmedoids(size_t num_objects = 0);
     ~kmedoids();
 
     /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
@@ -118,11 +120,9 @@ namespace cluster {
     template <class D>
     double assign_objects_to_clusters(D distance) {
       // first point the medoid objects at the right clusters
-      /*
       for (medoid_id mi = 0; mi < medoids.size(); mi++) {
         cluster_ids[medoids[mi]] = mi;
       }
-      */
 
       // now go through and assign each object to nearest medoid, keeping track of total 
       // dissimilarity, too.

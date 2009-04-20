@@ -27,7 +27,9 @@ namespace cluster {
     /// medoids[clusterid[i]] == representative of that cluster.
     std::vector<medoid_id> cluster_ids;
     
-    partition();
+    /// Constructor.  Can optionall supply the number of objects to be partitioned
+    /// and this will start out with one cluster containing all of them.
+    partition(size_t num_objects = 0);
     virtual ~partition();
 
     /// True if and only if object i is a medoid.

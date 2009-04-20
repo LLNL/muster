@@ -10,7 +10,7 @@ using namespace std;
 
 namespace cluster {
 
-  kmedoids::kmedoids() : partition() {
+  kmedoids::kmedoids(size_t num_objects) : partition(num_objects) {
     //nothing necessary.
   }
 
