@@ -69,7 +69,7 @@ namespace cluster {
       double best_dissim = DBL_MAX;
       for (size_t i = 0; i < iterations; i++) {
         // Take a random sample of objects, store sample in a vector
-        vector<size_t> sample_to_full;
+        std::vector<size_t> sample_to_full;
         random_subset(objects.size(), sample_size, back_inserter(sample_to_full), random);
 
         // Build a distance matrix for PAM
