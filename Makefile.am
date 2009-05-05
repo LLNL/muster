@@ -5,6 +5,7 @@ noinst_HEADERS = \
 	ltqnorm.h \
 	random.h \
 	counter.h \
+	color.h \
 	dissimilarity.h \
 	partition.h\
 	MersenneTwister.h \
