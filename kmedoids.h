@@ -20,6 +20,7 @@ namespace cluster {
   class kmedoids : public partition {
   public:
     RNGenerator random;             /// Random number generator for this algorithm
+    double average_dissimilarity;   /// Avg dissimilarity for last clustering run.
 
     /// Constructor.  Can optionally specify number of objects to be clustered.
     /// and this will start out with all of them in one cluster.
@@ -70,7 +71,7 @@ namespace cluster {
         // Take a random sample of objects, store sample in a vector
         vector<size_t> sample_to_full;
         random_subset(objects.size(), sample_size, back_inserter(sample_to_full), random);
-      
+
         // Build a distance matrix for PAM
         dissimilarity_matrix distance;
         build_dissimilarity_matrix(objects, sample_to_full, dmetric, distance);
@@ -86,16 +87,17 @@ namespace cluster {
 
         // sync up the cluster_ids matrix with the new medoids by assigning
         // each object to its closest medoid.  Remember the quality of the clustering.
-        double avg_dissim = assign_objects_to_clusters(lazy_distance(objects, dmetric));
+        average_dissimilarity = assign_objects_to_clusters(lazy_distance(objects, dmetric));
 
         // keep the best clustering found so far around
-        if (avg_dissim < best_dissim) {
+        if (average_dissimilarity < best_dissim) {
           this->swap(best_partition);
-          best_dissim = avg_dissim;
+          best_dissim = average_dissimilarity;
         } 
       }
       
       this->swap(best_partition);
+      average_dissimilarity = best_dissim;
     }    
 
     private:

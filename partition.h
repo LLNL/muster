@@ -58,6 +58,10 @@ namespace cluster {
   /// Convenience overload for comparing partition objects directly
   double mirkin_distance(partition& c1, partition& c2);
 
+  /// Expand a cluster_list by l levels.  That is, replace each index i
+  /// in the cluster_list with indices in [2^l * i ... 2^l * (i+1) - 1]
+  void expand(cluster_list& list, size_t level = 1);
+
 } // namespace cluster
 
 #endif // PARTITION_H

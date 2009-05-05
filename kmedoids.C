@@ -85,9 +85,10 @@ namespace cluster {
     init_medoids(k);
 
     // initial cluster setup
-    assign_objects_to_clusters(matrix_distance(distance));
+    average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
     if (k == 1) return;  // bail here if we only need one cluster.
 
+    size_t counter = 0;
     while (true) {
       //vars to keep track of minimum
       double minTotalCost = DBL_MAX;
@@ -111,14 +112,14 @@ namespace cluster {
       }
 
       // bail if we can't gain anything more (we've converged)
-      if (minTotalCost >= 0) break;
+      if (minTotalCost >= 0 || counter++ > 10000) break;  // TODO: hack!  investigate convergence.
 
       //replace a medoid if it gains us something
       medoids[minMedoid] = minObject;
       cluster_ids[minObject] = minMedoid;
 
       //put objects in cluster w/nearest medoid
-      assign_objects_to_clusters(matrix_distance(distance));
+      average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
     }
   }
 

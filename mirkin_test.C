@@ -12,20 +12,20 @@ using namespace cluster;
 
 void makeClusterings(cluster_list& c1, cluster_list& c2) {
   const char *clusters1[] = {
-    "1 3 5 7 9",
-    "2 4",
-    "6 8"
+    "0 2 4 6",
+    "1 3",
+    "5 7"
   };
 
   const char *clusters2[] = {
-    "1 3 5 7 9",
-    "2 4 11",
-    "6 8"
+    "0 2 4 6",
+    "1 3 7",
+    "5"
   };
   
   c1.resize(sizeof(clusters1)/sizeof(char*));
   c2.resize(sizeof(clusters2)/sizeof(char*));
-  
+
   for (size_t i=0; i < c1.size(); i++) {
     istringstream s1(clusters1[i]);
     istringstream s2(clusters2[i]);
@@ -38,6 +38,20 @@ void makeClusterings(cluster_list& c1, cluster_list& c2) {
 int main(int argc, char **argv) {
   cluster_list c1, c2;
   makeClusterings(c1, c2);
+
+  cout << c1 << endl;
+  cout << c2 << endl;
+  cout << mirkin_distance(c1, c2) << endl;
+
+  expand(c1);
+  expand(c2);
+
+  cout << c1 << endl;
+  cout << c2 << endl;
+  cout << mirkin_distance(c1, c2) << endl;
+
+  expand(c1);
+  expand(c2);
 
   cout << c1 << endl;
   cout << c2 << endl;
