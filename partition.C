@@ -1,6 +1,7 @@
 #include "partition.h"
 #include <iostream>
 #include <cassert>
+#include <algorithm>
 using namespace cluster;
 using namespace std;
 
