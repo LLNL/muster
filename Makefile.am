@@ -7,7 +7,7 @@ noinst_HEADERS = \
 	counter.h \
 	color.h \
 	dissimilarity.h \
-	partition.h\
+	partition.h \
 	MersenneTwister.h \
 	RNGenerator.h \
 	Stat.h
