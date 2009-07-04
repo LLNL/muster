@@ -86,7 +86,7 @@ void draw(string label,  vector<point>& points, const cluster::partition& parts)
   
   const int min_hbar = 80;
   cout << label << " ";
-  for (int x = 0; x <= max(max_x, min_hbar)-label.size()-1; x++) cout << "-";
+  for (size_t x = 0; x <= max(max_x, min_hbar)-label.size()-1; x++) cout << "-";
   cout << endl;
 
   for (int y = max_y; y >= 0; y--) {
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
   kmedoids km;
   kmedoids clara;
   cout << "foo"<< endl;
-  for (int k = 1; k <= clusters; k++) {
+  for (size_t k = 1; k <= clusters; k++) {
     km.pam(distance, k);
     clara.clara(points, point_distance(), k);
 

@@ -14,7 +14,7 @@
 #ifndef RN_GENERATOR_H
 #define RN_GENERATOR_H
 
-#include "cluster/MersenneTwister.h"
+#include "MersenneTwister.h"
 
 /**
  * Wrapper for random number generator that seeds the generator

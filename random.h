@@ -11,7 +11,7 @@ void random_subset(size_t numElements, size_t sample_size, OutputIterator out,
   // and put them in the subset's mapping.
   size_t first = 0;
   size_t remaining = numElements;
-  size_t m = sample_size;
+  long long m = sample_size;
   
   while (m > 0) {
     if (random(remaining) < m) {
