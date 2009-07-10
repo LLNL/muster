@@ -39,7 +39,8 @@ subdir = cluster
 DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
-am__aclocal_m4_deps = $(top_srcdir)/m4/ac_detect_bluegene.m4 \
+am__aclocal_m4_deps = $(top_srcdir)/m4/ac_ampl.m4 \
+	$(top_srcdir)/m4/ac_detect_bluegene.m4 \
 	$(top_srcdir)/m4/ac_inc_subst.m4 \
 	$(top_srcdir)/m4/ac_lib_dwarf.m4 \
 	$(top_srcdir)/m4/ac_lib_elf.m4 $(top_srcdir)/m4/ac_lib_papi.m4 \
@@ -103,6 +104,8 @@ ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
+AMPL_CPPFLAGS = @AMPL_CPPFLAGS@
+AMPL_LDFLAGS = @AMPL_LDFLAGS@
 AMTAR = @AMTAR@
 AR = @AR@
 AUTOCONF = @AUTOCONF@
@@ -293,9 +296,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  cluster/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  cluster/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  cluster/Makefile
+	  $(AUTOMAKE) --gnu  cluster/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
