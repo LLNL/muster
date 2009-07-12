@@ -52,7 +52,6 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_detect_bluegene.m4 \
 	$(top_srcdir)/m4/ac_safe_check_lib.m4 \
 	$(top_srcdir)/m4/ac_sprng.m4 $(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
-	$(top_srcdir)/m4/swig_enable_cxx.m4 \
 	$(top_srcdir)/m4/swig_python.m4 $(top_srcdir)/m4/vtk.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
