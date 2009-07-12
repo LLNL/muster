@@ -4,17 +4,15 @@
 #include <sys/time.h>
 
 
-RNGenerator::RNGenerator(int salt) :
+RNGenerator::RNGenerator(int salt) {
     //seed random number generator with perturbed system clock 
-    generator(getSeed(salt))
-{
-    ; //nothing to do.
+    seed(salt);
 }
 
 
-int RNGenerator::getSeed(int salt) {
+void RNGenerator::seed(int salt) {
     struct timeval time;
     gettimeofday(&time, 0);
-    return (time.tv_sec * (salt+1) - salt);
+    generator.seed(time.tv_sec * (salt+1) - salt);
 }
 

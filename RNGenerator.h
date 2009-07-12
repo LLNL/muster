@@ -89,7 +89,7 @@ public:
      * provided.
      * @param salt unique int value used to perturb the system time.
      */
-    static int getSeed(int salt);
+    void seed(int salt);
 };
 
 #endif //RN_GENERATOR_H
