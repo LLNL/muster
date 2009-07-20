@@ -2,7 +2,6 @@ lib_LTLIBRARIES = libcluster.la
 
 noinst_HEADERS = \
 	kmedoids.h \
-	ltqnorm.h \
 	random.h \
 	counter.h \
 	color.h \
@@ -15,8 +14,7 @@ noinst_HEADERS = \
 libcluster_la_SOURCES = \
 	partition.C \
 	kmedoids.C \
-	RNGenerator.C \
-	ltqnorm.C
+	RNGenerator.C 
 
 #test program for matrix
 noinst_PROGRAMS = point-cluster-test mirkin-test

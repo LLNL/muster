@@ -52,6 +52,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ac_detect_bluegene.m4 \
 	$(top_srcdir)/m4/ac_safe_check_lib.m4 \
 	$(top_srcdir)/m4/ac_sprng.m4 $(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ax_prefix_config_h.m4 \
+	$(top_srcdir)/m4/swig_enable_cxx.m4 \
 	$(top_srcdir)/m4/swig_python.m4 $(top_srcdir)/m4/vtk.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -69,8 +70,7 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 libLTLIBRARIES_INSTALL = $(INSTALL)
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcluster_la_LIBADD =
-am_libcluster_la_OBJECTS = partition.lo kmedoids.lo RNGenerator.lo \
-	ltqnorm.lo
+am_libcluster_la_OBJECTS = partition.lo kmedoids.lo RNGenerator.lo
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
 PROGRAMS = $(noinst_PROGRAMS)
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
@@ -261,7 +261,6 @@ top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
 noinst_HEADERS = \
 	kmedoids.h \
-	ltqnorm.h \
 	random.h \
 	counter.h \
 	color.h \
@@ -274,8 +273,7 @@ noinst_HEADERS = \
 libcluster_la_SOURCES = \
 	partition.C \
 	kmedoids.C \
-	RNGenerator.C \
-	ltqnorm.C
+	RNGenerator.C 
 
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
@@ -365,7 +363,6 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RNGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmedoids.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ltqnorm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partition.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_cluster_test.Po@am__quote@
