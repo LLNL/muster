@@ -33,7 +33,7 @@ public:
   double distance(const point& other) const {
     int dx = other.x - x;
     int dy = other.y - y;
-    return sqrt((dx*dx) + (dy*dy));
+    return ::sqrt((dx*dx) + (dy*dy));
   }
   
   point& operator+=(const point& other) {
