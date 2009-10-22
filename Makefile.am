@@ -9,7 +9,8 @@ noinst_HEADERS = \
 	partition.h \
 	MersenneTwister.h \
 	RNGenerator.h \
-	Stat.h
+	Stat.h \
+	par_kmedoids.h
 
 libcluster_la_SOURCES = \
 	partition.C \

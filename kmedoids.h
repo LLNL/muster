@@ -19,9 +19,6 @@ namespace cluster {
   /// 
   class kmedoids : public partition {
   public:
-    RNGenerator random;             /// Random number generator for this algorithm
-    double average_dissimilarity;   /// Avg dissimilarity for last clustering run.
-
     /// Constructor.  Can optionally specify number of objects to be clustered.
     /// and this will start out with all of them in one cluster.
     kmedoids(size_t num_objects = 0);
@@ -38,12 +35,19 @@ namespace cluster {
     /// CLARA clustering algorithm, as per Kaufman and Rousseuw and
     /// R. Ng and J. Han, "Efficient and Effective Clustering Methods 
     /// for Spatial Data Mining."
+    /// 
+    /// Template parameters (inferred from args):
+    ///   T              Type of objects to be clustered.
+    ///   D              Dissimilarity metric type.  D should be callable 
+    ///                  on (T, T) and should return a double.
+    /// 
     /// Parameters:
     ///   objects        Objects to cluster
     ///   dmetric        Distance metric to build dissimilarity matrices with
     ///   k              Number of clusters to partition
     ///   sample_size    defaults to 40+2*k, per Kaufman and Rousseeuw's recommendation
     ///   iterations     Number of times to run PAM with sampled dataset
+    ///
     template <class T, class D>
     void clara(std::vector<T> objects, D dmetric,
                size_t k, size_t sample_size = 0, size_t iterations=5) {
@@ -100,7 +104,10 @@ namespace cluster {
       average_dissimilarity = best_dissim;
     }    
 
-    private:
+    protected:
+    RNGenerator random;             /// Random number generator for this algorithm
+    double average_dissimilarity;   /// Avg dissimilarity for last clustering run.
+
     /// Assigns medoids randomly from the input objects.
     void init_medoids(size_t k);
 
@@ -202,5 +209,3 @@ namespace cluster {
 } // namespace cluster
 
 #endif //K_MEDOIDS_H
-
-  
