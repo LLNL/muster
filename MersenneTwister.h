@@ -102,7 +102,9 @@ public:
 	uint32 randInt();                       // integer in [0,2^32-1]
 	uint32 randInt( const uint32& n );      // integer in [0,n] for n < 2^32
 	double operator()() { return rand(); }  // same as rand()
-	
+	double operator()(int N)                // model STL Random Number Generator 
+    { return randInt(N-1); }
+
 	// Access to 53-bit random numbers (capacity of IEEE double precision)
 	double rand53();  // real number in [0,1)
 	

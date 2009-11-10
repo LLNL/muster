@@ -36,9 +36,21 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT)
+@HAVE_MPI_TRUE@am__append_1 = \
+@HAVE_MPI_TRUE@	par_kmedoids.h \
+@HAVE_MPI_TRUE@	multi_gather.h
+
+@HAVE_MPI_TRUE@am__append_2 = \
+@HAVE_MPI_TRUE@	par_kmedoids.C
+
+noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
+	$(am__EXEEXT_1)
+@HAVE_MPI_TRUE@am__append_3 = \
+@HAVE_MPI_TRUE@	par-cluster-test \
+@HAVE_MPI_TRUE@	multi-gather-test
+
 subdir = cluster
-DIST_COMMON = $(noinst_HEADERS) $(srcdir)/Makefile.am \
+DIST_COMMON = $(am__noinst_HEADERS_DIST) $(srcdir)/Makefile.am \
 	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ax_boost_base.m4 \
@@ -91,13 +103,27 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcluster_la_LIBADD =
-am_libcluster_la_OBJECTS = partition.lo kmedoids.lo RNGenerator.lo
+am__libcluster_la_SOURCES_DIST = partition.C kmedoids.C point.C \
+	par_kmedoids.C
+@HAVE_MPI_TRUE@am__objects_1 = par_kmedoids.lo
+am_libcluster_la_OBJECTS = partition.lo kmedoids.lo point.lo \
+	$(am__objects_1)
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
+@HAVE_MPI_TRUE@am__EXEEXT_1 = par-cluster-test$(EXEEXT) \
+@HAVE_MPI_TRUE@	multi-gather-test$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
 mirkin_test_DEPENDENCIES = libcluster.la
+am_multi_gather_test_OBJECTS = multi_gather_test.$(OBJEXT)
+multi_gather_test_OBJECTS = $(am_multi_gather_test_OBJECTS)
+multi_gather_test_LDADD = $(LDADD)
+multi_gather_test_DEPENDENCIES = libcluster.la
+am_par_cluster_test_OBJECTS = par_cluster_test.$(OBJEXT)
+par_cluster_test_OBJECTS = $(am_par_cluster_test_OBJECTS)
+par_cluster_test_LDADD = $(LDADD)
+par_cluster_test_DEPENDENCIES = libcluster.la
 am_point_cluster_test_OBJECTS = point_cluster_test.$(OBJEXT)
 point_cluster_test_OBJECTS = $(am_point_cluster_test_OBJECTS)
 point_cluster_test_LDADD = $(LDADD)
@@ -116,9 +142,14 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
+	$(multi_gather_test_SOURCES) $(par_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES)
-DIST_SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
-	$(point_cluster_test_SOURCES)
+DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
+	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
+	$(par_cluster_test_SOURCES) $(point_cluster_test_SOURCES)
+am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
+	dissimilarity.h partition.h MersenneTwister.h Stat.h point.h \
+	par_kmedoids.h multi_gather.h
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -298,26 +329,18 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
-noinst_HEADERS = \
-	kmedoids.h \
-	random.h \
-	counter.h \
-	color.h \
-	dissimilarity.h \
-	partition.h \
-	MersenneTwister.h \
-	RNGenerator.h \
-	Stat.h
-
-libcluster_la_SOURCES = \
-	partition.C \
-	kmedoids.C \
-	RNGenerator.C 
-
+noinst_HEADERS = kmedoids.h random.h counter.h color.h dissimilarity.h \
+	partition.h MersenneTwister.h Stat.h point.h $(am__append_1)
+libcluster_la_SOURCES = partition.C kmedoids.C point.C $(am__append_2)
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
+par_cluster_test_SOURCES = par_cluster_test.C
+multi_gather_test_SOURCES = multi_gather_test.C
 LDADD = libcluster.la
-INCLUDES = $(BOOST_CPPFLAGS)
+INCLUDES = \
+	$(BOOST_CPPFLAGS) \
+  -I$(top_srcdir)/libwavelet
+
 all: all-am
 
 .SUFFIXES:
@@ -397,6 +420,12 @@ clean-noinstPROGRAMS:
 mirkin-test$(EXEEXT): $(mirkin_test_OBJECTS) $(mirkin_test_DEPENDENCIES) 
 	@rm -f mirkin-test$(EXEEXT)
 	$(CXXLINK) $(mirkin_test_OBJECTS) $(mirkin_test_LDADD) $(LIBS)
+multi-gather-test$(EXEEXT): $(multi_gather_test_OBJECTS) $(multi_gather_test_DEPENDENCIES) 
+	@rm -f multi-gather-test$(EXEEXT)
+	$(CXXLINK) $(multi_gather_test_OBJECTS) $(multi_gather_test_LDADD) $(LIBS)
+par-cluster-test$(EXEEXT): $(par_cluster_test_OBJECTS) $(par_cluster_test_DEPENDENCIES) 
+	@rm -f par-cluster-test$(EXEEXT)
+	$(CXXLINK) $(par_cluster_test_OBJECTS) $(par_cluster_test_LDADD) $(LIBS)
 point-cluster-test$(EXEEXT): $(point_cluster_test_OBJECTS) $(point_cluster_test_DEPENDENCIES) 
 	@rm -f point-cluster-test$(EXEEXT)
 	$(CXXLINK) $(point_cluster_test_OBJECTS) $(point_cluster_test_LDADD) $(LIBS)
@@ -407,10 +436,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RNGenerator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi_gather_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partition.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_cluster_test.Po@am__quote@
 
 .C.o:

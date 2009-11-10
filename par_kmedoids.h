@@ -1,12 +1,25 @@
 #ifndef PAR_KMEDOIDS_H
 #define PAR_KMEDOIDS_H
 
-#include "kmedoids.h"
 #include <mpi.h>
+#include <vector>
+#include <set>
+
+#include "kmedoids.h"
+#include "multi_gather.h"
 
 namespace cluster {
 
   class par_kmedoids : public kmedoids {
+  public:
+    ///
+    /// Constructs a parallel kmedoids object and seeds its random number generator.
+    /// This is a collective operation, and needs to be called by all processes.
+    ///
+    /// par_kmedoids assumes that there is one object to be clustered per process.
+    ///
+    par_kmedoids() : kmedoids() { }
+
     
     ///
     /// Parallel version of the CLARA clustering algorithm.  Assumes that objects
@@ -34,25 +47,42 @@ namespace cluster {
     /// of sample_size objects distributed over all processes in the system.
     ///
     template <class T, class D>
-    void par_clara(T object, D dmetric, size_t max_k, MPI_Comm comm,
-                   size_t sample_size = 0, size_t iterations=5) {
-
-      if (!sample_size) sample_size = 40+2*k;
+    void par_clara(const T& object, D dmetric, size_t max_k, MPI_Comm comm,
+                   size_t init_size = 40, size_t iterations=5) {
       
       int size, rank;
       MPI_Comm_size(comm, &size);
       MPI_Comm_rank(comm, &rank);
 
-      // Generate all samples using the same sequence of random numbers across all processes.
-      vector<int> samples;
-      random_subset(size, sample_size * iterations, back_inserter(sample), random);
+      seed_random(comm); // seed RN generator uniformly across ranks.
 
       // Aggregate samples to worker processes to do PAM clustering.
-      // Attempt to distribute workers evenly through ranks by using mod sets.
-      // Iterate multiple times through this if there are not enough workers to 
-      // do everything in parallel.
-      std::vector<T> my_objects;
+      std::vector<T>  my_objects;
+      multi_gather<T> gather(comm);
+
+      int root = 0;
+      for (size_t k = 1; k < max_k; k++) {
+        for (size_t trial = 0; trial < 5; trial++) {
+          // size of the sample to cluster.
+          size_t sample_size = init_size + 2 * k;
+          
+          // Generate a set of indices for members of this k-medoids trial
+          std::set<int> samples;
+          random_subset(size, sample_size, inserter(samples, samples.begin()), random);
+
+          // if this rank is either the root or if it's a sampled process, start a gather.
+          if (samples.count(rank) || rank == root) {
+            gather.start(object, samples.begin(), samples.end(), my_objects, root);
+            root++;
+          }
+        }
+      }
       
+      
+      
+
+
+      /*
       
       
       // Just run plain KMedoids once if sampling won't gain us anything
@@ -103,46 +133,20 @@ namespace cluster {
       
       this->swap(best_partition);
       average_dissimilarity = best_dissim;
+      */
     }    
 
-
-    ///
-    ///   Gathers T to rank <root> from all ranks in the source_ranks vector.
-    ///   Results will be stored in the dest vector on the root, but the dest
-    ///   vector is untouched on other processes.
-    ///   
-    ///   Communication is done asynchronously, and requests made are appended to 
-    ///   the reqs vector.
-    ///   
-    ///   asynchronously.  Requests (for later completion with MPI_Waitall() or equivalent)
-    ///   are pl
-    ///   
-    ///   T must support the following operations:
-    ///     - int packed_size(MPI_Comm comm) const
-    ///     - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-    ///     - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
-    ///
-    template <class Iterator, class T>
-    void gather(const T& my_object, Iterator start_rank, Iterator end_rank, std::vector<T> dest, 
-                   MPI_Comm comm, std::vector<MPI_Request> reqs, int root=0) 
-    {
-      int size, rank;
-      MPI_Comm_size(comm, &size);
-      MPI_Comm_rank(comm, &rank);
-      
-      if (rank == root) {
-        dest.resize(end_rank - start_rank);
-        for (Iterator i=start_rank; i != end_rank; i++) {
-          MPI_Irecv();
-        }
-      } else {
-        
-      }
-    }
+    /// 
+    /// Seeds random number generators across all processes with the same number,
+    /// taken from the time in microseconds since the epoch on the process 0.
+    /// 
+    void seed_random(MPI_Comm comm);
     
+  protected:
 
 
-        
+
+
   };
 
 } // namespace cluster

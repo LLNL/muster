@@ -1,3 +1,4 @@
+
 #ifndef K_MEDOIDS_H
 #define K_MEDOIDS_H
 
@@ -9,6 +10,7 @@
 
 #include "random.h"
 #include "dissimilarity.h"
+#include "MersenneTwister.h"
 #include "partition.h"
 
 namespace cluster {
@@ -19,8 +21,13 @@ namespace cluster {
   /// 
   class kmedoids : public partition {
   public:
+    ///
     /// Constructor.  Can optionally specify number of objects to be clustered.
     /// and this will start out with all of them in one cluster.
+    /// 
+    /// The random number generator associated with this kmedoids object is seeded
+    /// with the time in microseconds since the epoch.
+    /// 
     kmedoids(size_t num_objects = 0);
     ~kmedoids();
 
@@ -49,10 +56,10 @@ namespace cluster {
     ///   iterations     Number of times to run PAM with sampled dataset
     ///
     template <class T, class D>
-    void clara(std::vector<T> objects, D dmetric,
-               size_t k, size_t sample_size = 0, size_t iterations=5) {
+    void clara(const std::vector<T> objects, D dmetric,
+               size_t k, size_t init_size = 40, size_t iterations=5) {
 
-      if (!sample_size) sample_size = 40+2*k;
+      size_t sample_size = init_size + 2*k;
     
       // Just run plain KMedoids once if sampling won't gain us anything
       if (objects.size() <= sample_size) {
@@ -105,7 +112,7 @@ namespace cluster {
     }    
 
     protected:
-    RNGenerator random;             /// Random number generator for this algorithm
+    MTRand random;             /// Random number generator for this algorithm
     double average_dissimilarity;   /// Avg dissimilarity for last clustering run.
 
     /// Assigns medoids randomly from the input objects.
