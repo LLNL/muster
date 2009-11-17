@@ -3,6 +3,8 @@ using namespace cluster;
 
 #include <algorithm>
 #include <cassert>
+#include <cstdlib>
+#include <sys/time.h>
 using namespace std;
 
 #include "counter.h"
@@ -10,9 +12,13 @@ using namespace std;
 
 namespace cluster {
 
+  
   kmedoids::kmedoids(size_t num_objects) : partition(num_objects) {
-    //nothing necessary.
+    struct timeval time;
+    gettimeofday(&time, 0);
+    random.seed(time.tv_sec * time.tv_usec);
   }
+
 
   kmedoids::~kmedoids() {
     //nothing necessary.
