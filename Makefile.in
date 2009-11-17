@@ -307,7 +307,8 @@ noinst_HEADERS = \
 	partition.h \
 	MersenneTwister.h \
 	RNGenerator.h \
-	Stat.h
+	Stat.h \
+	par_kmedoids.h
 
 libcluster_la_SOURCES = \
 	partition.C \
@@ -331,9 +332,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu cluster/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign cluster/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu cluster/Makefile
+	  $(AUTOMAKE) --foreign cluster/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
