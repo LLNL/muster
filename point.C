@@ -4,7 +4,9 @@
 #include "config.h"
 #endif // HAVE_CONFIG_H
 
+#ifdef HAVE_MPI
 #include "mpi_utils.h"
+#endif // HAVE_MPI
 #include "color.h"
 
 #include <boost/numeric/ublas/matrix.hpp>
