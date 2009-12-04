@@ -18,10 +18,12 @@ libcluster_la_SOURCES = \
 
 if HAVE_MPI
 noinst_HEADERS += \
+	par_partition.h \
 	par_kmedoids.h \
 	multi_gather.h
 
 libcluster_la_SOURCES += \
+	par_partition.C \
 	par_kmedoids.C
 endif
 
@@ -40,7 +42,7 @@ par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 
 
-LDADD = libcluster.la
+LDADD = libcluster.la ../libwavelet/libwavelet.la
 
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \

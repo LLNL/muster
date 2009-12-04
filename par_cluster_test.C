@@ -22,7 +22,8 @@ int main(int argc, char **argv) {
 
   // parallel clusterer for data
   par_kmedoids cluster;
-  cluster.par_clara(p, point_distance(), 10, MPI_COMM_WORLD);
+  vector< source_pair<point> > medoids;
+  cluster.par_clara(p, point_distance(), 10, medoids);
 
   MPI_Finalize();
 }

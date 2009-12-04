@@ -1,6 +1,10 @@
 #include "kmedoids.h"
 using namespace cluster;
 
+#include <mpi.h>
+#include <vector>
+#include <fstream>
+
 #include <algorithm>
 #include <cassert>
 #include <cstdlib>
@@ -8,10 +12,9 @@ using namespace cluster;
 using namespace std;
 
 #include "counter.h"
-
+#include "matrix_utils.h"
 
 namespace cluster {
-
   
   kmedoids::kmedoids(size_t num_objects) : partition(num_objects) {
     struct timeval time;
@@ -39,27 +42,24 @@ namespace cluster {
     //oi is the object id of medoid i, mi is the medoid id.
     object_id oi = medoids[mi];
   
-    double cost;
     if (cluster_ids[oj] == mi) {
       medoid_id mj2 = nearest_medoid(oj, matrix_distance(distance), mi).first;
       object_id oj2 = medoids[mj2];
       if (distance(oj, oj2) < distance(oj, oh)) {
-        cost = distance(oj, oj2) - distance(oj, oi);
+        return distance(oj, oj2) - distance(oj, oi);
       } else {
-        cost = distance(oj, oh) - distance(oj, oi);            
+        return distance(oj, oh) - distance(oj, oi);            
       }
     
     } else {
       medoid_id mj2 = cluster_ids[oj];
       object_id oj2 = medoids[mj2];
       if (distance(oj, oj2) < distance(oj, oh)) {
-        cost = 0.0;
+        return 0.0;
       } else {
-        cost = distance(oj, oh) - distance(oj, oj2);
+        return distance(oj, oh) - distance(oj, oj2);
       }
     }
-  
-    return cost;
   }
 
 
@@ -94,6 +94,14 @@ namespace cluster {
     average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
     if (k == 1) return;  // bail here if we only need one cluster.
 
+      
+    
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+    std::vector<double> cost;
+
+
     size_t counter = 0;
     while (true) {
       //vars to keep track of minimum
@@ -117,8 +125,16 @@ namespace cluster {
         }
       }
 
+      cost.push_back(minTotalCost);
+
       // bail if we can't gain anything more (we've converged)
-      if (minTotalCost >= 0 || counter++ > 10000) break;  // TODO: hack!  investigate convergence.
+      if (minTotalCost >= 0) break;
+
+      if (counter++ > 10000) {
+        // TODO: hack!  investigate convergence.
+        cerr << "bad convergence on rank " << rank << endl;        
+        break;
+      }
 
       //replace a medoid if it gains us something
       medoids[minMedoid] = minObject;
@@ -127,6 +143,15 @@ namespace cluster {
       //put objects in cluster w/nearest medoid
       average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
     }
+
+    ostringstream name;
+    name << "cost." << rank;
+    ofstream file(name.str().c_str());
+    for (size_t i=0; i < cost.size(); i++) {
+      file << cost[i] << endl;
+    }
+
+
   }
 
 

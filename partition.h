@@ -60,6 +60,7 @@ namespace cluster {
 
   /// Expand a cluster_list by l levels.  That is, replace each index i
   /// in the cluster_list with indices in [2^l * i ... 2^l * (i+1) - 1]
+  /// TODO: deprecate and delete.
   void expand(cluster_list& list, size_t level = 1);
 
 } // namespace cluster

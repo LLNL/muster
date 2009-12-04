@@ -37,10 +37,12 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @HAVE_MPI_TRUE@am__append_1 = \
+@HAVE_MPI_TRUE@	par_partition.h \
 @HAVE_MPI_TRUE@	par_kmedoids.h \
 @HAVE_MPI_TRUE@	multi_gather.h
 
 @HAVE_MPI_TRUE@am__append_2 = \
+@HAVE_MPI_TRUE@	par_partition.C \
 @HAVE_MPI_TRUE@	par_kmedoids.C
 
 noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
@@ -104,8 +106,8 @@ am__installdirs = "$(DESTDIR)$(libdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libcluster_la_LIBADD =
 am__libcluster_la_SOURCES_DIST = partition.C kmedoids.C point.C \
-	par_kmedoids.C
-@HAVE_MPI_TRUE@am__objects_1 = par_kmedoids.lo
+	par_partition.C par_kmedoids.C
+@HAVE_MPI_TRUE@am__objects_1 = par_partition.lo par_kmedoids.lo
 am_libcluster_la_OBJECTS = partition.lo kmedoids.lo point.lo \
 	$(am__objects_1)
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
@@ -115,19 +117,22 @@ PROGRAMS = $(noinst_PROGRAMS)
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
-mirkin_test_DEPENDENCIES = libcluster.la
+mirkin_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la
 am_multi_gather_test_OBJECTS = multi_gather_test.$(OBJEXT)
 multi_gather_test_OBJECTS = $(am_multi_gather_test_OBJECTS)
 multi_gather_test_LDADD = $(LDADD)
-multi_gather_test_DEPENDENCIES = libcluster.la
+multi_gather_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la
 am_par_cluster_test_OBJECTS = par_cluster_test.$(OBJEXT)
 par_cluster_test_OBJECTS = $(am_par_cluster_test_OBJECTS)
 par_cluster_test_LDADD = $(LDADD)
-par_cluster_test_DEPENDENCIES = libcluster.la
+par_cluster_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la
 am_point_cluster_test_OBJECTS = point_cluster_test.$(OBJEXT)
 point_cluster_test_OBJECTS = $(am_point_cluster_test_OBJECTS)
 point_cluster_test_LDADD = $(LDADD)
-point_cluster_test_DEPENDENCIES = libcluster.la
+point_cluster_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -149,7 +154,7 @@ DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
 	$(par_cluster_test_SOURCES) $(point_cluster_test_SOURCES)
 am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
 	dissimilarity.h partition.h MersenneTwister.h Stat.h point.h \
-	par_kmedoids.h multi_gather.h
+	par_partition.h par_kmedoids.h multi_gather.h
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -336,7 +341,7 @@ mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
-LDADD = libcluster.la
+LDADD = libcluster.la ../libwavelet/libwavelet.la
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
   -I$(top_srcdir)/libwavelet
@@ -441,6 +446,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi_gather_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_partition.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partition.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_cluster_test.Po@am__quote@
