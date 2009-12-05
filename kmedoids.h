@@ -112,19 +112,17 @@ namespace cluster {
     }    
 
     protected:
-    MTRand random;             /// Random number generator for this algorithm
-    double average_dissimilarity;   /// Avg dissimilarity for last clustering run.
+    MTRand random;                           /// Random number generator for this algorithm
+    double average_dissimilarity;            /// Avg dissimilarity for last clustering run.
+    std::vector<medoid_id> sec_nearest   ;   /// Index of second closest medoids.  Used by PAM.
 
     /// Assigns medoids randomly from the input objects.
     void init_medoids(size_t k);
 
-    /// Finds the cost of swapping object oh with medoid j.
-    /// PRE: object[oi] is the medoid with index cluster_id[oi] in medoids.
-    double cost(medoid_id mi, object_id oh, object_id oj, const dissimilarity_matrix& distance) const;
-
     /// Total cost of swapping object h with medoid i.
     /// Sums costs of this exchagne for all objects j.
-    double total_cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const;
+    double cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const;
+
 
     /// Assign each object to the cluster with the closest medoid.
     /// Returns:
@@ -135,81 +133,37 @@ namespace cluster {
     ///   In CLARA, it should compute lazily.
     template <class D>
     double assign_objects_to_clusters(D distance) {
-      // first point the medoid objects at the right clusters
-      for (medoid_id mi = 0; mi < medoids.size(); mi++) {
-        cluster_ids[medoids[mi]] = mi;
+      if (sec_nearest.size() != cluster_ids.size()) {
+        sec_nearest.resize(cluster_ids.size());
       }
-
-      // now go through and assign each object to nearest medoid, keeping track of total 
-      // dissimilarity, too.
-      double sum = 0;
-      for (object_id i=0; i < cluster_ids.size(); i++) {
-        if (!is_medoid(i)) {
-          std::pair<medoid_id, double> nearest = nearest_medoid(i, distance);
-          cluster_ids[i] = nearest.first;
-          sum += nearest.second;
-        }
-      }
-
-      return sum / cluster_ids.size();
-    }
-
-    /// Finds the nearest medoid to the object oi.
-    /// Returns:
-    ///   - Index of the nearest medoid to oi
-    ///   - distance from oi to this medoid.
-    ///   
-    /// D should be a callable object that computes distances.  
-    ///   In PAM, it should use the distance matrix.  
-    ///   In CLARA, it should compute lazily.
-    template <class D>
-    std::pair<medoid_id, double> nearest_medoid(
-      object_id oi, D distance, medoid_id exclude=std::numeric_limits<size_t>::max()
-    ) const {
-      medoid_id nearest = 0;
-      double min_distance = DBL_MAX;
       
-      for (size_t i=0; i < medoids.size(); i++) {
-        if (i == exclude) continue;
-        double d = distance(oi, medoids[i]);
-        if (d < min_distance) {
-          min_distance = d;
-          nearest = i;
+      // go through and assign each object to nearest medoid, keeping track of total dissimilarity.
+      double total_dissimilarity = 0;
+      for (object_id i=0; i < cluster_ids.size(); i++) {
+        if (is_medoid(i)) continue;
+
+        double    d1, d2;  // smallest, second smallest distance to medoid, respectively
+        medoid_id m1, m2;  // index of medoids with distances d1, d2 from object i, respectively
+
+        d1 = d2 = DBL_MAX;
+        m1 = m2 = medoids.size();
+        for (medoid_id m=0; m < medoids.size(); m++) {
+          double d = distance(i, medoids[m]);
+          if (d < d1) {
+            d2 = d1;  m2 = m1;
+            d1 = d;   m1 = m;
+          } else if (d < d2) {
+            d2 = d;   m2 = m;
+          }
         }
+
+        cluster_ids[i] = m1;
+        sec_nearest[i] = m2;
+        total_dissimilarity += d1;
       }
-      return std::make_pair(nearest, min_distance);
+
+      return total_dissimilarity / cluster_ids.size();
     }
-
-
-    /// Functor for computing distance lazily from an object array and
-    /// a distance metric.  Use this for CLARA, where we don't want to
-    /// precompute the entire distance matrix.
-    template <class T, class D>
-    struct lazy_distance_functor {
-      const std::vector<T>& objects;
-      D dissimilarity;
-
-      lazy_distance_functor(const std::vector<T>& objs, D d)
-        : objects(objs), dissimilarity(d) { }
-
-      double operator()(size_t i, size_t j) {
-        return dissimilarity(objects[i], objects[j]);
-      }
-    };
-
-    /// Type-inferred syntactic sugar for constructing lazy_distance_functors.
-    template <class T, class D>
-    lazy_distance_functor<T,D> lazy_distance(const std::vector<T>& objs, D dist) {
-      return lazy_distance_functor<T,D>(objs, dist);
-    }
-
-    /// Simple adapter for passing a matrix by reference to the template
-    /// functions above.  Avoids wholesale copy of distance matrix.
-    struct matrix_distance {
-      const dissimilarity_matrix& mat;
-      matrix_distance(const dissimilarity_matrix& m) : mat(m) { }
-      double operator()(size_t i, size_t j) { return mat(i,j); }
-    };
   };
 
 

@@ -43,6 +43,9 @@ namespace cluster {
 
     /// Fast swap with other patrition objects
     void swap(partition& other);
+    
+    /// puts medoids in order of their clusters' appearance in cluster_ids.
+    void sort();
   };
 
   /// Prints out nicely formatted clustering

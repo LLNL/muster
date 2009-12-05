@@ -1,5 +1,6 @@
 #include "partition.h"
 #include <iostream>
+#include <map>
 #include <cassert>
 #include <algorithm>
 using namespace cluster;
@@ -31,6 +32,24 @@ namespace cluster {
     cluster_ids.swap(other.cluster_ids);
   }
 
+  
+  void partition::sort() {
+    vector<medoid_id> mapping(medoids.size(), medoids.size());
+    vector<object_id> new_medoids(medoids.size());
+
+    medoid_id cur_id = 0;
+    for (object_id i=0; i < cluster_ids.size(); i++) {
+      medoid_id id = cluster_ids[i];
+      if (mapping[id] == medoids.size()) {
+        medoid_id new_id = cur_id++;
+        mapping[id] = new_id;
+        new_medoids[new_id] = medoids[id];
+      }
+      cluster_ids[i] = mapping[id];
+    }
+
+    medoids.swap(new_medoids);
+  }
 
   
   ostream& operator<<(ostream& out, const cluster_list& clusters) {
@@ -109,7 +128,5 @@ namespace cluster {
     }
     expanded.swap(list);
   }
-
-
 
 } // namespace cluster

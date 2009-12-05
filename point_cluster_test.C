@@ -38,16 +38,15 @@ int main(int argc, char **argv) {
 
   cout << "Testing with " << points.size() << " points for 1 to " << clusters << " clusters." << endl;
 
-
   dissimilarity_matrix distance;
   build_dissimilarity_matrix(points, point_distance(), distance);
 
-  kmedoids km;
-  kmedoids clara;
-  cout << "foo"<< endl;
+  kmedoids km, clara;
   for (size_t k = 1; k <= clusters; k++) {
     km.pam(distance, k);
+    km.sort();
     clara.clara(points, point_distance(), k);
+    clara.sort();
 
     cout << "k: " << k << ", Mirkin distance: " << mirkin_distance(km, clara) << endl;
     draw("PAM", points, km);

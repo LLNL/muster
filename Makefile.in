@@ -46,7 +46,7 @@ host_triplet = @host@
 @HAVE_MPI_TRUE@	par_kmedoids.C
 
 noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
-	$(am__EXEEXT_1)
+	pathological-cluster-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_3 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
 @HAVE_MPI_TRUE@	multi-gather-test
@@ -128,6 +128,13 @@ par_cluster_test_OBJECTS = $(am_par_cluster_test_OBJECTS)
 par_cluster_test_LDADD = $(LDADD)
 par_cluster_test_DEPENDENCIES = libcluster.la \
 	../libwavelet/libwavelet.la
+am_pathological_cluster_test_OBJECTS =  \
+	pathological_cluster_test.$(OBJEXT)
+pathological_cluster_test_OBJECTS =  \
+	$(am_pathological_cluster_test_OBJECTS)
+pathological_cluster_test_LDADD = $(LDADD)
+pathological_cluster_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la
 am_point_cluster_test_OBJECTS = point_cluster_test.$(OBJEXT)
 point_cluster_test_OBJECTS = $(am_point_cluster_test_OBJECTS)
 point_cluster_test_LDADD = $(LDADD)
@@ -148,10 +155,13 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcluster_la_SOURCES) $(mirkin_test_SOURCES) \
 	$(multi_gather_test_SOURCES) $(par_cluster_test_SOURCES) \
+	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES)
 DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
 	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
-	$(par_cluster_test_SOURCES) $(point_cluster_test_SOURCES)
+	$(par_cluster_test_SOURCES) \
+	$(pathological_cluster_test_SOURCES) \
+	$(point_cluster_test_SOURCES)
 am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
 	dissimilarity.h partition.h MersenneTwister.h Stat.h point.h \
 	par_partition.h par_kmedoids.h multi_gather.h
@@ -341,6 +351,7 @@ mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
+pathological_cluster_test_SOURCES = pathological_cluster_test.C
 LDADD = libcluster.la ../libwavelet/libwavelet.la
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
@@ -431,6 +442,9 @@ multi-gather-test$(EXEEXT): $(multi_gather_test_OBJECTS) $(multi_gather_test_DEP
 par-cluster-test$(EXEEXT): $(par_cluster_test_OBJECTS) $(par_cluster_test_DEPENDENCIES) 
 	@rm -f par-cluster-test$(EXEEXT)
 	$(CXXLINK) $(par_cluster_test_OBJECTS) $(par_cluster_test_LDADD) $(LIBS)
+pathological-cluster-test$(EXEEXT): $(pathological_cluster_test_OBJECTS) $(pathological_cluster_test_DEPENDENCIES) 
+	@rm -f pathological-cluster-test$(EXEEXT)
+	$(CXXLINK) $(pathological_cluster_test_OBJECTS) $(pathological_cluster_test_LDADD) $(LIBS)
 point-cluster-test$(EXEEXT): $(point_cluster_test_OBJECTS) $(point_cluster_test_DEPENDENCIES) 
 	@rm -f point-cluster-test$(EXEEXT)
 	$(CXXLINK) $(point_cluster_test_OBJECTS) $(point_cluster_test_LDADD) $(LIBS)
@@ -448,6 +462,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_partition.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/partition.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pathological_cluster_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_cluster_test.Po@am__quote@
 

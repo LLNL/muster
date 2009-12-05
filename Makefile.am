@@ -28,7 +28,10 @@ libcluster_la_SOURCES += \
 endif
 
 #test program for matrix
-noinst_PROGRAMS = point-cluster-test mirkin-test 
+noinst_PROGRAMS = \
+	point-cluster-test \
+	mirkin-test \
+	pathological-cluster-test
 
 if HAVE_MPI
 noinst_PROGRAMS += \
@@ -40,7 +43,7 @@ mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
-
+pathological_cluster_test_SOURCES = pathological_cluster_test.C
 
 LDADD = libcluster.la ../libwavelet/libwavelet.la
 

@@ -14,6 +14,9 @@ using namespace std;
 #include "counter.h"
 #include "matrix_utils.h"
 
+// relative error for cost function.  Avoids roundoff error.
+static const double epsilon = 1e-15;
+
 namespace cluster {
   
   kmedoids::kmedoids(size_t num_objects) : partition(num_objects) {
@@ -23,9 +26,7 @@ namespace cluster {
   }
 
 
-  kmedoids::~kmedoids() {
-    //nothing necessary.
-  }
+  kmedoids::~kmedoids() {  }
 
 
   void kmedoids::init_medoids(size_t k) {
@@ -35,43 +36,33 @@ namespace cluster {
   }
 
 
-  /// Finds the cost of swapping object oh with medoid j.
-  /// PRE: object[oi] is the medoid with index cluster_id[oi] in medoids.
-  double kmedoids::cost(medoid_id mi, object_id oh, object_id oj, 
-                        const dissimilarity_matrix& distance) const {
-    //oi is the object id of medoid i, mi is the medoid id.
-    object_id oi = medoids[mi];
-  
-    if (cluster_ids[oj] == mi) {
-      medoid_id mj2 = nearest_medoid(oj, matrix_distance(distance), mi).first;
-      object_id oj2 = medoids[mj2];
-      if (distance(oj, oj2) < distance(oj, oh)) {
-        return distance(oj, oj2) - distance(oj, oi);
-      } else {
-        return distance(oj, oh) - distance(oj, oi);            
-      }
-    
-    } else {
-      medoid_id mj2 = cluster_ids[oj];
-      object_id oj2 = medoids[mj2];
-      if (distance(oj, oj2) < distance(oj, oh)) {
-        return 0.0;
-      } else {
-        return distance(oj, oh) - distance(oj, oj2);
-      }
-    }
-  }
+  double kmedoids::cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const {
+    static ofstream branches("branches");
 
-
-  /// Total cost of swapping object h with medoid i.
-  /// Sums costs of this exchagne for all objects j.
-  double kmedoids::total_cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const {
-    double sum =0;
+    double total = 0;
     for (object_id j = 0; j < cluster_ids.size(); j++) {
-      if (is_medoid(j) || j == h) continue;   //skip medoids and self
-      sum += cost(i, h, j, distance);    //add cost of swapping object h with object j
+      if (is_medoid(j) || j == h) continue;      //skip medoids and self
+
+      object_id mi  = medoids[i];                // object id of medoid i
+      double    dhj = distance(h, j);            // distance between object h and object j
+      
+      object_id mj1 = medoids[cluster_ids[j]];   // object id of j's nearest medoid
+      double    dj1 = distance(mj1, j);          // distance to j's nearest medoid
+
+      // check if distance bt/w medoid i and j is same as j's current nearest medoid.
+      if (distance(mi, j) == dj1) {
+        double dj2 = DBL_MAX;
+        if (medoids.size() > 1) { // look at 2nd nearest if there's more than one medoid.
+          object_id mj2 = medoids[sec_nearest[j]];  // object id of j's 2nd-nearest medoid
+          dj2 = distance(mj2, j);                   // distance to j's 2nd-nearest medoid
+        }
+        total += min(dj2, dhj) - dj1;
+
+      } else if (dhj < dj1) {
+        total += dhj - dj1;
+      }
     }
-    return sum;
+    return total;
   }
 
 
@@ -81,7 +72,7 @@ namespace cluster {
     }
 
     if (distance.size1() != distance.size2()) {
-      throw std::logic_error("Error: distance matrix is now square!");
+      throw std::logic_error("Error: distance matrix is not square!");
     }
     
     // first get this the right size.
@@ -90,20 +81,14 @@ namespace cluster {
     // size cluster_ids appropriately and randomly pick initial medoids
     init_medoids(k);
 
-    // initial cluster setup
-    average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
-    if (k == 1) return;  // bail here if we only need one cluster.
+    // set tolerance equal to epsilon times mean magnitude of distances.
+    // Note that distances *should* all be non-negative.
+    double tolerance = epsilon * sum(distance) / (distance.size1() * distance.size2());
 
-      
-    
-    int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    std::vector<double> cost;
-
-
-    size_t counter = 0;
     while (true) {
+      // initial cluster setup
+      average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
+
       //vars to keep track of minimum
       double minTotalCost = DBL_MAX;
       medoid_id minMedoid = 0;
@@ -116,7 +101,7 @@ namespace cluster {
           if (is_medoid(h)) continue;
 
           //see if the total cost of swapping i & h was less than min
-          double curCost = total_cost(i, h, distance);
+          double curCost = cost(i, h, distance);
           if (curCost < minTotalCost) {
             minTotalCost = curCost;
             minMedoid = i;
@@ -125,33 +110,13 @@ namespace cluster {
         }
       }
 
-      cost.push_back(minTotalCost);
-
       // bail if we can't gain anything more (we've converged)
-      if (minTotalCost >= 0) break;
+      if (minTotalCost >= -tolerance) break;
 
-      if (counter++ > 10000) {
-        // TODO: hack!  investigate convergence.
-        cerr << "bad convergence on rank " << rank << endl;        
-        break;
-      }
-
-      //replace a medoid if it gains us something
+      // install the new medoid if we found a beneficial swap
       medoids[minMedoid] = minObject;
       cluster_ids[minObject] = minMedoid;
-
-      //put objects in cluster w/nearest medoid
-      average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
     }
-
-    ostringstream name;
-    name << "cost." << rank;
-    ofstream file(name.str().c_str());
-    for (size_t i=0; i < cost.size(); i++) {
-      file << cost[i] << endl;
-    }
-
-
   }
 
 
