@@ -9,9 +9,8 @@
 #endif // HAVE_MPI
 #include "color.h"
 
-#include <boost/numeric/ublas/matrix.hpp>
 #include <iomanip>
-
+#include <boost/numeric/ublas/matrix.hpp>
 using boost::numeric::ublas::matrix;
 using namespace std;
 
@@ -82,9 +81,11 @@ namespace cluster {
 
     for (int y = max_y; y >= 0; y--) {
       for (int x = 0; x <= max_x; x++) {
-        if (pmat(x,y) >= 0) {
-          out << colors[parts.cluster_ids[pmat(x,y)] % num_colors];
-          out << "o";
+        int oid = pmat(x,y);
+        if (oid >= 0) {
+          int cid = parts.cluster_ids[oid];
+          out << colors[cid % num_colors];
+          out << (parts.is_medoid(oid) ? "o" : "+");
           out << None;
         } else {
           out << " ";
