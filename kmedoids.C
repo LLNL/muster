@@ -3,7 +3,6 @@ using namespace cluster;
 
 #include <mpi.h>
 #include <vector>
-#include <fstream>
 #include <sstream>
 
 #include <algorithm>
@@ -59,12 +58,8 @@ namespace cluster {
 
 
   double kmedoids::cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const {
-    static ofstream branches("branches");
-
     double total = 0;
     for (object_id j = 0; j < cluster_ids.size(); j++) {
-      if (is_medoid(j) || j == h) continue;         //skip medoids and self
-
       object_id mi  = medoid_ids[i];                // object id of medoid i
       double    dhj = distance(h, j);               // distance between object h and object j
       
@@ -112,8 +107,6 @@ namespace cluster {
     // Note that distances *should* all be non-negative.
     double tolerance = epsilon * sum(distance) / (distance.size1() * distance.size2());
 
-    size_t count = 0;
-    bool warned = false;
     while (true) {
       // initial cluster setup
       total_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
@@ -142,33 +135,6 @@ namespace cluster {
       // bail if we can't gain anything more (we've converged)
       if (minTotalCost >= -tolerance) break;
 
-      /*
-      int rank;
-      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-      */
-
-      cerr << count << ":\t" << minTotalCost << endl;
-      count++;
-
-      if (count > 20) break;
-
-
-      /*
-
-      if (!warned && count > 2000) {
-        warned = true;
-        ostringstream msg;
-        msg << "WARNING: more than 10k iterations" // on " << rank
-            << "minTotalCost == " << minTotalCost
-            << endl;
-        std::cerr << msg.str();
-      } else if (warned && count < 10100) {
-        ostringstream msg;
-        msg << ":  minTotalCost = " << minTotalCost
-            << endl;
-        std::cerr << msg.str();
-      }
-*/
       // install the new medoid if we found a beneficial swap
       medoid_ids[minMedoid] = minObject;
       cluster_ids[minObject] = minMedoid;

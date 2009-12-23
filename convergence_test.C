@@ -11,7 +11,7 @@ using namespace std;
 
 
 int main(int argc, char **argv) {
-  vector<point> points;
+  /*
   parse_points("( 1,  2) ( 2,  1) ( 5,  1) ( 5,  0) (10,  2) (16,  2) (17,  1) (23,  2)"
                "(23,  0) (24,  1) (31,  2) (30,  1) (40,  1) (40,  2) (40,  0) (50,  2)"
                "(49,  1) (51,  1) (61,  1) (62,  1) (73,  1) (86,  1) (86,  0) (85,  1)"
@@ -21,12 +21,23 @@ int main(int argc, char **argv) {
                "(295, 0) (320, 1) (320, 0) (319, 1) (321, 1) (346, 2) (372, 1) (374, 1)", 
                points);
   const object_id initial_medoids[] = {1, 14, 25, 27, 34, 42, 52, 55};
+  */
+
+  vector<point> points;
+  parse_points("(1, 1) (1, 2)"
+               "(0,  1) (2,  1) (19, 1) (19,  2) (19,  0) (18,  1) (38,  0) (39,  1)"
+               "(58, 1) (58, 0) (79, 2) (101, 1) (100, 1) (124, 2) (124, 0)",
+               points);
+  const object_id initial_medoids[] = {4, 12, 8};//22, 25};
+  const size_t k = 3;
 
   kmedoids cluster;
+  cluster.points = &points;
+
   dissimilarity_matrix distance;
   build_dissimilarity_matrix(points, point_distance(), distance);
 
   cerr << "Starting PAM" << endl;
-  cluster.pam(distance, 8, initial_medoids);
+  cluster.pam(distance, k, initial_medoids);
   cerr << "Finished."    << endl;
 }
