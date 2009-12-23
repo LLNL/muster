@@ -20,7 +20,7 @@ namespace cluster {
   struct partition {
     /// Gives the index of the object that is the ith medoid.
     /// medoids[i] == index in object array for last call to findClusters()
-    std::vector<object_id> medoids;
+    std::vector<object_id> medoid_ids;
 
     /// Gives cluster id (index in medoids) for the ith object.
     /// clusterid[i]          == id of cluster of which object i is a member.
@@ -34,7 +34,7 @@ namespace cluster {
 
     /// True if and only if object i is a medoid.
     bool is_medoid(object_id oi) const {
-      return medoids[cluster_ids[oi]] == oi;
+      return medoid_ids[cluster_ids[oi]] == oi;
     }
 
     /// Creates a list of std::sets from the partition info in 
@@ -44,7 +44,7 @@ namespace cluster {
     /// Fast swap with other patrition objects
     void swap(partition& other);
     
-    /// puts medoids in order of their clusters' appearance in cluster_ids.
+    /// puts medoids in order by their object id, and adjusts cluster_ids accordingly.
     void sort();
   };
 

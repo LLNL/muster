@@ -4,6 +4,7 @@ using namespace cluster;
 #include <mpi.h>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 #include <algorithm>
 #include <cassert>
@@ -14,12 +15,18 @@ using namespace std;
 #include "counter.h"
 #include "matrix_utils.h"
 
+#include "point.h"
+
 // relative error for cost function.  Avoids roundoff error.
 static const double epsilon = 1e-15;
 
 namespace cluster {
   
-  kmedoids::kmedoids(size_t num_objects) : partition(num_objects) {
+  kmedoids::kmedoids(size_t num_objects) 
+    : partition(num_objects), 
+      total_dissimilarity(std::numeric_limits<double>::infinity()),
+      sort_medoids(true)
+  {
     struct timeval time;
     gettimeofday(&time, 0);
     random.seed(time.tv_sec * time.tv_usec);
@@ -28,11 +35,26 @@ namespace cluster {
 
   kmedoids::~kmedoids() {  }
 
+  double kmedoids::average_dissimilarity() {
+    return total_dissimilarity / cluster_ids.size();
+  }
+
+  void kmedoids::set_sort_medoids(bool sort) {
+    sort_medoids = sort;
+  }
+
 
   void kmedoids::init_medoids(size_t k) {
-    medoids.clear();
-    random_subset(cluster_ids.size(), k, back_inserter(medoids), random);
-    assert(medoids.size() == k);
+    medoid_ids.clear();
+    random_subset(cluster_ids.size(), k, back_inserter(medoid_ids), random);
+    assert(medoid_ids.size() == k);
+
+    ostringstream msg;
+    msg << "initial medoids: [";
+    copy(medoid_ids.begin(), medoid_ids.end(), ostream_iterator<object_id>(msg, " "));
+    msg << "]" << endl;
+    cerr << msg.str();
+
   }
 
 
@@ -41,20 +63,20 @@ namespace cluster {
 
     double total = 0;
     for (object_id j = 0; j < cluster_ids.size(); j++) {
-      if (is_medoid(j) || j == h) continue;      //skip medoids and self
+      if (is_medoid(j) || j == h) continue;         //skip medoids and self
 
-      object_id mi  = medoids[i];                // object id of medoid i
-      double    dhj = distance(h, j);            // distance between object h and object j
+      object_id mi  = medoid_ids[i];                // object id of medoid i
+      double    dhj = distance(h, j);               // distance between object h and object j
       
-      object_id mj1 = medoids[cluster_ids[j]];   // object id of j's nearest medoid
-      double    dj1 = distance(mj1, j);          // distance to j's nearest medoid
+      object_id mj1 = medoid_ids[cluster_ids[j]];   // object id of j's nearest medoid
+      double    dj1 = distance(mj1, j);             // distance to j's nearest medoid
 
       // check if distance bt/w medoid i and j is same as j's current nearest medoid.
       if (distance(mi, j) == dj1) {
         double dj2 = DBL_MAX;
-        if (medoids.size() > 1) { // look at 2nd nearest if there's more than one medoid.
-          object_id mj2 = medoids[sec_nearest[j]];  // object id of j's 2nd-nearest medoid
-          dj2 = distance(mj2, j);                   // distance to j's 2nd-nearest medoid
+        if (medoid_ids.size() > 1) {   // look at 2nd nearest if there's more than one medoid.
+          object_id mj2 = medoid_ids[sec_nearest[j]];  // object id of j's 2nd-nearest medoid
+          dj2 = distance(mj2, j);                      // distance to j's 2nd-nearest medoid
         }
         total += min(dj2, dhj) - dj1;
 
@@ -66,7 +88,7 @@ namespace cluster {
   }
 
 
-  void kmedoids::pam(dissimilarity_matrix distance, size_t k) {
+  void kmedoids::pam(dissimilarity_matrix distance, size_t k, const object_id *initial_medoids) {
     if (k > distance.size1()) {
       throw std::logic_error("Attempt to instantiate kmedoids with more clusters than data.");
     }
@@ -79,15 +101,22 @@ namespace cluster {
     cluster_ids.resize(distance.size1());
 
     // size cluster_ids appropriately and randomly pick initial medoids
-    init_medoids(k);
+    if (initial_medoids) {
+      medoid_ids.clear();
+      copy(initial_medoids, initial_medoids + k, back_inserter(medoid_ids));
+    } else {
+      init_medoids(k);
+    }
 
     // set tolerance equal to epsilon times mean magnitude of distances.
     // Note that distances *should* all be non-negative.
     double tolerance = epsilon * sum(distance) / (distance.size1() * distance.size2());
 
+    size_t count = 0;
+    bool warned = false;
     while (true) {
       // initial cluster setup
-      average_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
+      total_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
 
       //vars to keep track of minimum
       double minTotalCost = DBL_MAX;
@@ -113,10 +142,39 @@ namespace cluster {
       // bail if we can't gain anything more (we've converged)
       if (minTotalCost >= -tolerance) break;
 
+      /*
+      int rank;
+      MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+      */
+
+      cerr << count << ":\t" << minTotalCost << endl;
+      count++;
+
+      if (count > 20) break;
+
+
+      /*
+
+      if (!warned && count > 2000) {
+        warned = true;
+        ostringstream msg;
+        msg << "WARNING: more than 10k iterations" // on " << rank
+            << "minTotalCost == " << minTotalCost
+            << endl;
+        std::cerr << msg.str();
+      } else if (warned && count < 10100) {
+        ostringstream msg;
+        msg << ":  minTotalCost = " << minTotalCost
+            << endl;
+        std::cerr << msg.str();
+      }
+*/
       // install the new medoid if we found a beneficial swap
-      medoids[minMedoid] = minObject;
+      medoid_ids[minMedoid] = minObject;
       cluster_ids[minObject] = minMedoid;
     }
+
+    if (sort_medoids) sort();
   }
 
 

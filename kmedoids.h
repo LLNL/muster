@@ -31,12 +31,20 @@ namespace cluster {
     kmedoids(size_t num_objects = 0);
     ~kmedoids();
 
+    /// Get the average dissimilarity of objects w/their medoids for the last run.
+    double average_dissimilarity();
+    
+    /// Set whether medoids will be sorted by object id after clustering is complete.
+    /// Defaults to true.
+    void set_sort_medoids(bool sort_medoids);
+
     /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
     /// algorithm as described in Kaufman and Rousseeuw. 
     /// Parameters:
-    ///   distance     dissimilarity matrix for all objects to cluster
-    ///   k            number of clusters to produce
-    void pam(dissimilarity_matrix distance, size_t k);
+    ///   distance         dissimilarity matrix for all objects to cluster
+    ///   k                number of clusters to produce
+    ///   initial_medoids  Optionally supply k initial object ids to be used as initial medoids.
+    void pam(dissimilarity_matrix distance, size_t k, const object_id *initial_medoids = NULL);
     
     ///
     /// CLARA clustering algorithm, as per Kaufman and Rousseuw and
@@ -54,7 +62,6 @@ namespace cluster {
     ///   k              Number of clusters to partition
     ///   sample_size    defaults to 40+2*k, per Kaufman and Rousseeuw's recommendation
     ///   iterations     Number of times to run PAM with sampled dataset
-    ///
     template <class T, class D>
     void clara(const std::vector<T> objects, D dmetric,
                size_t k, size_t init_size = 40, size_t iterations=5) {
@@ -70,14 +77,14 @@ namespace cluster {
       }
 
       // get everything the right size before starting.
-      medoids.resize(k);
+      medoid_ids.resize(k);
       cluster_ids.resize(objects.size());
 
       // medoids and clusters for best partition so far.
       partition best_partition;
 
       //run KMedoids on a sampled subset ITERATIONS times
-      double best_dissim = DBL_MAX;
+      total_dissimilarity = DBL_MAX;
       for (size_t i = 0; i < iterations; i++) {
         // Take a random sample of objects, store sample in a vector
         std::vector<size_t> sample_to_full;
@@ -89,32 +96,33 @@ namespace cluster {
 
         // Actually run PAM on the subset
         kmedoids subcall;
-        subcall.pam(distance, k);
+        subcall.set_sort_medoids(false); // skip sort for subcall since it's not needed
+        subcall.pam(distance, k);  
 
         // copy medoids from the subcall to local data, being sure to translate indices
-        for (size_t i=0; i < medoids.size(); i++) {
-          medoids[i] = sample_to_full[subcall.medoids[i]];
+        for (size_t i=0; i < medoid_ids.size(); i++) {
+          medoid_ids[i] = sample_to_full[subcall.medoid_ids[i]];
         }
 
         // sync up the cluster_ids matrix with the new medoids by assigning
         // each object to its closest medoid.  Remember the quality of the clustering.
-        average_dissimilarity = assign_objects_to_clusters(lazy_distance(objects, dmetric));
-
+        double dissimilarity = assign_objects_to_clusters(lazy_distance(objects, dmetric));
+        
         // keep the best clustering found so far around
-        if (average_dissimilarity < best_dissim) {
-          this->swap(best_partition);
-          best_dissim = average_dissimilarity;
+        if (dissimilarity < total_dissimilarity) {
+          swap(best_partition);
+          total_dissimilarity = dissimilarity;
         } 
       }
       
-      this->swap(best_partition);
-      average_dissimilarity = best_dissim;
+      if (sort_medoids) sort();   // just do one final ordering of ids.
     }    
 
     protected:
     MTRand random;                           /// Random number generator for this algorithm
-    double average_dissimilarity;            /// Avg dissimilarity for last clustering run.
-    std::vector<medoid_id> sec_nearest   ;   /// Index of second closest medoids.  Used by PAM.
+    std::vector<medoid_id> sec_nearest;      /// Index of second closest medoids.  Used by PAM.
+    double total_dissimilarity;              /// Total dissimilarity bt/w objects and their medoid
+    bool sort_medoids;                       /// Whether medoids should be canonically sorted by object id.
 
     /// Assigns medoids randomly from the input objects.
     void init_medoids(size_t k);
@@ -126,7 +134,7 @@ namespace cluster {
 
     /// Assign each object to the cluster with the closest medoid.
     /// Returns:
-    ///   Average dissimilarity of objects w/their medoids.
+    ///   Total dissimilarity of objects w/their medoids.
     /// 
     /// D should be a callable object that computes distances.  
     ///   In PAM, it should use the distance matrix.  
@@ -146,9 +154,9 @@ namespace cluster {
         medoid_id m1, m2;  // index of medoids with distances d1, d2 from object i, respectively
 
         d1 = d2 = DBL_MAX;
-        m1 = m2 = medoids.size();
-        for (medoid_id m=0; m < medoids.size(); m++) {
-          double d = distance(i, medoids[m]);
+        m1 = m2 = medoid_ids.size();
+        for (medoid_id m=0; m < medoid_ids.size(); m++) {
+          double d = distance(i, medoid_ids[m]);
           if (d < d1) {
             d2 = d1;  m2 = m1;
             d1 = d;   m1 = m;
@@ -162,7 +170,7 @@ namespace cluster {
         total_dissimilarity += d1;
       }
 
-      return total_dissimilarity / cluster_ids.size();
+      return total_dissimilarity;
     }
   };
 

@@ -11,12 +11,12 @@ namespace cluster {
   
   /// Parallel partition object.  
   struct par_partition {
-    /// Gives the rank of the process owning the ith medoid.
-    /// medoids[i] == rank of process owning ith medoid
-    std::vector<object_id> medoids;
+    /// Gives the object id for the ith medoid.  This object may not be local.
+    std::vector<object_id> medoid_ids;
     
-    /// Identity of medoid this process is a member of.
-    medoid_id my_id;
+    /// Global cluster ids for local objects.  These are indices into medoid_ids.
+    /// The object id of the medoid of the ith local object is medoid_ids[cluster_ids[i]].
+    std::vector<object_id> cluster_ids;
     
     /// Communicator, the processes of which this partition divides
     MPI_Comm comm;
@@ -24,6 +24,9 @@ namespace cluster {
     /// Construct a parallel partition for the communicator supplied
     /// Partition starts off with everyone in one cluster with medoid 0.
     par_partition(MPI_Comm comm = MPI_COMM_WORLD);
+
+    /// Virtual destructor for inheritance.
+    virtual ~par_partition();
 
     /// Collective operation.  Gathers my_id from all processes into a 
     /// local partition object. If size of system is large, then this method

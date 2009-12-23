@@ -16,12 +16,6 @@ int main(int argc, char **argv) {
     max_k = atoi(argv[1]);
   }
 
-  MPI_Init(&argc, &argv);
-  
-  int rank, size;
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  
   // make a set of points to cluster in a diagonal line from the origin.
   std::vector<point> points;
   for (size_t i=0; i < max_k; i++) {
@@ -39,6 +33,4 @@ int main(int argc, char **argv) {
     
     cerr << k << setw(20) << timer["Cluster"]/1e9 << endl;
   }
-
-  MPI_Finalize();
 }

@@ -7,11 +7,13 @@ using namespace cluster;
 using namespace std;
 
 #include "counter.h"
+#include "color.h"
+#include "stl_utils.h"
 
 namespace cluster {
 
   partition::partition(size_t num_objects) : cluster_ids(num_objects, 0) {
-    if (num_objects) medoids.resize(1);
+    if (num_objects) medoid_ids.resize(1);
   }
 
 
@@ -20,7 +22,7 @@ namespace cluster {
 
   void partition::to_cluster_list(cluster_list& clusters) const {
     clusters.clear();
-    clusters.resize(medoids.size(), cset());
+    clusters.resize(medoid_ids.size(), cset());
     for (unsigned object=0; object < cluster_ids.size(); object++) {
       clusters[cluster_ids[object]].insert(object);
     }
@@ -28,47 +30,51 @@ namespace cluster {
 
 
   void partition::swap(partition& other) {
-    medoids.swap(other.medoids);
+    medoid_ids.swap(other.medoid_ids);
     cluster_ids.swap(other.cluster_ids);
   }
-
+  
   
   void partition::sort() {
-    vector<medoid_id> mapping(medoids.size(), medoids.size());
-    vector<object_id> new_medoids(medoids.size());
+    // first create a mapping from new ids to old ids.
+    vector<size_t> mapping(medoid_ids.size());
+    generate(mapping.begin(), mapping.end(), sequence());
 
-    medoid_id cur_id = 0;
-    for (object_id i=0; i < cluster_ids.size(); i++) {
-      medoid_id id = cluster_ids[i];
-      if (mapping[id] == medoids.size()) {
-        medoid_id new_id = cur_id++;
-        mapping[id] = new_id;
-        new_medoids[new_id] = medoids[id];
-      }
-      cluster_ids[i] = mapping[id];
+    std::sort(mapping.begin(), mapping.end(), indexed_lt(medoid_ids));
+    invert(mapping);
+    std::sort(medoid_ids.begin(), medoid_ids.end());
+
+    // translate old cluster ids to new ones.
+    for (size_t i=0; i < cluster_ids.size(); i++) {
+      cluster_ids[i] = mapping[cluster_ids[i]];
     }
-
-    medoids.swap(new_medoids);
   }
 
-  
-  ostream& operator<<(ostream& out, const cluster_list& clusters) {
+
+  static void write(ostream& out, const cluster_list& clusters, const vector<object_id> *medoid_ids = NULL) {
     out << "id\tmembers" << endl;
     for (unsigned i=0; i < clusters.size(); i++) {
       out << i << "\t";
       const cset& c = clusters[i];
       for (cset::iterator obj=c.begin(); obj != c.end(); obj++) {
-        out << *obj << " ";
+        if (medoid_ids && (*medoid_ids)[i] == *obj) {
+          out << Red << *obj << None << " ";
+        } else {
+          out << *obj << " ";          
+        }
       }
       out << endl;
     }
+  }
+
+
+  ostream& operator<<(ostream& out, const cluster_list& clusters) {
+    write(out, clusters);
     return out;
   }
 
 
   double mirkin_distance(const cluster_list& c1, const cluster_list& c2) {
-    assert(c1.size() == c2.size());
-
     size_t c1_sum2 = 0;
     size_t n = 0;
     for (size_t i=0; i < c1.size(); i++) {
@@ -100,7 +106,7 @@ namespace cluster {
   std::ostream& operator<<(std::ostream& out, const partition& p) {
     cluster_list list;
     p.to_cluster_list(list);
-    out << list;
+    write(out, list, &p.medoid_ids);
     return out;
   }
 

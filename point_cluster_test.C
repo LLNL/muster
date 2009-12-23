@@ -23,32 +23,43 @@ int main(int argc, char **argv) {
     clusters = strtol(argv[1], NULL, 0);    
   }
 
+  size_t max_k = clusters;
+  if (argc > 1) {
+    max_k = strtol(argv[2], NULL, 0);    
+  }
+
   //put 5-pt crosses inthe vector, offset by increasing distances
-  point middle(1,1);
-  point up(0,1), down(0,-1), left(-1,0), right(1,0);
+  point ref(1,1);
+  point stencil[] = {
+    point( 0, 0),
+    point( 0, 1), 
+    point( 0,-1), 
+    point(-1, 0), 
+    point( 1, 0)
+  };
+  size_t stencil_size = sizeof(stencil) / sizeof(point);
+
   for (size_t i=0; i < clusters; i++) {
-    points.push_back(middle);
-    points.push_back(middle + up);
-    points.push_back(middle + down);
-    points.push_back(middle + left);
-    points.push_back(middle + right);
-      
-    middle += (point(i+4, 0));
+    for (size_t s=0; s < stencil_size; s++) {
+      point p = ref + stencil[s];
+      points.push_back(p);
+    }
+    ref += point(i+4, 0);
   }
 
   cout << "Testing with " << points.size() << " points for 1 to " << clusters << " clusters." << endl;
 
-  dissimilarity_matrix distance;
-  build_dissimilarity_matrix(points, point_distance(), distance);
+  dissimilarity_matrix dmatrix;
+  build_dissimilarity_matrix(points, point_distance(), dmatrix);
 
   kmedoids km, clara;
-  for (size_t k = 1; k <= clusters; k++) {
-    km.pam(distance, k);
-    km.sort();
+  for (size_t k = 1; k <= max_k; k++) {
+    km.pam(dmatrix, k);
     clara.clara(points, point_distance(), k);
-    clara.sort();
 
     cout << "k: " << k << ", Mirkin distance: " << mirkin_distance(km, clara) << endl;
+
+
     draw("PAM", points, km);
     draw("CLARA", points, clara);
     cout << endl;

@@ -10,9 +10,13 @@
 #include "color.h"
 
 #include <iomanip>
+#include <cstdlib>
 #include <boost/numeric/ublas/matrix.hpp>
 using boost::numeric::ublas::matrix;
 using namespace std;
+
+#include "string_utils.h"
+using namespace stringutils;
 
 namespace cluster {
 
@@ -45,6 +49,24 @@ namespace cluster {
 
   ostream& operator<<(ostream& out, const point& p) {
     return out << "(" << setw(2) << p.x << "," << setw(2) << p.y << ")";
+  }
+
+
+  void parse_points(const string& str, vector<point>& points) {
+    string trimmed = trim(str, "() ");
+
+    vector<string> parts;
+    split(trimmed, "(,", parts);
+
+    vector<int> values(parts.size());
+    for (size_t i=0; i < parts.size(); i++) {
+      parts[i]  = trim(parts[i], "() ,");
+      values[i] = strtol(parts[i].c_str(), NULL, 0);
+    }
+
+    for (size_t i=1; i < values.size(); i += 2) {
+      points.push_back(point(values[i-1], values[i]));
+    }
   }
 
 

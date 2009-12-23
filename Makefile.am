@@ -9,12 +9,16 @@ noinst_HEADERS = \
 	partition.h \
 	MersenneTwister.h \
 	Stat.h \
-	point.h
+	point.h \
+	bic.h \
+	trial.h \
+	id_pair.h
 
 libcluster_la_SOURCES = \
 	partition.C \
 	kmedoids.C \
-	point.C
+	point.C \
+	trial.C
 
 if HAVE_MPI
 noinst_HEADERS += \
@@ -31,7 +35,8 @@ endif
 noinst_PROGRAMS = \
 	point-cluster-test \
 	mirkin-test \
-	pathological-cluster-test
+	pathological-cluster-test \
+	convergence-test
 
 if HAVE_MPI
 noinst_PROGRAMS += \
@@ -44,6 +49,7 @@ point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
+convergence_test_SOURCES = convergence_test.C
 
 LDADD = libcluster.la ../libwavelet/libwavelet.la
 

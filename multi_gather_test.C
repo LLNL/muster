@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
+#include <iterator>
 #include <iomanip>
 #include <sstream>
 
@@ -13,6 +14,17 @@
 
 using namespace std;
 using namespace cluster;
+
+
+template <class OutputIterator>
+void generate_points_for_rank(int rank, OutputIterator out) {
+  for (int i=0; i < (rank % 10 + 1); i++) {
+    int p = rank * 10 + i;
+    *out++ = point(p,p);
+  }
+}
+
+
 
 int main(int argc, char **argv) {
   Timer timer;
@@ -38,9 +50,11 @@ int main(int argc, char **argv) {
   MTRand random;
   random.seed(1);  // make sure all ranks generate the same numbers.
 
-  point p(rank, rank);    // local point to send
+  vector<point> points;   // local points to send
   vector<point> dest;     // destination vector for gathered points
   vector<int> sources;    // ranks we received from, so we can check the local points vector
+
+  generate_points_for_rank(rank, back_inserter(points));
 
   timer.record("init");
 
@@ -49,7 +63,7 @@ int main(int argc, char **argv) {
   for (int root=0; root < size; root++) {
     vector<int> cur_sources;
     random_subset(size, (int)ceil(sqrt(size)), back_inserter(cur_sources), random);
-    gather.start(p, cur_sources.begin(), cur_sources.end(), dest, root);
+    gather.start(points.begin(), points.end(), cur_sources.begin(), cur_sources.end(), dest, root);
 
     if (rank == root) {
       // record sources so we can check later.
@@ -66,32 +80,39 @@ int main(int argc, char **argv) {
     timer.record("verbose");
   }
 
+  if (verbose) cerr << rank << " calling multi_gather::finish()." << endl;
+
   gather.finish();
   timer.record("finish_gathers");
 
-  if (verbose) {
-    cerr << rank << "Finished gather." << endl;
-  }
+  if (verbose) cerr << rank << " finished gather." << endl;
   
-  int passed = dest.size() == sources.size();
+  int passed = 1;
+  size_t index = 0;
   for (size_t i=0; passed && i < sources.size(); i++) {
-    // make sure x and y are the same as the rank the point came from.
-    if (dest[i].x != sources[i] || dest[i].y != sources[i]) {
-      passed = 0;
+    vector<point> expected;
+    generate_points_for_rank(sources[i], back_inserter(expected));
+    
+    for (size_t j=0; j < expected.size(); j++) {
+      if (index >= dest.size() || dest[index] != expected[j]) {
+        passed = 0;
+      }
+      index++;
     }
   }
   timer.record("check");
 
-  if (!passed && verbose) {
+  if (verbose) {
     ostringstream msg;
+
     msg << rank << " Expected: ";
     for (size_t i=0; i < sources.size(); i++) {
-      msg << " " << point(sources[i], sources[i]);
+      generate_points_for_rank(sources[i], ostream_iterator<point>(msg, " "));
     }
     msg << endl;
 
-    msg << rank << " Found:    ";
-    for (size_t i=0; i < sources.size(); i++) {
+    msg << rank << " Found:   ";
+    for (size_t i=0; i < dest.size(); i++) {
       msg << " " << dest[i];
     }
     msg << endl;

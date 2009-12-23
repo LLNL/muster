@@ -10,9 +10,9 @@ using namespace std;
 
 namespace cluster {
   
-  par_partition::par_partition(MPI_Comm _comm) : my_id(0), comm(_comm) { 
-    medoids.push_back(0);
-  }
+  par_partition::par_partition(MPI_Comm _comm) : comm(_comm) { }
+
+  par_partition::~par_partition() { }
 
 
   void par_partition::gather(partition& destination, int root) {
@@ -21,17 +21,26 @@ namespace cluster {
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     
 #ifdef DEBUG
-    size_t count = medoids.size();
+    size_t count = medoid_ids.size();
     MPI_Bcast(&count, 1, MPI_SIZE_T, root, comm);
-    if (count != medoids.size()) {
-      cerr << "Error: incorrect number of medoids on " << rank << endl;
+    if (count != medoid_ids.size()) {
+      cerr << "Error: incorrect number of medoids on " << rank << ": " << medoid_ids.size() 
+           << ", expected " << count << endl;
       exit(1);
     }
     
-    std::vector<object_id> bcast_medoids = medoids;
-    MPI_Bcast(&bcast_medoids[0], bcast_medoids.size(), MPI_SIZE_T, root, comm);
-    for (size_t i=0; i < medoids.size(); i++) {
-      if (medoids[i] != bcast_medoids[i]) {
+    size_t object_count = cluster_ids.size();
+    MPI_Bcast(&object_count, 1, MPI_SIZE_T, root, comm);    
+    if (object_count != cluster_ids.size()) {
+      cerr << "Error: incorrect number of objects on " << rank << ": " << cluster_ids.size() 
+           << ", expected " << object_count << endl;
+      exit(1);
+    }
+
+    std::vector<object_id> bcast_medoid_ids = medoid_ids;
+    MPI_Bcast(&bcast_medoid_ids[0], bcast_medoid_ids.size(), MPI_SIZE_T, root, comm);
+    for (size_t i=0; i < medoid_ids.size(); i++) {
+      if (medoid_ids[i] != bcast_medoid_ids[i]) {
         cerr << "Error: medoids do not match on " << rank << endl;
         exit(1);
       }
@@ -39,11 +48,12 @@ namespace cluster {
 #endif // DEBUG
     
     if (rank == root) {
-      destination.cluster_ids.resize(size);
+      destination.medoid_ids = medoid_ids;
+      destination.cluster_ids.resize(cluster_ids.size() * size);
     }
 
-    MPI_Gather(&my_id, 1, MPI_SIZE_T, 
-               &destination.cluster_ids[0], 1, MPI_SIZE_T, 
+    MPI_Gather(&cluster_ids[0],             cluster_ids.size(), MPI_SIZE_T,
+               &destination.cluster_ids[0], cluster_ids.size(), MPI_SIZE_T, 
                root, comm);
   }
 

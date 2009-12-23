@@ -1,9 +1,7 @@
 #ifndef CLUSTER_TEST_POINT_H
 #define CLUSTER_TEST_POINT_H
 
-#ifdef HAVE_CONFIG_H
 #include "libra-config.h"
-#endif // HAVE_CONFIG_H
 
 #ifdef LIBRA_HAVE_MPI
 #include <mpi.h>
@@ -60,6 +58,14 @@ namespace cluster {
       return *this;
     }
 
+    bool operator==(const point& other) { 
+      return x == other.x && y == other.y;
+    }
+
+    bool operator!=(const point& other) { 
+      return !(*this == other);
+    }
+
 #ifdef LIBRA_HAVE_MPI
     /// Returns the size of a packed point
     int packed_size(MPI_Comm comm) const;
@@ -74,6 +80,12 @@ namespace cluster {
 
   std::ostream& operator<<(std::ostream& out, const point& p);
 
+  ///
+  /// Parses a string containing points in parentheses, like this:
+  ///  "(1, 1)  (2, 2) (3, 3)"
+  /// Appends parsed points to points vector.
+  ///
+  void parse_points(const std::string& str, std::vector<point>& points);
 
   ///
   /// Draws a set of points in ascii with console colors.  Colors are assigned based on
