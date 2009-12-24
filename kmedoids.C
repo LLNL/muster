@@ -136,10 +136,17 @@ namespace cluster {
       init_medoids(k, distance);
     }
 
+    ostringstream msg;
+    msg << "initial medoids: ";
+    copy(medoid_ids.begin(), medoid_ids.end(), ostream_iterator<object_id>(msg, " "));
+
+
     // set tolerance equal to epsilon times mean magnitude of distances.
     // Note that distances *should* all be non-negative.
     double tolerance = epsilon * sum(distance) / (distance.size1() * distance.size2());
 
+    size_t count = 0;
+    bool warned = false;
     while (true) {
       // initial cluster setup
       total_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
@@ -163,6 +170,15 @@ namespace cluster {
             minObject = h;
           }
         }
+      }
+
+      count++;
+      if (count > 1000 && count <= 1100) {
+        if (!warned) {
+          cerr << "WARNING: bad convergence." << endl;
+          warned = true;
+        }
+        cerr << minTotalCost << endl;
       }
 
       // bail if we can't gain anything more (we've converged)
