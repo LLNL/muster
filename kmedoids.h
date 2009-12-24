@@ -124,8 +124,8 @@ namespace cluster {
     double total_dissimilarity;              /// Total dissimilarity bt/w objects and their medoid
     bool sort_medoids;                       /// Whether medoids should be canonically sorted by object id.
 
-    /// Assigns medoids randomly from the input objects.
-    void init_medoids(size_t k);
+    /// KR BUILD algorithm for assigning initial medoids to a partition.
+    void init_medoids(size_t k, const dissimilarity_matrix& distance);
 
     /// Total cost of swapping object h with medoid i.
     /// Sums costs of this exchagne for all objects j.

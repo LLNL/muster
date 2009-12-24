@@ -6,6 +6,7 @@ using namespace cluster;
 #include <sstream>
 
 #include <algorithm>
+#include <numeric>
 #include <cassert>
 #include <cstdlib>
 #include <sys/time.h>
@@ -43,17 +44,49 @@ namespace cluster {
   }
 
 
-  void kmedoids::init_medoids(size_t k) {
+  
+
+  void kmedoids::init_medoids(size_t k, const dissimilarity_matrix& distance) {
     medoid_ids.clear();
-    random_subset(cluster_ids.size(), k, back_inserter(medoid_ids), random);
-    assert(medoid_ids.size() == k);
+    
+    // find first oject: object minimum dissimilarity to others
+    object_id first_medoid = 0;
+    double min_dist = DBL_MAX;
+    for (size_t o=0; o < distance.size2(); o++) {
+      const double *start = &distance(o,0);
+      double d = accumulate(start, start + distance.size2(), 0);
+      if (d < min_dist) {
+        min_dist = d;
+        first_medoid = o;
+      } 
+    }
+    
+    // add first object to medoids and compute medoid ids.
+    medoid_ids.push_back(first_medoid);
+    assign_objects_to_clusters(matrix_distance(distance));
 
-    ostringstream msg;
-    msg << "initial medoids: [";
-    copy(medoid_ids.begin(), medoid_ids.end(), ostream_iterator<object_id>(msg, " "));
-    msg << "]" << endl;
-    cerr << msg.str();
+    // now select next k-1 objects according to KR's BUILD algorithm
+    for (size_t cur_k = 1; cur_k < k; cur_k++) {
+      object_id best_obj = 0;
+      double max_gain = 0.0;
+      for (size_t i=0; i < distance.size1(); i++) {
+        if (is_medoid(i)) continue;
 
+        double gain = 0.0;
+        for (size_t j=0; j < distance.size1(); j++) {
+          double Dj = distance(j, medoid_ids[cluster_ids[j]]);  // distance from j to its medoid
+          gain += max(Dj - distance(i,j), 0.0);                 // gain from selecting i  
+        }
+
+        if (gain >= max_gain) {   // set the next medoid to the object that 
+          max_gain = gain;        // maximizes the gain function.
+          best_obj = i;
+        }
+      }
+      
+      medoid_ids.push_back(best_obj);
+      assign_objects_to_clusters(matrix_distance(distance));
+    }
   }
 
 
@@ -100,7 +133,7 @@ namespace cluster {
       medoid_ids.clear();
       copy(initial_medoids, initial_medoids + k, back_inserter(medoid_ids));
     } else {
-      init_medoids(k);
+      init_medoids(k, distance);
     }
 
     // set tolerance equal to epsilon times mean magnitude of distances.
@@ -133,6 +166,7 @@ namespace cluster {
       }
 
       // bail if we can't gain anything more (we've converged)
+      //if (minTotalCost >= 0.0) break;
       if (minTotalCost >= -tolerance) break;
 
       // install the new medoid if we found a beneficial swap
