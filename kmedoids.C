@@ -48,17 +48,18 @@ namespace cluster {
 
   void kmedoids::init_medoids(size_t k, const dissimilarity_matrix& distance) {
     medoid_ids.clear();
-    
     // find first oject: object minimum dissimilarity to others
     object_id first_medoid = 0;
-    double min_dist = DBL_MAX;
-    for (size_t o=0; o < distance.size2(); o++) {
-      const double *start = &distance(o,0);
-      double d = accumulate(start, start + distance.size2(), 0);
-      if (d < min_dist) {
-        min_dist = d;
-        first_medoid = o;
-      } 
+    double min_dissim = DBL_MAX;
+    for (size_t i=0; i < distance.size1(); i++) {
+      double total = 0.0;
+      for (size_t j=0; j < distance.size2(); j++) {
+        total += distance(i,j);
+      }
+      if (total < min_dissim) {
+        min_dissim   = total;
+        first_medoid = i;
+      }
     }
     
     // add first object to medoids and compute medoid ids.
@@ -139,7 +140,7 @@ namespace cluster {
     ostringstream msg;
     msg << "initial medoids: ";
     copy(medoid_ids.begin(), medoid_ids.end(), ostream_iterator<object_id>(msg, " "));
-
+    cerr << msg.str() << endl;
 
     // set tolerance equal to epsilon times mean magnitude of distances.
     // Note that distances *should* all be non-negative.
@@ -173,7 +174,7 @@ namespace cluster {
       }
 
       count++;
-      if (count > 1000 && count <= 1100) {
+      if (count > 1000 && count <= 1020) {
         if (!warned) {
           cerr << "WARNING: bad convergence." << endl;
           warned = true;
@@ -183,7 +184,7 @@ namespace cluster {
 
       // bail if we can't gain anything more (we've converged)
       //if (minTotalCost >= 0.0) break;
-      if (minTotalCost >= -tolerance) break;
+      if (minTotalCost >= 0) break;//-tolerance) break;
 
       // install the new medoid if we found a beneficial swap
       medoid_ids[minMedoid] = minObject;
