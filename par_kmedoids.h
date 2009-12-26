@@ -138,23 +138,6 @@ namespace cluster {
                     std::back_inserter(sample_indices),
                     std::bind2nd(std::minus<int>(), objects.size() * rank));
 
-
-          /*          
-          if (rank == 0) {
-            std::cerr << root << " receiving objects [";
-            copy(sample_ids.begin(), sample_ids.end(), std::ostream_iterator<size_t>(std::cerr, " "));
-            std::cerr << "]" << std::endl;
-
-            std::cerr << "  from: [";
-            copy(sources.begin(), sources.end(), std::ostream_iterator<int>(std::cerr, " "));
-            std::cerr << "]" << std::endl;
-
-          }
-          std::cerr << rank << ":  local indices are: [";
-          copy(sample_indices.begin(), sample_indices.end(), std::ostream_iterator<int>(std::cerr, " "));
-          std::cerr << "]" << std::endl;
-          */
-
           // gather trial members to the current worker (root)
           gather.start(boost::make_permutation_iterator(objects.begin(), sample_indices.begin()), 
                        boost::make_permutation_iterator(objects.begin(), sample_indices.end()),
@@ -180,21 +163,6 @@ namespace cluster {
         if (my_k >= 0) {
           dissimilarity_matrix mat;
           build_dissimilarity_matrix(my_objects, dmetric, mat);
-
-          std::ostringstream msg;
-          msg << rank 
-              << ": my_k: " << my_k
-              << ", my_trial = " << my_trial
-              << ", matrix size = " << mat.size1() << "x" << mat.size2()
-              << std::endl;
-          std::cerr << msg.str();
-
-          msg.str("");
-          msg << "data: [";
-          std::copy(my_objects.begin(), my_objects.end(), std::ostream_iterator<T>(msg, " "));
-          msg << "]" << std::endl;
-          std::cerr << msg.str();
-
           cluster.pam(mat, my_k);
 
           // put this trial's medoids into its spot in the global medoids array.

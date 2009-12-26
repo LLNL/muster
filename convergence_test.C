@@ -40,7 +40,6 @@ int main(int argc, char **argv) {
      6}
   };
   const size_t num_tests = sizeof(tests) / sizeof(test);
-  
 
   for (size_t i=0; i < num_tests; i++) {
     vector<point> points;
@@ -58,6 +57,5 @@ int main(int argc, char **argv) {
     ostringstream label;
     label << "Trial " << i;
     draw(label.str(), points, cluster);
-
   }
 }

@@ -139,21 +139,9 @@ namespace cluster {
       init_medoids(k, distance);
     }
 
-    ostringstream msg;
-    msg << "initial medoids: ";
-    vector<object_id> sorted = medoid_ids;
-    std::sort(sorted.begin(), sorted.end());
-    copy(sorted.begin(), sorted.end(), ostream_iterator<object_id>(msg, " "));
-    cerr << msg.str() << endl;
-
     // set tolerance equal to epsilon times mean magnitude of distances.
     // Note that distances *should* all be non-negative.
     double tolerance = epsilon * sum(distance) / (distance.size1() * distance.size2());
-
-    size_t count = 0;
-    bool warned = false;
-
-    vector<double> mtc;
 
     while (true) {
       // initial cluster setup
@@ -180,27 +168,12 @@ namespace cluster {
         }
       }
 
-      mtc.push_back(minTotalCost);
-
-      count++;
-      if (count > 1000 && count <= 1020) {
-        if (!warned) {
-          cerr << "WARNING: bad convergence." << endl;
-          warned = true;
-        }
-        cerr << minTotalCost << endl;
-      }
-
       // bail if we can't gain anything more (we've converged)
       if (minTotalCost >= -tolerance) break;
 
       // install the new medoid if we found a beneficial swap
       medoid_ids[minMedoid] = minObject;
       cluster_ids[minObject] = minMedoid;
-    }
-
-    for (int i = max((int)mtc.size()-10, 0); i < (int)mtc.size(); i++) {
-      cerr << mtc[i] << endl;
     }
     
     if (sort_medoids) sort();

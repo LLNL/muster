@@ -55,18 +55,8 @@ int main(int argc, char **argv) {
     ref += point(i+4, 0);
   }
 
-  if (rank == 0) {
-    cerr << "num_objects  = " << num_objects << endl;
-    cerr << "max_clusters = " << max_clusters << endl;
-  }
-  cerr << rank << ":  " << my_points.size() << " points: ";
-  copy(my_points.begin(), my_points.end(), ostream_iterator<point>(cerr, " "));
-  cerr << endl;
-
   dissimilarity_matrix distance;
   build_dissimilarity_matrix(points, point_distance(), distance);
-
-  cerr << rank << ": matrix size is " << distance.size1() << "x" << distance.size2() << endl;
 
   kmedoids km;
   par_kmedoids clara;
@@ -82,7 +72,7 @@ int main(int argc, char **argv) {
       cout << "k: " << k 
            << ", Mirkin distance: " << setprecision(3) << mirkin_distance(km, local_clara) 
            << endl;
-      
+
       ostringstream pam_msg;
       pam_msg << "PAM"
               << ", " << km.medoid_ids.size() << " clusters"

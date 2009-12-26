@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
   }
 
   size_t max_k = clusters;
-  if (argc > 1) {
+  if (argc > 2) {
     max_k = strtol(argv[2], NULL, 0);    
   }
 
