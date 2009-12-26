@@ -36,7 +36,8 @@ noinst_PROGRAMS = \
 	point-cluster-test \
 	mirkin-test \
 	pathological-cluster-test \
-	convergence-test
+	convergence-test \
+	reuse-test
 
 if HAVE_MPI
 noinst_PROGRAMS += \
@@ -50,6 +51,7 @@ par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
 convergence_test_SOURCES = convergence_test.C
+reuse_test_SOURCES = reuse_test.C
 
 LDADD = libcluster.la ../libwavelet/libwavelet.la
 

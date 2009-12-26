@@ -22,6 +22,10 @@ int main(int argc, char **argv) {
     points.push_back(point(i,i));
   }
   
+  cout << "points: ";
+  copy(points.begin(), points.end(), ostream_iterator<point>(cout, " "));
+  cout << endl;
+
   dissimilarity_matrix distance;
   build_dissimilarity_matrix(points, point_distance(), distance);
 

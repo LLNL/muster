@@ -14,8 +14,14 @@ namespace cluster {
       total_dissimilarity(numeric_limits<double>::infinity()),
       min_bic_score(0),
       init_size(40),
-      max_reps(5)
+      max_reps(5),
+      epsilon(1e-15)
   { }
+
+
+  void par_kmedoids::set_epsilon(double e) {
+    epsilon = e;
+  }
 
 
   double par_kmedoids::average_dissimilarity() {

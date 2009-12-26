@@ -17,15 +17,15 @@ using namespace std;
 
 #include "point.h"
 
-// relative error for cost function.  Avoids roundoff error.
-static const double epsilon = 1e-15;
 
 namespace cluster {
   
   kmedoids::kmedoids(size_t num_objects) 
     : partition(num_objects), 
       total_dissimilarity(std::numeric_limits<double>::infinity()),
-      sort_medoids(true)
+      sort_medoids(true),
+      //epsilon(1e-15)
+      epsilon(0)
   {
     struct timeval time;
     gettimeofday(&time, 0);
@@ -43,7 +43,9 @@ namespace cluster {
     sort_medoids = sort;
   }
 
-
+  void kmedoids::set_epsilon(double e) {
+    epsilon = e;
+  }
   
 
   void kmedoids::init_medoids(size_t k, const dissimilarity_matrix& distance) {
@@ -139,7 +141,9 @@ namespace cluster {
 
     ostringstream msg;
     msg << "initial medoids: ";
-    copy(medoid_ids.begin(), medoid_ids.end(), ostream_iterator<object_id>(msg, " "));
+    vector<object_id> sorted = medoid_ids;
+    std::sort(sorted.begin(), sorted.end());
+    copy(sorted.begin(), sorted.end(), ostream_iterator<object_id>(msg, " "));
     cerr << msg.str() << endl;
 
     // set tolerance equal to epsilon times mean magnitude of distances.
@@ -148,6 +152,9 @@ namespace cluster {
 
     size_t count = 0;
     bool warned = false;
+
+    vector<double> mtc;
+
     while (true) {
       // initial cluster setup
       total_dissimilarity = assign_objects_to_clusters(matrix_distance(distance));
@@ -173,6 +180,8 @@ namespace cluster {
         }
       }
 
+      mtc.push_back(minTotalCost);
+
       count++;
       if (count > 1000 && count <= 1020) {
         if (!warned) {
@@ -183,14 +192,17 @@ namespace cluster {
       }
 
       // bail if we can't gain anything more (we've converged)
-      //if (minTotalCost >= 0.0) break;
-      if (minTotalCost >= 0) break;//-tolerance) break;
+      if (minTotalCost >= -tolerance) break;
 
       // install the new medoid if we found a beneficial swap
       medoid_ids[minMedoid] = minObject;
       cluster_ids[minObject] = minMedoid;
     }
 
+    for (int i = max((int)mtc.size()-10, 0); i < (int)mtc.size(); i++) {
+      cerr << mtc[i] << endl;
+    }
+    
     if (sort_medoids) sort();
   }
 

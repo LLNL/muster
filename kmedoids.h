@@ -38,6 +38,11 @@ namespace cluster {
     /// Defaults to true.
     void set_sort_medoids(bool sort_medoids);
 
+    /// Set tolerance for convergence.  This is relative error, not absolute error.  It will be
+    /// multiplied by the mean distance before it is used to test convergence.
+    /// Defaults to 1e-15; may need to be higher if there exist clusterings with very similar quality.
+    void set_epsilon(double epsilon);
+
     /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
     /// algorithm as described in Kaufman and Rousseeuw. 
     /// Parameters:
@@ -123,6 +128,7 @@ namespace cluster {
     std::vector<medoid_id> sec_nearest;      /// Index of second closest medoids.  Used by PAM.
     double total_dissimilarity;              /// Total dissimilarity bt/w objects and their medoid
     bool sort_medoids;                       /// Whether medoids should be canonically sorted by object id.
+    double epsilon;
 
     /// KR BUILD algorithm for assigning initial medoids to a partition.
     void init_medoids(size_t k, const dissimilarity_matrix& distance);
@@ -145,11 +151,12 @@ namespace cluster {
         sec_nearest.resize(cluster_ids.size());
       }
       
+      std::set<object_id> medoids;
+      medoids.insert(medoid_ids.begin(), medoid_ids.end());
+
       // go through and assign each object to nearest medoid, keeping track of total dissimilarity.
       double total_dissimilarity = 0;
       for (object_id i=0; i < cluster_ids.size(); i++) {
-        if (is_medoid(i)) continue;
-
         double    d1, d2;  // smallest, second smallest distance to medoid, respectively
         medoid_id m1, m2;  // index of medoids with distances d1, d2 from object i, respectively
 

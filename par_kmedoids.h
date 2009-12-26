@@ -64,6 +64,11 @@ namespace cluster {
     ///
     size_t get_init_size() { return init_size; }
 
+    /// Set tolerance for convergence.  This is relative error, not absolute error.  It will be
+    /// multiplied by the mean distance before it is used to test convergence.
+    /// Defaults to 1e-15; may need to be higher if there exist clusterings with very similar quality.
+    void set_epsilon(double epsilon);
+
     ///
     /// Parallel version of the CLARA clustering algorithm.  Assumes that objects
     /// to be clustered are fully distributed across parallel process, one object
@@ -170,6 +175,8 @@ namespace cluster {
 
         // if we're a worker process (we were assigned a k and a trial number) then run PAM on the sample.
         kmedoids cluster;
+        cluster.set_epsilon(epsilon);
+
         if (my_k >= 0) {
           dissimilarity_matrix mat;
           build_dissimilarity_matrix(my_objects, dmetric, mat);
@@ -313,6 +320,7 @@ namespace cluster {
     double min_bic_score;         /// BIC score for the clustering found.
     size_t init_size;             /// baseline size for samples
     size_t max_reps;              /// Max repetitions of trials for a particular k.
+    double epsilon;               /// Tolerance for convergence tests in kmedoids PAM runs.
 
     Timer timer;                  /// Performance timer.
 
