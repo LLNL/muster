@@ -46,8 +46,8 @@ host_triplet = @host@
 @HAVE_MPI_TRUE@	par_kmedoids.C
 
 noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
-	pathological-cluster-test$(EXEEXT) convergence-test$(EXEEXT) \
-	reuse-test$(EXEEXT) $(am__EXEEXT_1)
+	pathological-cluster-test$(EXEEXT) nondistinct-test$(EXEEXT) \
+	convergence-test$(EXEEXT) reuse-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_3 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
 @HAVE_MPI_TRUE@	multi-gather-test
@@ -129,6 +129,11 @@ multi_gather_test_OBJECTS = $(am_multi_gather_test_OBJECTS)
 multi_gather_test_LDADD = $(LDADD)
 multi_gather_test_DEPENDENCIES = libcluster.la \
 	../libwavelet/libwavelet.la
+am_nondistinct_test_OBJECTS = nondistinct_test.$(OBJEXT)
+nondistinct_test_OBJECTS = $(am_nondistinct_test_OBJECTS)
+nondistinct_test_LDADD = $(LDADD)
+nondistinct_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la
 am_par_cluster_test_OBJECTS = par_cluster_test.$(OBJEXT)
 par_cluster_test_OBJECTS = $(am_par_cluster_test_OBJECTS)
 par_cluster_test_LDADD = $(LDADD)
@@ -165,12 +170,13 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcluster_la_SOURCES) $(convergence_test_SOURCES) \
 	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
-	$(par_cluster_test_SOURCES) \
+	$(nondistinct_test_SOURCES) $(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES)
 DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
 	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
-	$(multi_gather_test_SOURCES) $(par_cluster_test_SOURCES) \
+	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
+	$(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES)
 am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
@@ -366,6 +372,7 @@ point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
+nondistinct_test_SOURCES = nondistinct_test.C
 convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
 LDADD = libcluster.la ../libwavelet/libwavelet.la
@@ -458,6 +465,9 @@ mirkin-test$(EXEEXT): $(mirkin_test_OBJECTS) $(mirkin_test_DEPENDENCIES)
 multi-gather-test$(EXEEXT): $(multi_gather_test_OBJECTS) $(multi_gather_test_DEPENDENCIES) 
 	@rm -f multi-gather-test$(EXEEXT)
 	$(CXXLINK) $(multi_gather_test_OBJECTS) $(multi_gather_test_LDADD) $(LIBS)
+nondistinct-test$(EXEEXT): $(nondistinct_test_OBJECTS) $(nondistinct_test_DEPENDENCIES) 
+	@rm -f nondistinct-test$(EXEEXT)
+	$(CXXLINK) $(nondistinct_test_OBJECTS) $(nondistinct_test_LDADD) $(LIBS)
 par-cluster-test$(EXEEXT): $(par_cluster_test_OBJECTS) $(par_cluster_test_DEPENDENCIES) 
 	@rm -f par-cluster-test$(EXEEXT)
 	$(CXXLINK) $(par_cluster_test_OBJECTS) $(par_cluster_test_LDADD) $(LIBS)
@@ -481,6 +491,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi_gather_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nondistinct_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_partition.Plo@am__quote@

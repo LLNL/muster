@@ -36,6 +36,7 @@ noinst_PROGRAMS = \
 	point-cluster-test \
 	mirkin-test \
 	pathological-cluster-test \
+	nondistinct-test \
 	convergence-test \
 	reuse-test
 
@@ -50,6 +51,7 @@ point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
+nondistinct_test_SOURCES = nondistinct_test.C
 convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
 
