@@ -24,8 +24,7 @@ namespace cluster {
     : partition(num_objects), 
       total_dissimilarity(std::numeric_limits<double>::infinity()),
       sort_medoids(true),
-      //epsilon(1e-15)
-      epsilon(0)
+      epsilon(1e-15)
   {
     struct timeval time;
     gettimeofday(&time, 0);
