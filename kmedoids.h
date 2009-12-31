@@ -151,9 +151,6 @@ namespace cluster {
         sec_nearest.resize(cluster_ids.size());
       }
       
-      std::set<object_id> medoids;
-      medoids.insert(medoid_ids.begin(), medoid_ids.end());
-
       // go through and assign each object to nearest medoid, keeping track of total dissimilarity.
       double total_dissimilarity = 0;
       for (object_id i=0; i < cluster_ids.size(); i++) {
@@ -164,7 +161,7 @@ namespace cluster {
         m1 = m2 = medoid_ids.size();
         for (medoid_id m=0; m < medoid_ids.size(); m++) {
           double d = distance(i, medoid_ids[m]);
-          if (d < d1) {
+          if (d < d1 || medoid_ids[m] == i) {  // prefer the medoid in case of ties.
             d2 = d1;  m2 = m1;
             d1 = d;   m1 = m;
           } else if (d < d2) {
