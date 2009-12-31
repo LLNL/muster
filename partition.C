@@ -53,9 +53,12 @@ namespace cluster {
 
 
   static void write(ostream& out, const cluster_list& clusters, const vector<object_id> *medoid_ids = NULL) {
-    out << "Medoids: ";
-    copy(medoid_ids->begin(), medoid_ids->end(), ostream_iterator<object_id>(out, " "));
-    out << endl;
+    if (medoid_ids) {
+      out << "Medoids: ";
+      copy(medoid_ids->begin(), medoid_ids->end(), ostream_iterator<object_id>(out, " "));
+      out << endl;
+    }
+
     for (unsigned i=0; i < clusters.size(); i++) {
       out << i << "\t";
       const cset& c = clusters[i];
