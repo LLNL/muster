@@ -141,4 +141,24 @@ namespace cluster {
     expanded.swap(list);
   }
 
+  
+  void partition::write_members_with_runs(medoid_id m, ostream& out) {
+    object_id o=0;
+    bool first = true;
+    while (o < cluster_ids.size()) {
+      if (cluster_ids[o] == m) {
+        object_id start = o++;
+        while (o < cluster_ids.size() && cluster_ids[o] == m) o++;
+        if (!first) out << " ";
+        if (o == start+1) {
+          out << start;
+        } else {
+          out << start << "-" << (o-1);
+        }
+        first = false;
+      }
+      o++;
+    }
+  }
+
 } // namespace cluster

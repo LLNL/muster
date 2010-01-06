@@ -14,7 +14,6 @@ namespace cluster {
   typedef size_t medoid_id;       /// More descriptive type for medoid index
   typedef size_t object_id;       /// More descriptive type for object index
 
-
   /// Class to represent a partitioning of a dataset into 
   /// clusters with medoids.
   struct partition {
@@ -46,14 +45,40 @@ namespace cluster {
     
     /// puts medoids in order by their object id, and adjusts cluster_ids accordingly.
     void sort();
+
+    /// Write the members of cluster m out to the output stream as object_ids
+    template <class OutputIterator>
+    void write_members(medoid_id m, OutputIterator out) {
+      for (object_id o=0; o < cluster_ids.size(); o++) {
+        if (cluster_ids[o] == m) {
+          *out++ = o;
+        }
+      }
+    }
+
+    /// Write the members of cluster m out to the output stream formatted nicely with
+    /// hyphenated runs of consecutive numbers
+    void write_members_with_runs(medoid_id m, std::ostream& out);
+
+    /// writable structure returned by members() function.
+    struct member_writer {    
+      partition* p;
+      medoid_id m;
+      member_writer(partition *_p, medoid_id _m) : p(_p), m(_m) { }
+    };
+    member_writer members(medoid_id m) { return member_writer(this, m); }
   };
 
+  inline std::ostream& operator<<(std::ostream& out, const partition::member_writer& mw) {
+    mw.p->write_members_with_runs(mw.m, out);
+    return out;
+  }
+  
   /// Prints out nicely formatted clustering
   std::ostream& operator<<(std::ostream& out, const cluster_list& list);
 
   /// For convenience
-  std::ostream& operator<<(std::ostream& out, const partition& km);
-
+  std::ostream& operator<<(std::ostream& out, const partition& km);  
 
   /// Mirkin distance bt/w two clusterings.
   double mirkin_distance(const cluster_list& c1, const cluster_list& c2);
