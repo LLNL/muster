@@ -9,8 +9,8 @@ namespace cluster {
 
 
 
-  par_kmedoids::par_kmedoids() 
-    : par_partition(), 
+  par_kmedoids::par_kmedoids(MPI_Comm comm) 
+    : par_partition(comm), 
       total_dissimilarity(numeric_limits<double>::infinity()),
       min_bic_score(0),
       init_size(40),
@@ -26,7 +26,7 @@ namespace cluster {
 
   double par_kmedoids::average_dissimilarity() {
     int size;
-    MPI_Comm_size(comm, &size);
+    PMPI_Comm_size(comm, &size);
     return total_dissimilarity / size;
   }
 
@@ -36,7 +36,7 @@ namespace cluster {
 
   void par_kmedoids::seed_random_uniform(MPI_Comm comm) {
     int rank;
-    MPI_Comm_rank(comm, &rank);
+    PMPI_Comm_rank(comm, &rank);
 
     uint32_t seed = 0;
     if (rank == 0) {
@@ -46,7 +46,7 @@ namespace cluster {
       seed = time.tv_sec * time.tv_usec;
     }
 
-    MPI_Bcast(&seed, 1, MPI_INT, 0, comm);
+    PMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
     random.seed(seed);
   }
 

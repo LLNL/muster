@@ -2,10 +2,8 @@
 #define PAR_KMEDOIDS_H
 
 #include <mpi.h>
+#include <ostream>
 #include <vector>
-#include <sstream>
-#include <fstream>
-#include <set>
 #include <functional>
 
 #include <boost/iterator/permutation_iterator.hpp>
@@ -32,7 +30,7 @@ namespace cluster {
     ///
     /// par_kmedoids assumes that there is one object to be clustered per process.
     ///
-    par_kmedoids();
+    par_kmedoids(MPI_Comm comm = MPI_COMM_WORLD);
 
     virtual ~par_kmedoids() { }
 
@@ -96,8 +94,8 @@ namespace cluster {
     template <class T, class D>
     void clara(const std::vector<T>& objects, D dmetric, size_t max_k, std::vector<T> *medoids = NULL) {
       int size, rank;
-      MPI_Comm_size(comm, &size);
-      MPI_Comm_rank(comm, &rank);
+      PMPI_Comm_size(comm, &size);
+      PMPI_Comm_rank(comm, &rank);
 
       seed_random_uniform(comm); // seed RN generator uniformly across ranks.
 
@@ -202,7 +200,9 @@ namespace cluster {
         size_t *sizes   = &cluster_sizes[cluster_sizes.size() - num_medoids];
         
         for (size_t o=0; o < objects.size(); o++) {
-          std::pair<double, size_t> closest = closest_medoid(objects[o], all_medoids[i], dmetric);
+          object_id global_oid = rank + o;
+          std::pair<double, size_t> closest = closest_medoid(objects[o], global_oid, all_medoids[i], dmetric);
+
           all_dissimilarities[i]  += closest.first;
           dissim2[closest.second] += closest.first * closest.first;
           sizes[closest.second]   += 1;
@@ -218,11 +218,11 @@ namespace cluster {
       std::vector<double> sums2(all_dissim2.size());
       std::vector<size_t> sizes(cluster_sizes.size());
 
-      MPI_Reduce(&all_dissimilarities[0],  &sums[0], trials.count(), MPI_DOUBLE, MPI_SUM, 0, comm);
-      MPI_Reduce(&all_dissim2[0], &sums2[0], sums2.size(), MPI_DOUBLE, MPI_SUM, 0, comm);
-      MPI_Bcast(&sums[0],  trials.count(), MPI_DOUBLE, 0, comm);
-      MPI_Bcast(&sums2[0], sums2.size(), MPI_DOUBLE, 0, comm);
-      MPI_Allreduce(&cluster_sizes[0], &sizes[0], sizes.size(), MPI_SIZE_T, MPI_SUM, comm);
+      PMPI_Reduce(&all_dissimilarities[0],  &sums[0], trials.count(), MPI_DOUBLE, MPI_SUM, 0, comm);
+      PMPI_Reduce(&all_dissim2[0], &sums2[0], sums2.size(), MPI_DOUBLE, MPI_SUM, 0, comm);
+      PMPI_Bcast(&sums[0],  trials.count(), MPI_DOUBLE, 0, comm);
+      PMPI_Bcast(&sums2[0], sums2.size(), MPI_DOUBLE, 0, comm);
+      PMPI_Allreduce(&cluster_sizes[0], &sizes[0], sizes.size(), MPI_SIZE_T, MPI_SUM, comm);
       timer.record("GlobalSums");
 
       // find minmum global dissimilarity among all trials.
@@ -245,7 +245,6 @@ namespace cluster {
       }
       
       best = best_bic;
-
 
       // Finally set up the partition to correspond to best trial found.
       medoid_ids.resize(all_medoids[best].size());
@@ -275,7 +274,7 @@ namespace cluster {
         }
       }
 
-      timer.record("FindBest");
+      timer.record("BicScore");
     }    
 
     
@@ -304,7 +303,7 @@ namespace cluster {
     template <class T>
     void bcast_medoids(MPI_Comm comm, std::vector<T>& medoids, int root) {
       int rank;
-      MPI_Comm_rank(comm, &rank);
+      PMPI_Comm_rank(comm, &rank);
 
       // figure out size of packed buffer
       int packed_size=0;
@@ -316,7 +315,7 @@ namespace cluster {
       }
 
       // broadcast size and allocate receive buffer.
-      MPI_Bcast(&packed_size, 1, MPI_INT, root, comm);
+      PMPI_Bcast(&packed_size, 1, MPI_INT, root, comm);
       char packed_buffer[packed_size];
 
       // pack buffer with medoid objects
@@ -324,21 +323,21 @@ namespace cluster {
         int pos = 0;
 
         size_t num_medoids = medoids.size();
-        MPI_Pack(&num_medoids, 1, MPI_SIZE_T, packed_buffer, packed_size, &pos, comm);
+        PMPI_Pack(&num_medoids, 1, MPI_SIZE_T, packed_buffer, packed_size, &pos, comm);
 
         for (size_t i=0; i < num_medoids; i++) {
           medoids[i].pack(packed_buffer, packed_size, &pos, comm);
         }
       }
 
-      MPI_Bcast(&packed_buffer, packed_size, MPI_PACKED, root, comm);
+      PMPI_Bcast(&packed_buffer, packed_size, MPI_PACKED, root, comm);
 
       // unpack broadcast medoids.
       if (rank != root) {
         int pos = 0;
 
         size_t num_medoids;
-        MPI_Unpack(packed_buffer, packed_size, &pos, &num_medoids, 1, MPI_SIZE_T, comm);
+        PMPI_Unpack(packed_buffer, packed_size, &pos, &num_medoids, 1, MPI_SIZE_T, comm);
         medoids.resize(num_medoids);
 
         for (size_t i=0; i < medoids.size(); i++) {
@@ -354,13 +353,13 @@ namespace cluster {
     ///
     template <typename T, typename D>
     std::pair<double, size_t> closest_medoid(
-      const T& object, std::vector< id_pair<T> >& medoids, D dmetric
+      const T& object, object_id oid, std::vector< id_pair<T> >& medoids, D dmetric
     ) {
       double min_distance = DBL_MAX;
       size_t min_id = medoids.size();
       for (size_t m=0; m < medoids.size(); m++) {
         double d = dmetric(medoids[m].element, object);
-        if (d < min_distance) {
+        if (d < min_distance || medoids[m].id == oid) { // prefer actual medoid as closest
           min_distance = d;
           min_id = m;
         }
