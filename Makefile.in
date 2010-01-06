@@ -47,7 +47,8 @@ host_triplet = @host@
 
 noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
 	pathological-cluster-test$(EXEEXT) nondistinct-test$(EXEEXT) \
-	convergence-test$(EXEEXT) reuse-test$(EXEEXT) $(am__EXEEXT_1)
+	convergence-test$(EXEEXT) reuse-test$(EXEEXT) \
+	write-members-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_3 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
 @HAVE_MPI_TRUE@	multi-gather-test
@@ -155,6 +156,11 @@ am_reuse_test_OBJECTS = reuse_test.$(OBJEXT)
 reuse_test_OBJECTS = $(am_reuse_test_OBJECTS)
 reuse_test_LDADD = $(LDADD)
 reuse_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la
+am_write_members_test_OBJECTS = write_members_test.$(OBJEXT)
+write_members_test_OBJECTS = $(am_write_members_test_OBJECTS)
+write_members_test_LDADD = $(LDADD)
+write_members_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -172,13 +178,15 @@ SOURCES = $(libcluster_la_SOURCES) $(convergence_test_SOURCES) \
 	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
 	$(nondistinct_test_SOURCES) $(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
-	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES)
+	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
+	$(write_members_test_SOURCES)
 DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
 	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
 	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
 	$(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
-	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES)
+	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
+	$(write_members_test_SOURCES)
 am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
 	dissimilarity.h partition.h MersenneTwister.h Stat.h point.h \
 	bic.h trial.h id_pair.h par_partition.h par_kmedoids.h \
@@ -375,6 +383,7 @@ pathological_cluster_test_SOURCES = pathological_cluster_test.C
 nondistinct_test_SOURCES = nondistinct_test.C
 convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
+write_members_test_SOURCES = write_members_test.C
 LDADD = libcluster.la ../libwavelet/libwavelet.la
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
@@ -480,6 +489,9 @@ point-cluster-test$(EXEEXT): $(point_cluster_test_OBJECTS) $(point_cluster_test_
 reuse-test$(EXEEXT): $(reuse_test_OBJECTS) $(reuse_test_DEPENDENCIES) 
 	@rm -f reuse-test$(EXEEXT)
 	$(CXXLINK) $(reuse_test_OBJECTS) $(reuse_test_LDADD) $(LIBS)
+write-members-test$(EXEEXT): $(write_members_test_OBJECTS) $(write_members_test_DEPENDENCIES) 
+	@rm -f write-members-test$(EXEEXT)
+	$(CXXLINK) $(write_members_test_OBJECTS) $(write_members_test_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -501,6 +513,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/point_cluster_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/reuse_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trial.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/write_members_test.Po@am__quote@
 
 .C.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
