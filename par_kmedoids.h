@@ -92,7 +92,9 @@ namespace cluster {
     /// of sample_size objects distributed over all processes in the system.
     ///
     template <class T, class D>
-    void clara(const std::vector<T>& objects, D dmetric, size_t max_k, std::vector<T> *medoids = NULL) {
+    void xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality,
+                std::vector<T> *medoids = NULL) 
+    {
       int size, rank;
       PMPI_Comm_size(comm, &size);
       PMPI_Comm_rank(comm, &rank);
@@ -236,7 +238,7 @@ namespace cluster {
       size_t trial_offset = 0;  // offset into sizes array
       for (size_t i=0; i < trials.count(); i++) {
         size_t k = all_medoids[i].size();
-        double bic_score = bic(k, &sizes[trial_offset], &sums2[trial_offset], 2);
+        double bic_score = bic(k, &sizes[trial_offset], &sums2[trial_offset], dimensionality);
         if (bic_score < min_bic_score) {
           best_bic = i;
           min_bic_score = bic_score;

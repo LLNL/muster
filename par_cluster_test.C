@@ -59,18 +59,18 @@ int main(int argc, char **argv) {
   build_dissimilarity_matrix(points, point_distance(), distance);
 
   kmedoids km;
-  par_kmedoids clara;
+  par_kmedoids parkm;
   for (size_t k=1; k <= max_clusters; k++) {
     km.pam(distance, k);
 
     vector<point> medoids;
-    clara.clara(my_points, point_distance(), k, &medoids);
-    cluster::partition local_clara;
-    clara.gather(local_clara);
+    parkm.xclara(my_points, point_distance(), k, 2, &medoids);
+    cluster::partition local_partition;
+    parkm.gather(local_partition);
 
     if (rank == 0) {
       cout << "k: " << k 
-           << ", Mirkin distance: " << setprecision(3) << mirkin_distance(km, local_clara) 
+           << ", Mirkin distance: " << setprecision(3) << mirkin_distance(km, local_partition) 
            << endl;
 
       ostringstream pam_msg;
@@ -79,16 +79,16 @@ int main(int argc, char **argv) {
               << ", Avg. dissimilarity: " << km.average_dissimilarity()
               << ", BIC: " << bic(km, matrix_distance(distance), 2);
 
-      ostringstream clara_msg;
-      clara_msg << "Parallel CLARA" 
-                << ", " << local_clara.medoid_ids.size() << " clusters"
-                << ", Avg. dissimilarity: " << clara.average_dissimilarity()
-                << ", BIC: " << clara.bic_score();
+      ostringstream parkm_msg;
+      parkm_msg << "Parallel CLARA" 
+                << ", " << local_partition.medoid_ids.size() << " clusters"
+                << ", Avg. dissimilarity: " << parkm.average_dissimilarity()
+                << ", BIC: " << parkm.bic_score();
 
       draw(pam_msg.str(), points, km);
-      draw(clara_msg.str(), points, local_clara);
+      draw(parkm_msg.str(), points, local_partition);
       cout << endl;
-      clara.get_timer().write();
+      parkm.get_timer().write();
       cout << endl;
     }
   }

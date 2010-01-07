@@ -43,14 +43,34 @@ namespace cluster {
     /// Defaults to 1e-15; may need to be higher if there exist clusterings with very similar quality.
     void set_epsilon(double epsilon);
 
+    /// 
     /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
     /// algorithm as described in Kaufman and Rousseeuw. 
     /// Parameters:
     ///   distance         dissimilarity matrix for all objects to cluster
     ///   k                number of clusters to produce
     ///   initial_medoids  Optionally supply k initial object ids to be used as initial medoids.
+    /// 
     void pam(dissimilarity_matrix distance, size_t k, const object_id *initial_medoids = NULL);
-    
+
+    ///
+    /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
+    /// algorithm as described in Kaufman and Rousseeuw. Runs PAM from 1 to max_k and selects
+    /// the best k using the bayesian information criterion.  Sets this partition to the best
+    /// partition found using PAM from 1 to k.
+    /// 
+    /// Based on X-Means, see Pelleg & Moore, 2000.
+    /// 
+    /// Parameters:
+    ///   distance         dissimilarity matrix for all objects to cluster
+    ///   max_k            Upper limit on number of clusters to find.
+    ///   dimensionality   Number of dimensions in clustered data, for BIC.
+    ///
+    /// Return value:
+    ///   This routine returns the best BIC value found (the bic value of the final partitioning).
+    ///
+    double xpam(dissimilarity_matrix distance, size_t max_k, size_t dimensionality);
+
     ///
     /// CLARA clustering algorithm, as per Kaufman and Rousseuw and
     /// R. Ng and J. Han, "Efficient and Effective Clustering Methods 
@@ -67,6 +87,7 @@ namespace cluster {
     ///   k              Number of clusters to partition
     ///   sample_size    defaults to 40+2*k, per Kaufman and Rousseeuw's recommendation
     ///   iterations     Number of times to run PAM with sampled dataset
+    /// 
     template <class T, class D>
     void clara(const std::vector<T> objects, D dmetric,
                size_t k, size_t init_size = 40, size_t iterations=5) {
@@ -122,6 +143,7 @@ namespace cluster {
       
       if (sort_medoids) sort();   // just do one final ordering of ids.
     }    
+
 
     protected:
     MTRand random;                           /// Random number generator for this algorithm

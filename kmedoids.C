@@ -14,9 +14,7 @@ using namespace std;
 
 #include "counter.h"
 #include "matrix_utils.h"
-
-#include "point.h"
-
+#include "bic.h"
 
 namespace cluster {
   
@@ -176,6 +174,22 @@ namespace cluster {
     }
     
     if (sort_medoids) sort();
+  }
+
+
+  double kmedoids::xpam(dissimilarity_matrix distance, size_t max_k, size_t dimensionality) {
+    double best_bic = DBL_MAX;
+
+    kmedoids subcall;
+    for (size_t k = 1; k <= max_k; k++) {
+      subcall.pam(distance, k);
+      double cur_bic = bic(subcall, matrix_distance(distance), dimensionality);
+      if (cur_bic < best_bic) {
+        best_bic = cur_bic;
+        swap(subcall);
+      }
+    }
+    return best_bic;
   }
 
 
