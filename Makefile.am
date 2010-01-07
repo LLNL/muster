@@ -44,12 +44,14 @@ noinst_PROGRAMS = \
 if HAVE_MPI
 noinst_PROGRAMS += \
 	par-cluster-test \
+	par-cluster-speed-test \
 	multi-gather-test
 endif
 
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
+par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
 nondistinct_test_SOURCES = nondistinct_test.C
@@ -57,8 +59,9 @@ convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
 write_members_test_SOURCES = write_members_test.C
 
-LDADD = libcluster.la ../libwavelet/libwavelet.la
+LDADD = libcluster.la ../libwavelet/libwavelet.la ../callpath/libcallpath.la
 
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
-  -I$(top_srcdir)/libwavelet
+  -I$(top_srcdir)/libwavelet \
+  -I$(top_srcdir)/callpath

@@ -51,6 +51,7 @@ noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
 	write-members-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_3 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
+@HAVE_MPI_TRUE@	par-cluster-speed-test \
 @HAVE_MPI_TRUE@	multi-gather-test
 
 subdir = cluster
@@ -114,53 +115,61 @@ am_libcluster_la_OBJECTS = partition.lo kmedoids.lo point.lo trial.lo \
 	$(am__objects_1)
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
 @HAVE_MPI_TRUE@am__EXEEXT_1 = par-cluster-test$(EXEEXT) \
+@HAVE_MPI_TRUE@	par-cluster-speed-test$(EXEEXT) \
 @HAVE_MPI_TRUE@	multi-gather-test$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
 am_convergence_test_OBJECTS = convergence_test.$(OBJEXT)
 convergence_test_OBJECTS = $(am_convergence_test_OBJECTS)
 convergence_test_LDADD = $(LDADD)
 convergence_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
-mirkin_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la
+mirkin_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la \
+	../callpath/libcallpath.la
 am_multi_gather_test_OBJECTS = multi_gather_test.$(OBJEXT)
 multi_gather_test_OBJECTS = $(am_multi_gather_test_OBJECTS)
 multi_gather_test_LDADD = $(LDADD)
 multi_gather_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 am_nondistinct_test_OBJECTS = nondistinct_test.$(OBJEXT)
 nondistinct_test_OBJECTS = $(am_nondistinct_test_OBJECTS)
 nondistinct_test_LDADD = $(LDADD)
 nondistinct_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
+am_par_cluster_speed_test_OBJECTS = par_cluster_speed_test.$(OBJEXT)
+par_cluster_speed_test_OBJECTS = $(am_par_cluster_speed_test_OBJECTS)
+par_cluster_speed_test_LDADD = $(LDADD)
+par_cluster_speed_test_DEPENDENCIES = libcluster.la \
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 am_par_cluster_test_OBJECTS = par_cluster_test.$(OBJEXT)
 par_cluster_test_OBJECTS = $(am_par_cluster_test_OBJECTS)
 par_cluster_test_LDADD = $(LDADD)
 par_cluster_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 am_pathological_cluster_test_OBJECTS =  \
 	pathological_cluster_test.$(OBJEXT)
 pathological_cluster_test_OBJECTS =  \
 	$(am_pathological_cluster_test_OBJECTS)
 pathological_cluster_test_LDADD = $(LDADD)
 pathological_cluster_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 am_point_cluster_test_OBJECTS = point_cluster_test.$(OBJEXT)
 point_cluster_test_OBJECTS = $(am_point_cluster_test_OBJECTS)
 point_cluster_test_LDADD = $(LDADD)
 point_cluster_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 am_reuse_test_OBJECTS = reuse_test.$(OBJEXT)
 reuse_test_OBJECTS = $(am_reuse_test_OBJECTS)
 reuse_test_LDADD = $(LDADD)
-reuse_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la
+reuse_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la \
+	../callpath/libcallpath.la
 am_write_members_test_OBJECTS = write_members_test.$(OBJEXT)
 write_members_test_OBJECTS = $(am_write_members_test_OBJECTS)
 write_members_test_LDADD = $(LDADD)
 write_members_test_DEPENDENCIES = libcluster.la \
-	../libwavelet/libwavelet.la
+	../libwavelet/libwavelet.la ../callpath/libcallpath.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -176,14 +185,15 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libcluster_la_SOURCES) $(convergence_test_SOURCES) \
 	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
-	$(nondistinct_test_SOURCES) $(par_cluster_test_SOURCES) \
+	$(nondistinct_test_SOURCES) $(par_cluster_speed_test_SOURCES) \
+	$(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
 	$(write_members_test_SOURCES)
 DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
 	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
 	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
-	$(par_cluster_test_SOURCES) \
+	$(par_cluster_speed_test_SOURCES) $(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
 	$(write_members_test_SOURCES)
@@ -378,16 +388,18 @@ libcluster_la_SOURCES = partition.C kmedoids.C point.C trial.C \
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
+par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
 nondistinct_test_SOURCES = nondistinct_test.C
 convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
 write_members_test_SOURCES = write_members_test.C
-LDADD = libcluster.la ../libwavelet/libwavelet.la
+LDADD = libcluster.la ../libwavelet/libwavelet.la ../callpath/libcallpath.la
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
-  -I$(top_srcdir)/libwavelet
+  -I$(top_srcdir)/libwavelet \
+  -I$(top_srcdir)/callpath
 
 all: all-am
 
@@ -477,6 +489,9 @@ multi-gather-test$(EXEEXT): $(multi_gather_test_OBJECTS) $(multi_gather_test_DEP
 nondistinct-test$(EXEEXT): $(nondistinct_test_OBJECTS) $(nondistinct_test_DEPENDENCIES) 
 	@rm -f nondistinct-test$(EXEEXT)
 	$(CXXLINK) $(nondistinct_test_OBJECTS) $(nondistinct_test_LDADD) $(LIBS)
+par-cluster-speed-test$(EXEEXT): $(par_cluster_speed_test_OBJECTS) $(par_cluster_speed_test_DEPENDENCIES) 
+	@rm -f par-cluster-speed-test$(EXEEXT)
+	$(CXXLINK) $(par_cluster_speed_test_OBJECTS) $(par_cluster_speed_test_LDADD) $(LIBS)
 par-cluster-test$(EXEEXT): $(par_cluster_test_OBJECTS) $(par_cluster_test_DEPENDENCIES) 
 	@rm -f par-cluster-test$(EXEEXT)
 	$(CXXLINK) $(par_cluster_test_OBJECTS) $(par_cluster_test_LDADD) $(LIBS)
@@ -504,6 +519,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi_gather_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nondistinct_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_speed_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_partition.Plo@am__quote@
