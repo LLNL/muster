@@ -80,11 +80,12 @@ namespace cluster {
 
     int max_x=0;
     int max_y=0;
+
     for (size_t i=0; i < points.size(); i++) {
       max_x = max(points[i].x, max_x);
       max_y = max(points[i].y, max_y);
     }
-  
+
     matrix<int> pmat(max_x+1, max_y+1);
     for (size_t i=0; i < pmat.size1(); i++) {
       for (size_t j=0; j < pmat.size2(); j++) {
@@ -93,7 +94,10 @@ namespace cluster {
     }
 
     for (size_t i=0; i < points.size(); i++) {
-      pmat(points[i].x, points[i].y) = i;
+      if (!(pmat(points[i].x, points[i].y) != -1 &&  // make sure not to overwrite medoids.
+            parts.is_medoid(pmat(points[i].x, points[i].y)))) {
+        pmat(points[i].x, points[i].y) = i;
+      }
     }
   
     const int min_hbar = 80;

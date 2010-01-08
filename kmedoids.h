@@ -144,13 +144,18 @@ namespace cluster {
       if (sort_medoids) sort();   // just do one final ordering of ids.
     }    
 
+    /// Set callback function for XPAM.  default is none.
+    void set_xpam_callback(void (*)(const partition& part, double bic));
 
     protected:
     MTRand random;                           /// Random number generator for this algorithm
     std::vector<medoid_id> sec_nearest;      /// Index of second closest medoids.  Used by PAM.
     double total_dissimilarity;              /// Total dissimilarity bt/w objects and their medoid
     bool sort_medoids;                       /// Whether medoids should be canonically sorted by object id.
-    double epsilon;
+    double epsilon;                          /// Normalized sensitivity for convergence
+
+    /// Callback for each iteration of xpam.  is called with the current clustering and its BIC score.
+    void (*xpam_callback)(const partition& part, double bic);
 
     /// KR BUILD algorithm for assigning initial medoids to a partition.
     void init_medoids(size_t k, const dissimilarity_matrix& distance);

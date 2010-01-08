@@ -39,18 +39,22 @@ noinst_PROGRAMS = \
 	nondistinct-test \
 	convergence-test \
 	reuse-test \
-	write-members-test
+	write-members-test \
+	bic-test
 
 if HAVE_MPI
 noinst_PROGRAMS += \
 	par-cluster-test \
 	par-cluster-speed-test \
+	par-bic-test \
 	multi-gather-test
 endif
 
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
+par_bic_test_SOURCES = par_bic_test.C
+bic_test_SOURCES = bic_test.C
 par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C

@@ -18,8 +18,8 @@ namespace cluster {
   ///    k                   Number of clusters in the clustering.  Same as k from k-means or k-medoids.
   ///    cluster_sizes       Start of range of k sizes.  
   ///                          *cluster_sizes..*(cluster_sizes + k) == respective sizes of clusters 1 to k
-  ///    dimensionality      Dimensionality of clustered data.  E.g.: 2 for 2-dimensional points.
   ///    sum2_dissimilarity  Sum of squared dissimilarities of each object w.r.t. its closest medoid.
+  ///    dimensionality      Dimensionality of clustered data.  E.g.: 2 for 2-dimensional points.
   ///
   /// This implementation is based on "X-Means: Extending K-means with Efficient Estimation of the 
   /// Number of Clusters" by Dan Pelleg and Andrew Moore.
@@ -58,18 +58,20 @@ namespace cluster {
   ///
   template <typename D>
   double bic(const partition& p, D distance, size_t M) {
-    size_t k = p.medoid_ids.size();
+    size_t k = p.num_clusters();
     std::vector<size_t> sizes(k);
+
     for (size_t i=0; i < k; i++) {
-      sizes[i] = count(p.cluster_ids.begin(), p.cluster_ids.end(), i);
+      sizes[i] = p.size(i);
     }
 
     std::vector<double> sum2_dissim(k, 0.0);
-    for (size_t i=0; i < p.cluster_ids.size(); i++) {
-      sum2_dissim[p.cluster_ids[i]] += distance(i, p.medoid_ids[p.cluster_ids[i]]);
+    for (size_t i=0; i < p.size(); i++) {
+      double dissim = distance(i, p.medoid_ids[p.cluster_ids[i]]);
+      sum2_dissim[p.cluster_ids[i]] += dissim * dissim;
     }
 
-    return bic(p.medoid_ids.size(), sizes.begin(), sum2_dissim.begin(), M);
+    return bic(k, sizes.begin(), sum2_dissim.begin(), M);
   }
 
 

@@ -53,7 +53,7 @@ namespace cluster {
     }
   }
 
-
+  
   /// Adaptor for passing a matrix by reference to template functions that take
   /// a callable distance function.  Avoids copying distance matrix.
   struct matrix_distance {

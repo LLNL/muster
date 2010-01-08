@@ -45,7 +45,16 @@ namespace cluster {
     
     /// puts medoids in order by their object id, and adjusts cluster_ids accordingly.
     void sort();
+    
+    /// Total number of objects in the partition
+    size_t size() const { return cluster_ids.size(); }
 
+    /// Total number of clusters in the partition
+    size_t num_clusters() const { return medoid_ids.size(); }
+    
+    /// Number of objects in cluster i
+    size_t size(size_t i) const;
+    
     /// Write the members of cluster m out to the output stream as object_ids
     template <class OutputIterator>
     void write_members(medoid_id m, OutputIterator out) {
@@ -90,6 +99,32 @@ namespace cluster {
   /// in the cluster_list with indices in [2^l * i ... 2^l * (i+1) - 1]
   /// TODO: deprecate and delete.
   void expand(cluster_list& list, size_t level = 1);
+
+  ///
+  /// Compute the total dissimilarity between all objects and their medoids
+  ///
+  template <typename D>
+  double total_dissimilarity(const partition& p, D dist) {
+    double dissim = 0.0;
+    for (size_t i=0; i < p.cluster_ids.size(); i++) {
+      dissim += dist(i, p.medoid_ids[p.cluster_ids[i]]);
+    }
+    return dissim;
+  }
+  
+  ///
+  /// Compute the total squared dissimilarity between all objects and their medoids
+  ///
+  template <typename D>
+  double total_squared_dissimilarity(const partition& p, D dist) {
+    double dissim2 = 0.0;
+    for (size_t i=0; i < p.cluster_ids.size(); i++) {
+      double d = dist(i, p.medoid_ids[p.cluster_ids[i]]);
+      dissim2 += d * d;
+    }
+    return dissim2;
+  }
+
 
 } // namespace cluster
 
