@@ -129,10 +129,12 @@ int main(int argc, char **argv) {
   double avg = total / trials;
   
   if (rank == 0) {
-    ostringstream timing_filename;
-    timing_filename << "times-" << size;
-    ofstream timing(timing_filename.str().c_str());
-    parkm.get_timer().write(timing);
+    if (timing) {
+      ostringstream timing_filename;
+      timing_filename << "times-" << size;
+      ofstream timing_file(timing_filename.str().c_str());
+      parkm.get_timer().write(timing_file);
+    }
 
     cout << "PROCS:   " << size << " " << endl;
     cout << "TOTAL:   " << total / 1e9 << endl;
