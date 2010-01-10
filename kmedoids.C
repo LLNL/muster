@@ -22,7 +22,10 @@ namespace cluster {
     : partition(num_objects), 
       total_dissimilarity(std::numeric_limits<double>::infinity()),
       sort_medoids(true),
-      epsilon(1e-15)
+      epsilon(1e-15),
+      init_size(40),
+      max_reps(5),
+      xcallback(NULL)
   {
     struct timeval time;
     gettimeofday(&time, 0);
@@ -44,6 +47,9 @@ namespace cluster {
     epsilon = e;
   }
   
+  void kmedoids::set_xcallback(void (*xpc)(const partition& part, double bic)) {
+    xcallback = xpc;
+  }
 
   void kmedoids::init_medoids(size_t k, const dissimilarity_matrix& distance) {
     medoid_ids.clear();
@@ -178,13 +184,16 @@ namespace cluster {
 
 
   double kmedoids::xpam(dissimilarity_matrix distance, size_t max_k, size_t dimensionality) {
-    double best_bic = DBL_MAX;
+    double best_bic = -DBL_MAX;   // note that DBL_MIN isn't what you think it is.
 
-    kmedoids subcall;
     for (size_t k = 1; k <= max_k; k++) {
+      kmedoids subcall;
       subcall.pam(distance, k);
       double cur_bic = bic(subcall, matrix_distance(distance), dimensionality);
-      if (cur_bic < best_bic) {
+
+      if (xcallback) xcallback(subcall, cur_bic);
+
+      if (cur_bic > best_bic) {
         best_bic = cur_bic;
         swap(subcall);
       }

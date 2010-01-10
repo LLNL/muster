@@ -7,12 +7,10 @@ using namespace std;
 
 namespace cluster {
 
-
-
   par_kmedoids::par_kmedoids(MPI_Comm comm) 
     : par_partition(comm), 
       total_dissimilarity(numeric_limits<double>::infinity()),
-      min_bic_score(0),
+      best_bic_score(0),
       init_size(40),
       max_reps(5),
       epsilon(1e-15)
@@ -31,7 +29,7 @@ namespace cluster {
   }
 
   double par_kmedoids::bic_score() {
-    return min_bic_score;
+    return best_bic_score;
   }
 
   void par_kmedoids::seed_random_uniform(MPI_Comm comm) {

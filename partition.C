@@ -80,6 +80,12 @@ namespace cluster {
   }
 
 
+  size_t partition::size(size_t i) const {
+    return count(cluster_ids.begin(), cluster_ids.end(), i);
+  }
+
+
+
   double mirkin_distance(const cluster_list& c1, const cluster_list& c2) {
     size_t c1_sum2 = 0;
     size_t n = 0;

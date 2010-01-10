@@ -48,10 +48,11 @@ host_triplet = @host@
 noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
 	pathological-cluster-test$(EXEEXT) nondistinct-test$(EXEEXT) \
 	convergence-test$(EXEEXT) reuse-test$(EXEEXT) \
-	write-members-test$(EXEEXT) $(am__EXEEXT_1)
+	write-members-test$(EXEEXT) bic-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_3 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
 @HAVE_MPI_TRUE@	par-cluster-speed-test \
+@HAVE_MPI_TRUE@	par-bic-test \
 @HAVE_MPI_TRUE@	multi-gather-test
 
 subdir = cluster
@@ -116,8 +117,14 @@ am_libcluster_la_OBJECTS = partition.lo kmedoids.lo point.lo trial.lo \
 libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
 @HAVE_MPI_TRUE@am__EXEEXT_1 = par-cluster-test$(EXEEXT) \
 @HAVE_MPI_TRUE@	par-cluster-speed-test$(EXEEXT) \
+@HAVE_MPI_TRUE@	par-bic-test$(EXEEXT) \
 @HAVE_MPI_TRUE@	multi-gather-test$(EXEEXT)
 PROGRAMS = $(noinst_PROGRAMS)
+am_bic_test_OBJECTS = bic_test.$(OBJEXT)
+bic_test_OBJECTS = $(am_bic_test_OBJECTS)
+bic_test_LDADD = $(LDADD)
+bic_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la \
+	../callpath/libcallpath.la
 am_convergence_test_OBJECTS = convergence_test.$(OBJEXT)
 convergence_test_OBJECTS = $(am_convergence_test_OBJECTS)
 convergence_test_LDADD = $(LDADD)
@@ -138,6 +145,11 @@ nondistinct_test_OBJECTS = $(am_nondistinct_test_OBJECTS)
 nondistinct_test_LDADD = $(LDADD)
 nondistinct_test_DEPENDENCIES = libcluster.la \
 	../libwavelet/libwavelet.la ../callpath/libcallpath.la
+am_par_bic_test_OBJECTS = par_bic_test.$(OBJEXT)
+par_bic_test_OBJECTS = $(am_par_bic_test_OBJECTS)
+par_bic_test_LDADD = $(LDADD)
+par_bic_test_DEPENDENCIES = libcluster.la ../libwavelet/libwavelet.la \
+	../callpath/libcallpath.la
 am_par_cluster_speed_test_OBJECTS = par_cluster_speed_test.$(OBJEXT)
 par_cluster_speed_test_OBJECTS = $(am_par_cluster_speed_test_OBJECTS)
 par_cluster_speed_test_LDADD = $(LDADD)
@@ -183,24 +195,26 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libcluster_la_SOURCES) $(convergence_test_SOURCES) \
-	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
-	$(nondistinct_test_SOURCES) $(par_cluster_speed_test_SOURCES) \
+SOURCES = $(libcluster_la_SOURCES) $(bic_test_SOURCES) \
+	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
+	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
+	$(par_bic_test_SOURCES) $(par_cluster_speed_test_SOURCES) \
 	$(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
 	$(write_members_test_SOURCES)
-DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) \
+DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) $(bic_test_SOURCES) \
 	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
 	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
-	$(par_cluster_speed_test_SOURCES) $(par_cluster_test_SOURCES) \
+	$(par_bic_test_SOURCES) $(par_cluster_speed_test_SOURCES) \
+	$(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
 	$(write_members_test_SOURCES)
 am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
 	dissimilarity.h partition.h MersenneTwister.h Stat.h point.h \
-	bic.h trial.h id_pair.h par_partition.h par_kmedoids.h \
-	multi_gather.h
+	bic.h trial.h id_pair.h gaussian.h par_partition.h \
+	par_kmedoids.h multi_gather.h
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -382,12 +396,14 @@ top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
 noinst_HEADERS = kmedoids.h random.h counter.h color.h dissimilarity.h \
 	partition.h MersenneTwister.h Stat.h point.h bic.h trial.h \
-	id_pair.h $(am__append_1)
+	id_pair.h gaussian.h $(am__append_1)
 libcluster_la_SOURCES = partition.C kmedoids.C point.C trial.C \
 	$(am__append_2)
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
 par_cluster_test_SOURCES = par_cluster_test.C
+par_bic_test_SOURCES = par_bic_test.C
+bic_test_SOURCES = bic_test.C
 par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
@@ -477,6 +493,9 @@ clean-noinstPROGRAMS:
 	list=`for p in $$list; do echo "$$p"; done | sed 's/$(EXEEXT)$$//'`; \
 	echo " rm -f" $$list; \
 	rm -f $$list
+bic-test$(EXEEXT): $(bic_test_OBJECTS) $(bic_test_DEPENDENCIES) 
+	@rm -f bic-test$(EXEEXT)
+	$(CXXLINK) $(bic_test_OBJECTS) $(bic_test_LDADD) $(LIBS)
 convergence-test$(EXEEXT): $(convergence_test_OBJECTS) $(convergence_test_DEPENDENCIES) 
 	@rm -f convergence-test$(EXEEXT)
 	$(CXXLINK) $(convergence_test_OBJECTS) $(convergence_test_LDADD) $(LIBS)
@@ -489,6 +508,9 @@ multi-gather-test$(EXEEXT): $(multi_gather_test_OBJECTS) $(multi_gather_test_DEP
 nondistinct-test$(EXEEXT): $(nondistinct_test_OBJECTS) $(nondistinct_test_DEPENDENCIES) 
 	@rm -f nondistinct-test$(EXEEXT)
 	$(CXXLINK) $(nondistinct_test_OBJECTS) $(nondistinct_test_LDADD) $(LIBS)
+par-bic-test$(EXEEXT): $(par_bic_test_OBJECTS) $(par_bic_test_DEPENDENCIES) 
+	@rm -f par-bic-test$(EXEEXT)
+	$(CXXLINK) $(par_bic_test_OBJECTS) $(par_bic_test_LDADD) $(LIBS)
 par-cluster-speed-test$(EXEEXT): $(par_cluster_speed_test_OBJECTS) $(par_cluster_speed_test_DEPENDENCIES) 
 	@rm -f par-cluster-speed-test$(EXEEXT)
 	$(CXXLINK) $(par_cluster_speed_test_OBJECTS) $(par_cluster_speed_test_LDADD) $(LIBS)
@@ -514,11 +536,13 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bic_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convergence_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi_gather_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nondistinct_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_bic_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_speed_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_cluster_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
