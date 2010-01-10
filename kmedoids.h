@@ -12,6 +12,7 @@
 #include "dissimilarity.h"
 #include "MersenneTwister.h"
 #include "partition.h"
+#include "bic.h"
 
 namespace cluster {
 
@@ -89,7 +90,7 @@ namespace cluster {
     ///   iterations     Number of times to run PAM with sampled dataset
     /// 
     template <class T, class D>
-    void clara(const std::vector<T> objects, D dmetric,
+    void clara(const std::vector<T>& objects, D dmetric,
                size_t k, size_t init_size = 40, size_t iterations=5) {
 
       size_t sample_size = init_size + 2*k;
@@ -144,8 +145,32 @@ namespace cluster {
       if (sort_medoids) sort();   // just do one final ordering of ids.
     }    
 
-    /// Set callback function for XPAM.  default is none.
-    void set_xpam_callback(void (*)(const partition& part, double bic));
+
+    template <class T, class D>
+    double xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality,
+                size_t init_size = 40, size_t iterations=5) 
+    {
+      double best_bic = -DBL_MAX;   // note that DBL_MIN isn't what you think it is.
+      
+      for (size_t k = 1; k <= max_k; k++) {
+        kmedoids subcall;
+        subcall.clara(objects, dmetric, k, dimensionality);
+        double cur_bic = bic(subcall, dmetric, dimensionality);
+        
+        if (xcallback) xcallback(subcall, cur_bic);
+        
+        if (cur_bic > best_bic) {
+          best_bic = cur_bic;
+          swap(subcall);
+        }
+      }
+      return best_bic;
+    }
+
+
+
+    /// Set callback function for XPAM and XCLARA.  default is none.
+    void set_xcallback(void (*)(const partition& part, double bic));
 
     protected:
     MTRand random;                           /// Random number generator for this algorithm
@@ -155,7 +180,7 @@ namespace cluster {
     double epsilon;                          /// Normalized sensitivity for convergence
 
     /// Callback for each iteration of xpam.  is called with the current clustering and its BIC score.
-    void (*xpam_callback)(const partition& part, double bic);
+    void (*xcallback)(const partition& part, double bic);
 
     /// KR BUILD algorithm for assigning initial medoids to a partition.
     void init_medoids(size_t k, const dissimilarity_matrix& distance);

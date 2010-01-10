@@ -52,16 +52,20 @@ int main(int argc, char **argv) {
   dissimilarity_matrix dmatrix;
   build_dissimilarity_matrix(points, point_distance(), dmatrix);
 
-  kmedoids km, clara;
+  kmedoids km, clara, xkm, xclara;
   for (size_t k = 1; k <= max_k; k++) {
     km.pam(dmatrix, k);
     clara.clara(points, point_distance(), k);
+    xkm.xpam(dmatrix, k, 2);
+    xclara.xclara(points, point_distance(), k, 2);
 
     cout << "k: " << k << ", Mirkin distance: " << mirkin_distance(km, clara) << endl;
 
 
     draw("PAM", points, km);
     draw("CLARA", points, clara);
+    draw("XPAM", points, xkm);
+    draw("XCLARA", points, xclara);
     cout << endl;
   }
 }

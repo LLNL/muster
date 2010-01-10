@@ -213,8 +213,8 @@ DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST) $(bic_test_SOURCES) \
 	$(write_members_test_SOURCES)
 am__noinst_HEADERS_DIST = kmedoids.h random.h counter.h color.h \
 	dissimilarity.h partition.h MersenneTwister.h Stat.h point.h \
-	bic.h trial.h id_pair.h par_partition.h par_kmedoids.h \
-	multi_gather.h
+	bic.h trial.h id_pair.h gaussian.h par_partition.h \
+	par_kmedoids.h multi_gather.h
 HEADERS = $(noinst_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -396,7 +396,7 @@ top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
 noinst_HEADERS = kmedoids.h random.h counter.h color.h dissimilarity.h \
 	partition.h MersenneTwister.h Stat.h point.h bic.h trial.h \
-	id_pair.h $(am__append_1)
+	id_pair.h gaussian.h $(am__append_1)
 libcluster_la_SOURCES = partition.C kmedoids.C point.C trial.C \
 	$(am__append_2)
 mirkin_test_SOURCES = mirkin_test.C
@@ -430,9 +430,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu cluster/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign cluster/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu cluster/Makefile
+	  $(AUTOMAKE) --foreign cluster/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \

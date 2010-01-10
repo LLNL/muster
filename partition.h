@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <ostream>
+#include <stdint.h>
 
 namespace cluster {
 
@@ -101,7 +102,7 @@ namespace cluster {
   void expand(cluster_list& list, size_t level = 1);
 
   ///
-  /// Compute the total dissimilarity between all objects and their medoids
+  /// Compute the total dissimilarity between all objects and their medoids.
   ///
   template <typename D>
   double total_dissimilarity(const partition& p, D dist) {
@@ -111,9 +112,23 @@ namespace cluster {
     }
     return dissim;
   }
+
+  ///
+  /// Compute the total dissimilarity between all objects in a particular cluster and its medoid.
+  ///
+  template <typename D>
+  double total_dissimilarity(const partition& p, D dist, medoid_id m) {
+    double dissim = 0.0;
+    for (size_t i=0; i < p.cluster_ids.size(); i++) {
+      if (p.cluster_ids[i] == m) {
+        dissim += dist(i, p.medoid_ids[p.cluster_ids[i]]);
+      }
+    }
+    return dissim;
+  }
   
   ///
-  /// Compute the total squared dissimilarity between all objects and their medoids
+  /// Compute the total squared dissimilarity between all objects and their medoids.
   ///
   template <typename D>
   double total_squared_dissimilarity(const partition& p, D dist) {
@@ -121,6 +136,22 @@ namespace cluster {
     for (size_t i=0; i < p.cluster_ids.size(); i++) {
       double d = dist(i, p.medoid_ids[p.cluster_ids[i]]);
       dissim2 += d * d;
+    }
+    return dissim2;
+  }
+
+  ///
+  /// Compute the total squared dissimilarity between all objects in a particular 
+  /// cluster and its medoid.
+  ///
+  template <typename D>
+  double total_squared_dissimilarity(const partition& p, D dist, medoid_id m) {
+    double dissim2 = 0.0;
+    for (size_t i=0; i < p.cluster_ids.size(); i++) {
+      if (p.cluster_ids[i] == m) {
+        double d = dist(i, p.medoid_ids[p.cluster_ids[i]]);
+        dissim2 += d * d;
+      }
     }
     return dissim2;
   }

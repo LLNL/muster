@@ -12,7 +12,8 @@ noinst_HEADERS = \
 	point.h \
 	bic.h \
 	trial.h \
-	id_pair.h
+	id_pair.h \
+	gaussian.h
 
 libcluster_la_SOURCES = \
 	partition.C \

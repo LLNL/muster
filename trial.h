@@ -39,7 +39,7 @@ namespace cluster {
     /// Constructor to generate trials from min_k to max_k.
     ///
     trial_generator(size_t min_k, size_t _max_k, 
-                   size_t _max_reps, size_t _init_size, size_t _max_sample);
+                    size_t _max_reps, size_t _init_size, size_t _max_sample);
     
     size_t count() const;       /// return iterations so far.
     bool has_next() const;      /// whether there are trials remaining.

@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
     km.pam(distance, k);
 
     vector<point> medoids;
-    parkm.xclara(my_points, point_distance(), k, 2, &medoids);
+    parkm.clara(my_points, point_distance(), k, &medoids);
     cluster::partition local_partition;
     parkm.gather(local_partition);
 

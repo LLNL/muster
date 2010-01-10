@@ -27,51 +27,84 @@ namespace cluster {
   template <typename SizeIterator, typename DissimIterator>
   double bic(size_t k, SizeIterator cluster_sizes, DissimIterator sum2_dissim, size_t dimensionality) {
     // figure out total size of data set and put it in R.
-    const size_t R = std::accumulate(cluster_sizes, cluster_sizes + k, 0);
-
-    // Shorthand for model dimensionality
-    const size_t M = dimensionality;
-
+    const double R      = std::accumulate(cluster_sizes, cluster_sizes + k, 0);
+    const double M      = dimensionality;    // Shorthand for model dimensionality
     const double logR   = log(R);
     const double log2pi = log(2 * M_PI);
-    const size_t pj     = k + M*k;          // free parameter count
-    
-    // apply criterion formula from paper.
+    const double pj     = (k-1) + M*k + 1;   // free parameter count
+    const double s2     = std::accumulate(sum2_dissim, sum2_dissim + k, 0) / (R - k);
+
+    // apply criterion formula from xmeans paper.
     double criterion = 0;
     for (size_t i=0; i < k; i++) {
-      const size_t Rn = *(cluster_sizes + i);
-      const double s2 = *(sum2_dissim + i);
+      const double Rn = *(cluster_sizes + i);
       criterion += 
-        - (Rn / 2.0 * log2pi) 
+        - (Rn * log2pi) / 2.0
         - (Rn * M * log(s2)) / 2.0 
-        - (Rn - k) / 2.0 
+        - (Rn - 1) / 2.0 
         + Rn * log(Rn) 
         - Rn * logR;
     }
-    criterion -= pj/2.0 * logR;
+    criterion -= (pj/2.0 * logR);
     
     return criterion;
   }
-  
+
+
   ///
   /// BIC metric for partitions that have already been constructed.
   ///
   template <typename D>
-  double bic(const partition& p, D distance, size_t M) {
+  double old_bic(const partition& p, D distance, size_t M) {
     size_t k = p.num_clusters();
-    std::vector<size_t> sizes(k);
 
+    size_t sizes[k];     // cluster sizes
     for (size_t i=0; i < k; i++) {
       sizes[i] = p.size(i);
     }
 
-    std::vector<double> sum2_dissim(k, 0.0);
-    for (size_t i=0; i < p.size(); i++) {
-      double dissim = distance(i, p.medoid_ids[p.cluster_ids[i]]);
-      sum2_dissim[p.cluster_ids[i]] += dissim * dissim;
+    std::vector<double> sum2_dissim(k);  // sum of squared dissimilarity
+    for (size_t i=0; i < k; i++) {
+      sum2_dissim[i] = total_squared_dissimilarity(p, distance, i);
     }
 
-    return bic(k, sizes.begin(), sum2_dissim.begin(), M);
+    return bic(k, sizes, sum2_dissim.begin(), M);
+  }
+
+
+
+  ///
+  /// This is the direct calculation of the BIC from individual point probabilities.
+  /// Use this to check that the partial implementation is correct.
+  ///
+  template <typename D>
+  double bic(const partition& p, D distance, size_t M) {
+    size_t R = p.size();
+    size_t k = p.num_clusters();
+
+    // calculate variance.
+    double s2 = total_squared_dissimilarity(p, distance) / (R - k);
+    double s  = sqrt(s2);
+    double sM = pow(s, (double)M);
+    
+    size_t sizes[k];
+    for (size_t i=0; i < k; i++) {
+      sizes[i] = p.size(i);
+    }
+    
+    double root2pi = sqrt(2 * M_PI);
+    double lD = 0;
+    for (size_t i=0; i < p.size(); i++) {
+      double d  = distance(i, p.medoid_ids[p.cluster_ids[i]]);
+      double Ri = sizes[p.cluster_ids[i]];
+      lD += 
+        + log(1.0 / (root2pi * sM))
+        - (1 / (2 * s2)) * d * d
+        + log(Ri / R);
+    }
+
+    const size_t pj = (k-1) + M*k + 1;   // free parameter count
+    return lD - pj/2 * log(R);
   }
 
 
