@@ -23,6 +23,8 @@ namespace cluster {
       total_dissimilarity(std::numeric_limits<double>::infinity()),
       sort_medoids(true),
       epsilon(1e-15),
+      init_size(40),
+      max_reps(5),
       xcallback(NULL)
   {
     struct timeval time;

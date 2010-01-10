@@ -32,7 +32,7 @@ namespace cluster {
     const double logR   = log(R);
     const double log2pi = log(2 * M_PI);
     const double pj     = (k-1) + M*k + 1;   // free parameter count
-    const double s2     = std::accumulate(sum2_dissim, sum2_dissim + k, 0) / (R - k);
+    const double s2     = std::accumulate(sum2_dissim, sum2_dissim + k, 0.0) / (R - k);
 
     // apply criterion formula from xmeans paper.
     double criterion = 0;

@@ -7,14 +7,12 @@ using namespace std;
 
 namespace cluster {
 
-
-
   par_kmedoids::par_kmedoids(MPI_Comm comm) 
     : par_partition(comm), 
       total_dissimilarity(numeric_limits<double>::infinity()),
       best_bic_score(0),
-      init_size(60),
-      max_reps(7),
+      init_size(40),
+      max_reps(5),
       epsilon(1e-15)
   { }
 

@@ -31,7 +31,7 @@ void usage() {
   cerr << "               Default is 128." << endl;
   cerr << "  -c         Max number of clusters to search for." << endl;
   cerr << "               Default is 1." << endl;
-  cerr << "  -s         Scale values by this amount.." << endl;
+  cerr << "  -s         Scale values by this amount." << endl;
   exit(1);
 }
 
@@ -39,7 +39,7 @@ bool timing = false;
 bool validate = false;
 size_t num_points = 128;
 size_t max_clusters = 10;
-const size_t dimensions = 1;
+const size_t dimensions = 2;
 
 double scale = 1.0;
 
@@ -137,7 +137,8 @@ int main(int argc, char **argv) {
   vector<gaussian_generator_2d> clusters;
   for (size_t i=0; i < centroids.size(); i++) {
     clusters.push_back(
-      gaussian_generator_2d(centroids[i].x  * scale, centroids[i].y * scale, stddev * scale, xscale, yscale));
+      gaussian_generator_2d((int)(centroids[i].x  * scale), (int)(centroids[i].y * scale), 
+                            stddev * scale, xscale, yscale));
   }
 
   for (size_t r=0; r < num_points; r++) {
@@ -155,8 +156,8 @@ int main(int argc, char **argv) {
   
   kmedoids km;
   km.set_xcallback(print_cluster_info);
-  //double best_bic = km.xpam(dissimilarity, max_clusters, dimensions);
-  double best_bic = km.xclara(points, point_distance(), max_clusters, dimensions);
+  double best_bic = km.xpam(dissimilarity, max_clusters, dimensions);
+  //double best_bic = km.xclara(points, point_distance(), max_clusters, dimensions);
   //double best_bic = 0;
   //km.clara(points, point_distance(), max_clusters, dimensions);
 

@@ -12,8 +12,6 @@ using namespace cluster;
 
 
 
-/// Test using points instead of QGrams to make sure clustering 
-/// algorithms work.
 int main(int argc, char **argv) { 
   //vector of test points
   vector<point> points;

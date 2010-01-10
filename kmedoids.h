@@ -90,9 +90,7 @@ namespace cluster {
     ///   iterations     Number of times to run PAM with sampled dataset
     /// 
     template <class T, class D>
-    void clara(const std::vector<T>& objects, D dmetric,
-               size_t k, size_t init_size = 40, size_t iterations=5) {
-
+    void clara(const std::vector<T>& objects, D dmetric, size_t k) {
       size_t sample_size = init_size + 2*k;
     
       // Just run plain KMedoids once if sampling won't gain us anything
@@ -110,9 +108,9 @@ namespace cluster {
       // medoids and clusters for best partition so far.
       partition best_partition;
 
-      //run KMedoids on a sampled subset ITERATIONS times
+      //run KMedoids on a sampled subset max_reps times
       total_dissimilarity = DBL_MAX;
-      for (size_t i = 0; i < iterations; i++) {
+      for (size_t i = 0; i < max_reps; i++) {
         // Take a random sample of objects, store sample in a vector
         std::vector<size_t> sample_to_full;
         random_subset(objects.size(), sample_size, back_inserter(sample_to_full), random);
@@ -145,16 +143,16 @@ namespace cluster {
       if (sort_medoids) sort();   // just do one final ordering of ids.
     }    
 
-
+    ///
+    /// TODO: figure out better BIC criterion for this.
+    ///
     template <class T, class D>
-    double xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality,
-                size_t init_size = 40, size_t iterations=5) 
-    {
+    double xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality) {
       double best_bic = -DBL_MAX;   // note that DBL_MIN isn't what you think it is.
       
       for (size_t k = 1; k <= max_k; k++) {
         kmedoids subcall;
-        subcall.clara(objects, dmetric, k, dimensionality);
+        subcall.clara(objects, dmetric, k);
         double cur_bic = bic(subcall, dmetric, dimensionality);
         
         if (xcallback) xcallback(subcall, cur_bic);
@@ -168,6 +166,9 @@ namespace cluster {
     }
 
 
+    void set_init_size(size_t sz) { init_size = sz; }
+    void set_max_reps(size_t r) { max_reps = r; }
+
 
     /// Set callback function for XPAM and XCLARA.  default is none.
     void set_xcallback(void (*)(const partition& part, double bic));
@@ -178,6 +179,9 @@ namespace cluster {
     double total_dissimilarity;              /// Total dissimilarity bt/w objects and their medoid
     bool sort_medoids;                       /// Whether medoids should be canonically sorted by object id.
     double epsilon;                          /// Normalized sensitivity for convergence
+    size_t init_size;                        /// initial sample size (before 2*k)
+    size_t max_reps;                         /// initial sample size (before 2*k)
+
 
     /// Callback for each iteration of xpam.  is called with the current clustering and its BIC score.
     void (*xcallback)(const partition& part, double bic);

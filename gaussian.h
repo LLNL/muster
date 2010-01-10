@@ -29,11 +29,12 @@ namespace cluster {
       double px = x + r * cos(theta);
       double py = y + r * sin(theta);
       
-      return point(round(px * xs), round(py * ys));
+      return point((int)round(px * xs), (int)round(py * ys));
     }
 
   private:
-    int x, y, xs, ys;
+    int x, y;
+    double xs, ys;
     boost::mt19937 rand;
     
     typedef boost::normal_distribution<double> dist_type;
