@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "mpi_utils.h"
+#include "partition.h"
 
 //#define DEBUG
 
@@ -56,5 +57,15 @@ namespace cluster {
                 &destination.cluster_ids[0], cluster_ids.size(), MPI_SIZE_T, 
                 root, comm);
   }
+
+  std::ostream& operator<<(std::ostream& out, const par_partition& par) {
+    // TODO: fix this; it's hacky.
+    cluster::partition p;
+    p.medoid_ids = par.medoid_ids;
+    p.cluster_ids = par.cluster_ids;
+    out << p;
+    return out;
+  }
+
 
 } // namespace cluster

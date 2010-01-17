@@ -3,6 +3,7 @@
 
 #include <mpi.h>
 #include <vector>
+#include <ostream>
 
 #include "partition.h"
 
@@ -34,6 +35,8 @@ namespace cluster {
     void gather(partition& local, int root=0);
   };
   
+  std::ostream& operator<<(std::ostream& out, const par_partition& par);
+
 } // namespace cluster
 
 #endif // PAR_PARTITION_H
