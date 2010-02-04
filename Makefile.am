@@ -39,9 +39,9 @@ noinst_PROGRAMS = \
 	pathological-cluster-test \
 	nondistinct-test \
 	convergence-test \
-	reuse-test \
 	write-members-test \
-	bic-test
+	bic-test \
+	reuse-test
 
 if HAVE_MPI
 noinst_PROGRAMS += \

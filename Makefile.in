@@ -47,8 +47,8 @@ host_triplet = @host@
 
 noinst_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
 	pathological-cluster-test$(EXEEXT) nondistinct-test$(EXEEXT) \
-	convergence-test$(EXEEXT) reuse-test$(EXEEXT) \
-	write-members-test$(EXEEXT) bic-test$(EXEEXT) $(am__EXEEXT_1)
+	convergence-test$(EXEEXT) write-members-test$(EXEEXT) \
+	bic-test$(EXEEXT) reuse-test$(EXEEXT) $(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_3 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
 @HAVE_MPI_TRUE@	par-cluster-speed-test \

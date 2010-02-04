@@ -3,9 +3,9 @@
 #include <sstream>
 #include <fstream>
 
+#include "kmedoids.h"
 #include "point.h"
 #include "bic.h"
-#include "par_kmedoids.h"
 
 using namespace cluster;
 using namespace std;

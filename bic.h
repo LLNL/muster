@@ -79,7 +79,7 @@ namespace cluster {
   ///
   template <typename D>
   double bic(const partition& p, D distance, size_t M) {
-    size_t R = p.size();
+    double R = p.size();
     size_t k = p.num_clusters();
 
     // calculate variance.

@@ -10,7 +10,6 @@
 #include "io_utils.h"
 #include "wavelet.h"
 #include "kmedoids.h"
-#include "par_kmedoids.h"
 #include "bic.h"
 #include "matrix_utils.h"
 #include "gaussian.h"
@@ -32,9 +31,11 @@ void usage() {
   cerr << "  -c         Max number of clusters to search for." << endl;
   cerr << "               Default is 1." << endl;
   cerr << "  -s         Scale values by this amount." << endl;
+  cerr << "  -d         Verbose debug output." << endl;
   exit(1);
 }
 
+bool debug = false;
 bool timing = false;
 bool validate = false;
 size_t num_points = 128;
@@ -44,18 +45,21 @@ const size_t dimensions = 2;
 double scale = 1.0;
 
 /// Uses getopt to read in arguments.
-void get_args(int *argc, char ***argv, int rank) {
+void get_args(int *argc, char ***argv) {
   int c;
   char *err;
 
-  while ((c = getopt(*argc, *argv, "htvl:n:s:c:x:y:")) != -1) {
+  while ((c = getopt(*argc, *argv, "htdvl:n:s:c:x:y:")) != -1) {
     switch (c) {
     case 'h':
-      if (rank == 0) usage();
+      usage();
       exit(1);
       break;
     case 't':
       timing = true;
+      break;
+    case 'd':
+      debug = true;
       break;
     case 'v':
       validate = true;
@@ -73,7 +77,7 @@ void get_args(int *argc, char ***argv, int rank) {
       if (*err) usage();
       break;
     default:
-      if (rank == 0) usage();
+      usage();
       exit(1);
       break;
     }
@@ -95,18 +99,21 @@ dissimilarity_matrix dissimilarity;
 static void print_cluster_info(const cluster::partition& km, double bic) {
     cout << "k:       " << km.num_clusters() << endl;
     cout << "BIC:     " << bic << endl;
-    /*
-    cout << "medoids: ";
-    for (size_t i=0; i < km.medoid_ids.size(); i++) {
-      cout << points[km.medoid_ids[i]] << " ";
+    
+    if (debug) {
+      cout << "medoids: ";
+      for (size_t i=0; i < km.medoid_ids.size(); i++) {
+        cout << points[km.medoid_ids[i]] << " ";
+      }
+      cout << endl;
     }
-    cout << endl;
-    */
     cout << "old_bic: " << old_bic(km, matrix_distance(dissimilarity), dimensions) << endl;
-    //cout << "D:       " << total_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
-    //cout << "D2:      " << total_squared_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
 
-    //cout << km << endl;
+    if (debug) {
+      cout << "D:       " << total_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
+      cout << "D2:      " << total_squared_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
+      cout << km << endl;
+    }
 
     draw("Clustering", points, km);
     cout << endl;
@@ -114,16 +121,10 @@ static void print_cluster_info(const cluster::partition& km, double bic) {
 
 
 int main(int argc, char **argv) {
-  MPI_Init(&argc, &argv);
-
-  int rank, size;
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-
-  get_args(&argc, &argv, rank);
+  get_args(&argc, &argv);
 
   // make sure max_clusters is valid.
-  max_clusters = min(max_clusters, size * num_points);
+  max_clusters = min(max_clusters, num_points);
 
   const double stddev = 0.3; // size of clusters
 
@@ -142,7 +143,7 @@ int main(int argc, char **argv) {
   }
 
   for (size_t r=0; r < num_points; r++) {
-    size_t type = (rank + r) % clusters.size();
+    size_t type = r % clusters.size();
     point p;
     do {
       p = clusters[type].next_point();
@@ -160,7 +161,6 @@ int main(int argc, char **argv) {
   //double best_bic = km.xclara(points, point_distance(), max_clusters, dimensions);
   //double best_bic = 0;
   //km.clara(points, point_distance(), max_clusters, dimensions);
-
 
   cout << "========== Best ==========" << endl;
   print_cluster_info(km, best_bic);

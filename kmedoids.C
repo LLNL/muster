@@ -1,7 +1,6 @@
 #include "kmedoids.h"
 using namespace cluster;
 
-#include <mpi.h>
 #include <vector>
 #include <sstream>
 
