@@ -95,29 +95,37 @@ vector<point> centroids;
 vector<point> points;
 dissimilarity_matrix dissimilarity;
 
+
 /// Callback for printing out clusterings and their BIC scores.
 static void print_cluster_info(const cluster::partition& km, double bic) {
-    cout << "k:       " << km.num_clusters() << endl;
-    cout << "BIC:     " << bic << endl;
-    
-    if (debug) {
-      cout << "medoids: ";
-      for (size_t i=0; i < km.medoid_ids.size(); i++) {
-        cout << points[km.medoid_ids[i]] << " ";
-      }
-      cout << endl;
+  cout << "k:        " << km.num_clusters() << endl;
+  cout << "BIC:      " << bic << endl;
+  cout << "real bic: " << cluster::bic(km, matrix_distance(dissimilarity), dimensions) << endl;
+  cout << "old bic:  " << old_bic(km, matrix_distance(dissimilarity), dimensions) << endl;  
+  if (debug) {
+    cout << "medoids: ";
+    for (size_t i=0; i < km.medoid_ids.size(); i++) {
+      cout << points[km.medoid_ids[i]] << " ";
     }
-    cout << "old_bic: " << old_bic(km, matrix_distance(dissimilarity), dimensions) << endl;
-
-    if (debug) {
-      cout << "D:       " << total_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
-      cout << "D2:      " << total_squared_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
-      cout << km << endl;
-    }
-
-    draw("Clustering", points, km);
     cout << endl;
+  }
+
+  if (debug) {
+    cout << "D:       " << total_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
+    cout << "D2:      " << total_squared_dissimilarity(km, matrix_distance(dissimilarity)) << endl;
+    cout << km << endl;
+  }
+
+  draw("Clustering", points, km);
+  cout << endl;
 }
+
+static void only_6(const cluster::partition& km, double bic) {
+  if (km.num_clusters() == 6) {
+    print_cluster_info(km, bic);
+  }
+}
+
 
 
 int main(int argc, char **argv) {
@@ -155,13 +163,19 @@ int main(int argc, char **argv) {
 
   build_dissimilarity_matrix(points, point_distance(), dissimilarity);
   
-  kmedoids km;
-  km.set_xcallback(print_cluster_info);
-  double best_bic = km.xpam(dissimilarity, max_clusters, dimensions);
-  //double best_bic = km.xclara(points, point_distance(), max_clusters, dimensions);
+  kmedoids km, clara;
+  km.set_xcallback(only_6);
+  clara.set_xcallback(only_6);
+
+  double xpam_bic   = km.xpam(dissimilarity, max_clusters, dimensions);
+  double xclara_bic = clara.xclara(points, point_distance(), max_clusters, dimensions);
+
   //double best_bic = 0;
   //km.clara(points, point_distance(), max_clusters, dimensions);
 
-  cout << "========== Best ==========" << endl;
-  print_cluster_info(km, best_bic);
+  cout << "========== Best PAM ==========" << endl;
+  print_cluster_info(km, xpam_bic);
+
+  cout << "========== Best CLARA ==========" << endl;
+  print_cluster_info(clara, xclara_bic);
 }
