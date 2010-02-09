@@ -5,6 +5,9 @@
 #include <vector>
 #include <iostream>
 #include "mpi_utils.h"
+#ifdef AIX
+#include <algorithm>
+#endif
 
 namespace cluster {
   

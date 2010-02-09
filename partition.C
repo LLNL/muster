@@ -62,7 +62,12 @@ namespace cluster {
     for (unsigned i=0; i < clusters.size(); i++) {
       out << i << "\t";
       const cset& c = clusters[i];
+#ifdef AIX
+//AIX  xlC 6+ fails to compile without the const specification
+      for (cset::const_iterator obj=c.begin(); obj != c.end(); obj++) {
+#else
       for (cset::iterator obj=c.begin(); obj != c.end(); obj++) {
+#endif
         if (medoid_ids && (*medoid_ids)[i] == *obj) {
           out << Red << *obj << None << " ";
         } else {

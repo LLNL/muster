@@ -33,7 +33,11 @@ namespace cluster {
     double distance(const point& other) const {
       int dx = other.x - x;
       int dy = other.y - y;
+#ifdef AIX
+      return ::sqrt( (double)((dx*dx) + (dy*dy)) );
+#else
       return ::sqrt((dx*dx) + (dy*dy));
+#endif
     }
   
     point& operator+=(const point& other) {
