@@ -62,12 +62,7 @@ int main(int argc, char **argv) {
   multi_gather<point> gather(MPI_COMM_WORLD);
   for (int root=0; root < size; root++) {
     vector<int> cur_sources;
-#ifdef AIX
-///AIX does not have a sqrt(int) prototype
     random_subset(size, (int)ceil(sqrt((double)size)), back_inserter(cur_sources), random);
-#else
-    random_subset(size, (int)ceil(sqrt(size)), back_inserter(cur_sources), random);
-#endif
     gather.start(points.begin(), points.end(), cur_sources.begin(), cur_sources.end(), dest, root);
 
     if (rank == root) {
