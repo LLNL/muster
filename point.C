@@ -22,6 +22,8 @@ namespace cluster {
 
   point::point(int _x, int _y) : x(_x), y(_y) { }
 
+  point::point() : x(0), y(0) { }
+
   point::point(const point& other) : x(other.x), y(other.y) { }
 
 

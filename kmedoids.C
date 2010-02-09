@@ -121,7 +121,7 @@ namespace cluster {
   }
 
 
-  void kmedoids::pam(dissimilarity_matrix distance, size_t k, const object_id *initial_medoids) {
+  void kmedoids::pam(const dissimilarity_matrix& distance, size_t k, const object_id *initial_medoids) {
     if (k > distance.size1()) {
       throw std::logic_error("Attempt to instantiate kmedoids with more clusters than data.");
     }
@@ -182,7 +182,7 @@ namespace cluster {
   }
 
 
-  double kmedoids::xpam(dissimilarity_matrix distance, size_t max_k, size_t dimensionality) {
+  double kmedoids::xpam(const dissimilarity_matrix& distance, size_t max_k, size_t dimensionality) {
     double best_bic = -DBL_MAX;   // note that DBL_MIN isn't what you think it is.
 
     for (size_t k = 1; k <= max_k; k++) {
