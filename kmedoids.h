@@ -52,7 +52,7 @@ namespace cluster {
     ///   k                number of clusters to produce
     ///   initial_medoids  Optionally supply k initial object ids to be used as initial medoids.
     /// 
-    void pam(dissimilarity_matrix distance, size_t k, const object_id *initial_medoids = NULL);
+    void pam(const dissimilarity_matrix& distance, size_t k, const object_id *initial_medoids = NULL);
 
     ///
     /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
@@ -70,7 +70,7 @@ namespace cluster {
     /// Return value:
     ///   This routine returns the best BIC value found (the bic value of the final partitioning).
     ///
-    double xpam(dissimilarity_matrix distance, size_t max_k, size_t dimensionality);
+    double xpam(const dissimilarity_matrix& distance, size_t max_k, size_t dimensionality);
 
     ///
     /// CLARA clustering algorithm, as per Kaufman and Rousseuw and
@@ -143,20 +143,61 @@ namespace cluster {
       if (sort_medoids) sort();   // just do one final ordering of ids.
     }    
 
+
+    ///
+    /// Takes existing clustering and reassigns medoids by taking closest medoid to mean
+    /// of each cluster.  This is O(n) and can give better representatives for CLARA clusterings.
+    /// This is needed to apply gaussian-model BIC criteria to clusterings.
+    /// 
+    /// This function requires that T support algebraic operations.
+    /// Specifically, T must support enough to construct a mean:
+    ///    - addition        T + T = T
+    ///    - scalar division T / c = T
+    ///
+    template <class T, class D>
+    void center_medoids(const std::vector<T>& objects, D distance) {
+      // First sum up elements in all clusters to get the mean for each
+      std::vector<T>      means(medoid_ids.size());
+      std::vector<size_t> counts(medoid_ids.size());
+      for (size_t i=0; i < cluster_ids.size(); i++) {
+        medoid_id m = cluster_ids[i];
+        means[m] = counts[m] ? (means[m] + objects[i]) : objects[i];
+        counts[m]++;
+      }
+      
+      // Now, turn cumulative sums into means and calculate distance from medoids to means
+      std::vector<double> shortest(means.size());
+      for (size_t m=0; m < means.size(); m++) {
+        means[m] = means[m] / counts[m];
+        shortest[m] = distance(means[m], objects[medoid_ids[m]]);
+      }
+      
+      // Find closest medoids to each mean element, preferring existing medoids if there are ties.
+      for (size_t i=0; i < cluster_ids.size(); i++) {
+        medoid_id m = cluster_ids[i];
+        double d = distance(objects[i], means[m]);
+        if (d < shortest[m]) {
+          medoid_ids[m] = i;
+          shortest[m]   = d;
+        }
+      }
+    }
+
+
     ///
     /// TODO: figure out better BIC criterion for this.
     ///
     template <class T, class D>
     double xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality) {
       double best_bic = -DBL_MAX;   // note that DBL_MIN isn't what you think it is.
-      
+
       for (size_t k = 1; k <= max_k; k++) {
         kmedoids subcall;
         subcall.clara(objects, dmetric, k);
-        double cur_bic = bic(subcall, dmetric, dimensionality);
-        
+        center_medoids(objects, dmetric);
+        double cur_bic = bic(subcall, lazy_distance(objects, dmetric), dimensionality);
+
         if (xcallback) xcallback(subcall, cur_bic);
-        
         if (cur_bic > best_bic) {
           best_bic = cur_bic;
           swap(subcall);
@@ -198,11 +239,11 @@ namespace cluster {
     /// Returns:
     ///   Total dissimilarity of objects w/their medoids.
     /// 
-    /// D should be a callable object that computes distances.  
-    ///   In PAM, it should use the distance matrix.  
-    ///   In CLARA, it should compute lazily.
-    template <class D>
-    double assign_objects_to_clusters(D distance) {
+    /// DM should be a callable object that computes distances between indices, as a distance 
+    /// matrix would.  Algorithms are free to use real distance matrices (as in PAM) or to compute
+    /// lazily (as in CLARA medoid assignment).
+    template <class DM>
+    double assign_objects_to_clusters(DM distance) {
       if (sec_nearest.size() != cluster_ids.size()) {
         sec_nearest.resize(cluster_ids.size());
       }
