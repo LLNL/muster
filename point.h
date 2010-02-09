@@ -21,7 +21,12 @@ namespace cluster {
     int x, y;
     
     /// New point with position (x,y)
-    point(int x=0, int y=0);
+    point(int x, int y);
+
+    /// New point at (0,0)
+    point();
+
+    /// Copy constructor
     point(const point& other);
 
     // Distance between this point and another. 
@@ -64,6 +69,17 @@ namespace cluster {
 
     bool operator!=(const point& other) { 
       return !(*this == other);
+    }
+
+    void operator/=(int divisor) {
+      x = static_cast<int>(round(x / (double)divisor));
+      y = static_cast<int>(round(y / (double)divisor));
+    }
+
+    point operator/(int divisor) const {
+      point p(x,y);
+      p /= divisor;
+      return p;
     }
 
 #ifdef LIBRA_HAVE_MPI
