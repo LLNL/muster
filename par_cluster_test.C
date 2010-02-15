@@ -53,7 +53,7 @@ void get_args(int *argc, char ***argv, int rank) {
       break;
     case 'i':
       init_size = strtol(optarg, &err, 0);
-      if (*err) usage();
+     if (*err) usage();
       break;
     case 'r':
       max_reps = strtol(optarg, &err, 0);
@@ -103,6 +103,8 @@ int main(int argc, char **argv) {
   if (num_clusters == 0) {
     num_clusters = num_objects / stencil_size + 5;
   }
+
+  num_clusters = min(num_clusters, num_objects);
 
   vector<point> my_points;
   for (size_t i=0; points.size() < num_objects; i++) {
