@@ -4,6 +4,9 @@
 #include <vector>
 #include <boost/numeric/ublas/symmetric.hpp>
 
+
+#include <iostream>
+
 namespace cluster {
   ///
   /// Packed repersentation of symmetric dissimilarity matrix.
@@ -21,8 +24,10 @@ namespace cluster {
   template <class T, class D>
   void build_dissimilarity_matrix(const std::vector<T>& objects, D dissimilarity, 
                                   dissimilarity_matrix& mat) {
-    mat.resize(objects.size(), objects.size());
-
+    if (mat.size1() != objects.size() || mat.size2() != objects.size()) {
+      mat.resize(objects.size(), objects.size());
+    }
+    
     for (size_t i=0; i < objects.size(); i++) {
       for (size_t j=0; j <= i; j++) {
         mat(i,j) = dissimilarity(objects[i], objects[j]);
@@ -44,7 +49,9 @@ namespace cluster {
   template <class T, class D>
   void build_dissimilarity_matrix(const std::vector<T>& objects, const std::vector<size_t>& subset,
                                   D dissimilarity, dissimilarity_matrix& mat) {
-    mat.resize(subset.size(), subset.size());
+    if (mat.size1() != subset.size() || mat.size2() != subset.size()) {
+      mat.resize(subset.size(), subset.size());
+    }
 
     for (size_t i=0; i < subset.size(); i++) {
       for (size_t j=0; j <= i; j++) {

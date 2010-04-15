@@ -7,12 +7,9 @@
 #include <sys/time.h>
 
 #include "point.h"
-#include "io_utils.h"
-#include "wavelet.h"
 #include "kmedoids.h"
 #include "bic.h"
-#include "matrix_utils.h"
-#include "gaussian.h"
+#include "spherical_clustering_generator.h"
 
 using namespace cluster;
 using namespace std;
@@ -91,7 +88,6 @@ void get_args(int *argc, char ***argv) {
 const double xscale = 2.5;  // even out based on screen character size.
 const double yscale = 1.0;
 
-vector<point> centroids;
 vector<point> points;
 dissimilarity_matrix dissimilarity;
 
@@ -120,12 +116,12 @@ static void print_cluster_info(const cluster::partition& km, double bic) {
   cout << endl;
 }
 
-static void only_6(const cluster::partition& km, double bic) {
+
+static void print_cluster_info_if_6(const cluster::partition& km, double bic) {
   if (km.num_clusters() == 6) {
     print_cluster_info(km, bic);
   }
 }
-
 
 
 int main(int argc, char **argv) {
@@ -134,48 +130,39 @@ int main(int argc, char **argv) {
   // make sure max_clusters is valid.
   max_clusters = min(max_clusters, num_points);
 
-  const double stddev = 0.3; // size of clusters
+  spherical_clustering_generator cgen;
+  cgen.set_default_stddev(0.3);
+  cgen.set_xscale(scale * xscale);
+  cgen.set_yscale(scale * yscale);
 
-  centroids.push_back(point(2, 4));
-  centroids.push_back(point(6, 1));
-  centroids.push_back(point(15, 2));
-  centroids.push_back(point(4, 1));
-  centroids.push_back(point(4, 8));
-  centroids.push_back(point(10, 7));
-
-  vector<gaussian_generator_2d> clusters;
-  for (size_t i=0; i < centroids.size(); i++) {
-    clusters.push_back(
-      gaussian_generator_2d((int)(centroids[i].x  * scale), (int)(centroids[i].y * scale), 
-                            stddev * scale, xscale, yscale));
-  }
+  cgen.add_cluster(point(2,4));
+  cgen.add_cluster(point(6, 1));
+  cgen.add_cluster(point(15, 2));
+  cgen.add_cluster(point(4, 1));
+  cgen.add_cluster(point(4, 8));
+  cgen.add_cluster(point(10, 7));
 
   for (size_t r=0; r < num_points; r++) {
-    size_t type = r % clusters.size();
     point p;
     do {
-      p = clusters[type].next_point();
+      p = cgen.next_point();
     } while (p.x < 0 || p.y < 0);
-
     points.push_back(p);
   }
 
-
-  build_dissimilarity_matrix(points, point_distance(), dissimilarity);
-  
   kmedoids km, clara;
-  km.set_xcallback(only_6);
-  clara.set_xcallback(only_6);
+  build_dissimilarity_matrix(points, point_distance(), dissimilarity);
+  if (debug) {
+    km.set_xcallback(print_cluster_info_if_6);
+    clara.set_xcallback(print_cluster_info_if_6);
+  }
 
   double xpam_bic   = km.xpam(dissimilarity, max_clusters, dimensions);
   double xclara_bic = clara.xclara(points, point_distance(), max_clusters, dimensions);
 
-  //double best_bic = 0;
-  //km.clara(points, point_distance(), max_clusters, dimensions);
-
-  cout << "========== Best PAM ==========" << endl;
+  cout << "========== Best XPAM ==========" << endl;
   print_cluster_info(km, xpam_bic);
 
-  cout << "========== Best CLARA ==========" << endl;
+  cout << "========== Best XCLARA ==========" << endl;
   print_cluster_info(clara, xclara_bic);
 }

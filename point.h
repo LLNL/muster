@@ -1,5 +1,5 @@
-#ifndef CLUSTER_TEST_POINT_H
-#define CLUSTER_TEST_POINT_H
+#ifndef LIBRA_TEST_POINT_H
+#define LIBRA_TEST_POINT_H
 
 #include "libra-config.h"
 
@@ -18,10 +18,10 @@ namespace cluster {
   /// Simple 2 dimensional point class for testing medoids algorithms.
   struct point {
   public:
-    int x, y;
+    double x, y;
     
     /// New point with position (x,y)
-    point(int x, int y);
+    point(double x, double y);
 
     /// New point at (0,0)
     point();
@@ -31,9 +31,9 @@ namespace cluster {
 
     // Distance between this point and another. 
     double distance(const point& other) const {
-      int dx = other.x - x;
-      int dy = other.y - y;
-      return ::sqrt( (double)((dx*dx) + (dy*dy)) );
+      double dx = other.x - x;
+      double dy = other.y - y;
+      return ::sqrt(dx*dx + dy*dy);
     }
   
     point& operator+=(const point& other) {
@@ -71,12 +71,12 @@ namespace cluster {
       return !(*this == other);
     }
 
-    void operator/=(int divisor) {
-      x = static_cast<int>(round(x / (double)divisor));
-      y = static_cast<int>(round(y / (double)divisor));
+    void operator/=(double divisor) {
+      x /= divisor;
+      y /= divisor;
     }
 
-    point operator/(int divisor) const {
+    point operator/(double divisor) const {
       point p(x,y);
       p /= divisor;
       return p;
@@ -114,12 +114,12 @@ namespace cluster {
 
   /// Distance bt/w two points
   struct point_distance {
-    double operator()(const point& left, const point& right) {
+    double operator()(const point& left, const point& right) const {
       return left.distance(right);
     }
   };
 
 } // namespace cluster
 
-#endif // CLUSTER_TEST_POINT_H
+#endif // LIBRA_TEST_POINT_H
 

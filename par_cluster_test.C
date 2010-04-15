@@ -11,19 +11,20 @@ using namespace cluster;
 using namespace std;
 
 void usage() {
-  cerr << "Usage: par-cluster-test [-htvi] [-n num-points] [-c clusters] [-s scale]" << endl;
+  cerr << "Usage: par-cluster-test [-hxv] [-n num-points] [-k clusters] [-i initial-size] [-r reps]" << endl;
   cerr << "  Compare parallel clustering with sequential clustering." << endl;
   cerr << "Options:" << endl;
   cerr << "  -h         Show this message." << endl;
   cerr << "  -x         Use BIC-scored versions of PAM and CLARA." << endl;
+  cerr << "  -v         Verbose mode.  Draws actual clusterings and outputs timings." << endl;
   cerr << "  -n         Number of points per process." << endl;
   cerr << "               Default is 1." << endl;
+  cerr << "  -k         Max number of clusters to search for." << endl;
+  cerr << "               Default is number of processes * points per process." << endl;
   cerr << "  -i         Initial sample size in clara (before 2*k is added)." << endl;
   cerr << "               Default is 40." << endl;
   cerr << "  -r         Number of repeated trials per k in clara." << endl;
   cerr << "               Default is 5." << endl;
-  cerr << "  -k         Max number of clusters to search for." << endl;
-  cerr << "               Default is number of processes * points per process." << endl;
   exit(1);
 }
 
@@ -32,13 +33,14 @@ size_t num_clusters = 0;
 size_t init_size = 40;
 size_t max_reps = 5;
 bool use_bic = false;
+bool verbose = false;
 
 /// Uses getopt to read in arguments.
 void get_args(int *argc, char ***argv, int rank) {
   int c;
   char *err;
 
-  while ((c = getopt(*argc, *argv, "hxn:i:r:k:")) != -1) {
+  while ((c = getopt(*argc, *argv, "hxn:i:r:k:v")) != -1) {
     switch (c) {
     case 'h':
       if (rank == 0) usage();
@@ -63,6 +65,9 @@ void get_args(int *argc, char ***argv, int rank) {
       num_clusters = strtol(optarg, &err, 0);
       if (*err) usage();
       break;
+    case 'v':
+      verbose = true;
+      break;
     default:
       if (rank == 0) usage();
       exit(1);
@@ -74,6 +79,40 @@ void get_args(int *argc, char ***argv, int rank) {
   *argc -= optind;
   *argv += optind;
 }
+
+
+vector<point> points;
+kmedoids km;
+par_kmedoids parkm(MPI_COMM_WORLD);
+
+
+void print_cluster_info(const cluster::partition& gathered, const dissimilarity_matrix& distance) {
+  cout << "seq k: " << km.medoid_ids.size()
+       << ", par k: " << gathered.medoid_ids.size()
+       << ", Mirkin distance: " << setprecision(3) << mirkin_distance(km, gathered)
+       << endl;
+  
+  if (verbose) {
+    ostringstream pam_msg;
+    pam_msg << "PAM"
+            << ", " << km.medoid_ids.size() << " clusters"
+            << ", Avg. dissimilarity: " << km.average_dissimilarity()
+            << ", BIC: " << bic(km, matrix_distance(distance), 2);
+    
+    ostringstream parkm_msg;
+    parkm_msg << "Parallel CLARA" 
+              << ", " << gathered.medoid_ids.size() << " clusters"
+              << ", Avg. dissimilarity: " << parkm.average_dissimilarity()
+              << ", BIC: " << parkm.bic_score();
+    
+    draw(pam_msg.str(), points, km);
+    draw(parkm_msg.str(), points, gathered);
+    cout << endl;
+    parkm.get_timer().write();
+    cout << endl;
+  }
+}
+
 
 /// Test using points instead of QGrams to make sure clustering 
 /// algorithms work.
@@ -87,7 +126,6 @@ int main(int argc, char **argv) {
   get_args(&argc, &argv, rank);
   
   //put 5-pt crosses inthe vector, offset by increasing distances
-  vector<point> points;
   point ref(1,1);
   point stencil[] = {
     point( 0, 0),
@@ -121,41 +159,33 @@ int main(int argc, char **argv) {
   dissimilarity_matrix distance;
   build_dissimilarity_matrix(points, point_distance(), distance);
 
-  kmedoids km;
-  par_kmedoids parkm;
   parkm.set_init_size(init_size);
   parkm.set_max_reps(max_reps);
 
   for (size_t k=1; k <= num_clusters; k++) {
-    km.pam(distance, k);
-
     vector<point> medoids;
+    cluster::partition gathered;
+
+
+    km.pam(distance, k);
     parkm.clara(my_points, point_distance(), k, &medoids);
-    cluster::partition local_partition;
-    parkm.gather(local_partition);
+    parkm.gather(gathered);
 
     if (rank == 0) {
-      cout << "k: " << k 
-           << ", Mirkin distance: " << setprecision(3) << mirkin_distance(km, local_partition) 
-           << endl;
+      cout << "Max k = " << k << endl;
+      cout << "  No BIC:    ";
+      print_cluster_info(gathered, distance);
+    }
 
-      ostringstream pam_msg;
-      pam_msg << "PAM"
-              << ", " << km.medoid_ids.size() << " clusters"
-              << ", Avg. dissimilarity: " << km.average_dissimilarity()
-              << ", BIC: " << bic(km, matrix_distance(distance), 2);
+    km.xpam(distance, k, 2);
+    parkm.xclara(my_points, point_distance(), k, 2, &medoids);
+    parkm.gather(gathered);
 
-      ostringstream parkm_msg;
-      parkm_msg << "Parallel CLARA" 
-                << ", " << local_partition.medoid_ids.size() << " clusters"
-                << ", Avg. dissimilarity: " << parkm.average_dissimilarity()
-                << ", BIC: " << parkm.bic_score();
-
-      draw(pam_msg.str(), points, km);
-      draw(parkm_msg.str(), points, local_partition);
-      cout << endl;
-      parkm.get_timer().write();
+    if (rank == 0) {
+      cout << "  Using BIC: ";
+      print_cluster_info(gathered, distance);
       cout << endl;
     }
   }
 }
+

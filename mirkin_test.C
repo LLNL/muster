@@ -4,10 +4,10 @@
 #include <set>
 #include <cstdlib>
 #include <sstream>
-using namespace std;
 
-#include "kmedoids.h"
-#include "counter.h"
+#include "partition.h"
+
+using namespace std;
 using namespace cluster;
 
 void makeClusterings(cluster_list& c1, cluster_list& c2) {

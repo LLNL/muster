@@ -18,8 +18,8 @@ namespace cluster {
 
   void par_partition::gather(partition& destination, int root) {
     int rank, size;
-    PMPI_Comm_rank(MPI_COMM_WORLD, &rank);
-    PMPI_Comm_size(MPI_COMM_WORLD, &size);
+    PMPI_Comm_rank(comm, &rank);
+    PMPI_Comm_size(comm, &size);
     
 #ifdef DEBUG
     size_t count = medoid_ids.size();
@@ -57,6 +57,19 @@ namespace cluster {
                 &destination.cluster_ids[0], cluster_ids.size(), MPI_SIZE_T, 
                 root, comm);
   }
+
+
+  void par_partition::get_sizes(std::vector<size_t>& sizes) {
+    vector<size_t> local_sizes(medoid_ids.size(), 0);
+    for (size_t i=0; i < cluster_ids.size(); i++) {
+      local_sizes[cluster_ids[i]]++;
+    }
+    
+    sizes.resize(medoid_ids.size());
+    PMPI_Allreduce(&local_sizes[0], &sizes[0], medoid_ids.size(), MPI_SIZE_T, MPI_SUM, comm); 
+  }
+
+
 
   std::ostream& operator<<(std::ostream& out, const par_partition& par) {
     // TODO: fix this; it's hacky.

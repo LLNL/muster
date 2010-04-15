@@ -6,11 +6,12 @@
 #include <iomanip>
 #include <sstream>
 
+#include <boost/random.hpp>
+
 #include "multi_gather.h"
 #include "point.h"
 #include "random.h"
 #include "Timer.h"
-#include "MersenneTwister.h"
 
 using namespace std;
 using namespace cluster;
@@ -23,7 +24,6 @@ void generate_points_for_rank(int rank, OutputIterator out) {
     *out++ = point(p,p);
   }
 }
-
 
 
 int main(int argc, char **argv) {
@@ -47,8 +47,9 @@ int main(int argc, char **argv) {
     }
   }
 
-  MTRand random;
-  random.seed(1);  // make sure all ranks generate the same numbers.
+  typedef boost::mt19937 random_t;
+  random_t random(1);  // make sure all ranks generate the same numbers.
+  boost::random_number_generator<random_t> rng(random);
 
   vector<point> points;   // local points to send
   vector<point> dest;     // destination vector for gathered points
@@ -62,7 +63,7 @@ int main(int argc, char **argv) {
   multi_gather<point> gather(MPI_COMM_WORLD);
   for (int root=0; root < size; root++) {
     vector<int> cur_sources;
-    random_subset(size, (int)ceil(sqrt((double)size)), back_inserter(cur_sources), random);
+    random_subset(size, (int)ceil(sqrt((double)size)), back_inserter(cur_sources), rng);
     gather.start(points.begin(), points.end(), cur_sources.begin(), cur_sources.end(), dest, root);
 
     if (rank == root) {

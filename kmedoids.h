@@ -1,4 +1,3 @@
-
 #ifndef K_MEDOIDS_H
 #define K_MEDOIDS_H
 
@@ -8,9 +7,10 @@
 #include <stdexcept>
 #include <cfloat>
 
+#include <boost/random.hpp>
+
 #include "random.h"
 #include "dissimilarity.h"
-#include "MersenneTwister.h"
 #include "partition.h"
 #include "bic.h"
 
@@ -33,7 +33,7 @@ namespace cluster {
     ~kmedoids();
 
     /// Get the average dissimilarity of objects w/their medoids for the last run.
-    double average_dissimilarity();
+    double average_dissimilarity() const;
     
     /// Set whether medoids will be sorted by object id after clustering is complete.
     /// Defaults to true.
@@ -113,7 +113,7 @@ namespace cluster {
       for (size_t i = 0; i < max_reps; i++) {
         // Take a random sample of objects, store sample in a vector
         std::vector<size_t> sample_to_full;
-        random_subset(objects.size(), sample_size, back_inserter(sample_to_full), random);
+        random_subset(objects.size(), sample_size, back_inserter(sample_to_full), rng);
 
         // Build a distance matrix for PAM
         dissimilarity_matrix distance;
@@ -215,7 +215,13 @@ namespace cluster {
     void set_xcallback(void (*)(const partition& part, double bic));
 
     protected:
-    MTRand random;                           /// Random number generator for this algorithm
+    typedef boost::mt19937 random_type;                /// Type for RNG used in this algorithm
+    random_type random;                                /// Randomness source for this algorithm
+    
+    /// Adaptor for STL algorithms.
+    typedef boost::random_number_generator<random_type, unsigned long> rng_type;
+    rng_type rng;
+
     std::vector<medoid_id> sec_nearest;      /// Index of second closest medoids.  Used by PAM.
     double total_dissimilarity;              /// Total dissimilarity bt/w objects and their medoid
     bool sort_medoids;                       /// Whether medoids should be canonically sorted by object id.

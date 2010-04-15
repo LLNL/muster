@@ -4,12 +4,12 @@
 #include <map>
 #include <cassert>
 #include <algorithm>
-using namespace cluster;
-using namespace std;
 
 #include "counter.h"
 #include "color.h"
 #include "stl_utils.h"
+
+using namespace std;
 
 namespace cluster {
 
@@ -124,7 +124,7 @@ namespace cluster {
   }
 
 
-  double mirkin_distance(partition& c1, partition& c2) {
+  double mirkin_distance(const partition& c1, const partition& c2) {
     cluster_list l1, l2;
     c1.to_cluster_list(l1);
     c2.to_cluster_list(l2);

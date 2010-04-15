@@ -33,27 +33,28 @@ namespace cluster {
     ///
     /// Constructor to generate trials from 1 to max_k.
     /// 
-    trial_generator(size_t _max_k, size_t _max_reps, size_t _init_size, size_t _max_sample);
+    trial_generator(size_t _max_k, size_t _max_reps, size_t _init_size, size_t _num_objects);
 
     ///
     /// Constructor to generate trials from min_k to max_k.
     ///
     trial_generator(size_t min_k, size_t _max_k, 
-                    size_t _max_reps, size_t _init_size, size_t _max_sample);
+                    size_t _max_reps, size_t _init_size, size_t _num_objects);
     
     size_t count() const;       /// return iterations so far.
     bool has_next() const;      /// whether there are trials remaining.
     trial next();               /// return parameters for next trial
     void reset();               /// return to initial state
+    size_t num_trials();        /// Return total number of trials this will generate.
 
     const size_t max_k;         /// maximum k to try
     const size_t max_reps;      /// max number of repetitions per k
     const size_t init_size;     /// initial size for samples before factoring in k, as per CLARA paper.
-    const size_t max_sample;    /// maximum sample size (usually number of elements in the data set)
-    const trial init_trial;     /// initial trial, stored so that we can reset this iterator
+    const size_t num_objects;   /// number of elements in the data set; determines maximum sample size.
 
   private:
     trial cur_trial;            /// current state of the iterator.
+    size_t number_of_trials;    /// memoized total number of trials in this generator
     size_t iterations;          /// number of iterations so far
     
     /// size of the sample to cluster for particular k

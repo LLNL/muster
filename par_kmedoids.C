@@ -5,6 +5,8 @@
 #include <sys/time.h>
 using namespace std;
 
+#include "random.h"
+
 namespace cluster {
 
   par_kmedoids::par_kmedoids(MPI_Comm comm) 
@@ -36,14 +38,8 @@ namespace cluster {
     int rank;
     PMPI_Comm_rank(comm, &rank);
 
-    uint32_t seed = 0;
-    if (rank == 0) {
-      struct timeval time;
-      gettimeofday(&time, 0);
-    
-      seed = time.tv_sec * time.tv_usec;
-    }
-
+    // same seed on all processes.
+    uint32_t seed = get_time_seed();
     PMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
     random.seed(seed);
   }

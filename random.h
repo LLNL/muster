@@ -1,5 +1,7 @@
-#ifndef EFFORT_RANDOM_H
-#define EFFORT_RANDOM_H
+#ifndef LIBRA_RANDOM_H
+#define LIBRA_RANDOM_H
+
+#include <sys/time.h>
 
 ///
 /// This is Knuth's algorithm R for taking a sample of indices from
@@ -20,7 +22,7 @@ void random_subset(size_t numElements, size_t sample_size, OutputIterator out, R
   size_t m = sample_size;
   
   while (m > 0) {
-    if (random(remaining) < m) {
+    if ((size_t)random(remaining) < m) {
       *out = first;
       ++out;
       --m;
@@ -30,4 +32,16 @@ void random_subset(size_t numElements, size_t sample_size, OutputIterator out, R
   }
 }
 
-#endif // EFFORT_RANDOM_H
+
+///
+/// Returns a reasonably distributed seed for random number generators.
+/// Based on the product of the seconds and usec in gettimeofday().
+///
+inline long get_time_seed() {
+  struct timeval time;
+  gettimeofday(&time, 0);
+  return time.tv_sec * time.tv_usec;
+}
+
+
+#endif // LIBRA_RANDOM_H

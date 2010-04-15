@@ -7,6 +7,8 @@
 #include <mpi.h>
 #endif // LIBRA_HAVE_MPI
 
+
+
 #include <cstdlib>
 #include <ostream>
 
@@ -19,6 +21,9 @@ namespace cluster {
   struct id_pair {
     T element;
     size_t id;
+
+    /// Template typedef for creating vectors of id_pair<T>
+    typedef std::vector< id_pair<T> > vector;
 
     id_pair() { }
     id_pair(const T& elt, size_t _id) : element(elt), id(_id) { }
@@ -54,8 +59,10 @@ namespace cluster {
     out << "<" << p.element << ", " << p.id << ">";
     return out;
   }
-
-
+  
+  
+  
+  
 } // namespace cluster
 
 #endif // ID_PAIR_H

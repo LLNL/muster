@@ -12,15 +12,15 @@
 #include <iomanip>
 #include <cstdlib>
 #include <boost/numeric/ublas/matrix.hpp>
-using boost::numeric::ublas::matrix;
-using namespace std;
+#include <boost/algorithm/string.hpp>
 
-#include "string_utils.h"
-using namespace stringutils;
+using boost::numeric::ublas::matrix;
+using namespace boost;
+using namespace std;
 
 namespace cluster {
 
-  point::point(int _x, int _y) : x(_x), y(_y) { }
+  point::point(double _x, double _y) : x(_x), y(_y) { }
 
   point::point() : x(0), y(0) { }
 
@@ -30,20 +30,20 @@ namespace cluster {
 #ifdef HAVE_MPI
   /// Returns the size of a packed point
   int point::packed_size(MPI_Comm comm) const {
-    return 2 * mpi_packed_size(1, MPI_INT, comm);
+    return 2 * mpi_packed_size(1, MPI_DOUBLE, comm);
   }
   
   /// Packs a point into an MPI packed buffer
   void point::pack(void *buf, int bufsize, int *position, MPI_Comm comm) const {
-    PMPI_Pack(const_cast<int*>(&x), 1, MPI_INT, buf, bufsize, position, comm);
-    PMPI_Pack(const_cast<int*>(&y), 1, MPI_INT, buf, bufsize, position, comm);
+    PMPI_Pack(const_cast<double*>(&x), 1, MPI_DOUBLE, buf, bufsize, position, comm);
+    PMPI_Pack(const_cast<double*>(&y), 1, MPI_DOUBLE, buf, bufsize, position, comm);
   }
 
   /// Unpacks a point from an MPI packed buffer
   point point::unpack(void *buf, int bufsize, int *position, MPI_Comm comm) {
     point p;
-    PMPI_Unpack(buf, bufsize, position, &p.x, 1, MPI_INT,  comm);
-    PMPI_Unpack(buf, bufsize, position, &p.y, 1, MPI_INT,  comm);
+    PMPI_Unpack(buf, bufsize, position, &p.x, 1, MPI_DOUBLE,  comm);
+    PMPI_Unpack(buf, bufsize, position, &p.y, 1, MPI_DOUBLE,  comm);
     return p;
   }
 #endif // HAVE_MPI
@@ -55,15 +55,15 @@ namespace cluster {
 
 
   void parse_points(const string& str, vector<point>& points) {
-    string trimmed = trim(str, "() ");
+    string trimmed = trim_copy_if(str, is_any_of("() "));
 
     vector<string> parts;
-    split(trimmed, "(,", parts);
+    split(parts, trimmed, is_any_of("(,"));
 
-    vector<int> values(parts.size());
+    vector<double> values(parts.size());
     for (size_t i=0; i < parts.size(); i++) {
-      parts[i]  = trim(parts[i], "() ,");
-      values[i] = strtol(parts[i].c_str(), NULL, 0);
+      parts[i]  = trim_copy_if(parts[i], is_any_of("() ,"));
+      values[i] = strtod(parts[i].c_str(), NULL);
     }
 
     for (size_t i=1; i < values.size(); i += 2) {
@@ -80,15 +80,15 @@ namespace cluster {
     };
     static const size_t num_colors = sizeof(colors) / sizeof(const char *);
 
-    int max_x=0;
-    int max_y=0;
+    double max_x=0;
+    double max_y=0;
 
     for (size_t i=0; i < points.size(); i++) {
       max_x = max(points[i].x, max_x);
       max_y = max(points[i].y, max_y);
     }
 
-    matrix<int> pmat(max_x+1, max_y+1);
+    matrix<int> pmat((size_t)max_x+1, (size_t)max_y+1);
     for (size_t i=0; i < pmat.size1(); i++) {
       for (size_t j=0; j < pmat.size2(); j++) {
         pmat(i,j) = -1;
@@ -96,18 +96,21 @@ namespace cluster {
     }
 
     for (size_t i=0; i < points.size(); i++) {
-      if (!(pmat(points[i].x, points[i].y) != -1 &&  // make sure not to overwrite medoids.
-            parts.is_medoid(pmat(points[i].x, points[i].y)))) {
-        pmat(points[i].x, points[i].y) = i;
+      size_t x = static_cast<size_t>(points[i].x);
+      size_t y = static_cast<size_t>(points[i].y);
+
+      // make sure not to overwrite medoids.
+      if (!(pmat(x,y) != -1 && parts.is_medoid(pmat(x,y)))) {
+        pmat((size_t)points[i].x, (size_t)points[i].y) = i;
       }
     }
   
-    const int min_hbar = 80;
+    const double min_hbar = 80;
     out << label << " ";
     for (size_t x = 0; x <= max(max_x, min_hbar)-label.size()-1; x++) out << "-";
     out << endl;
 
-    for (int y = max_y; y >= 0; y--) {
+    for (int y = (int)max_y; y >= 0; y--) {
       for (int x = 0; x <= max_x; x++) {
         int oid = pmat(x,y);
         if (oid >= 0) {

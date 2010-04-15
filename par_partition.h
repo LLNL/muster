@@ -29,6 +29,10 @@ namespace cluster {
     /// Virtual destructor for inheritance.
     virtual ~par_partition();
 
+    /// Scalably get the sizes of all the clusters in this partition.
+    /// POST: sizes is valid on all processes
+    void get_sizes(std::vector<size_t>& sizes);
+
     /// Collective operation.  Gathers my_id from all processes into a 
     /// local partition object. If size of system is large, then this method
     /// will not scale.

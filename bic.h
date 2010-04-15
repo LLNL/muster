@@ -86,12 +86,14 @@ namespace cluster {
     double s2 = total_squared_dissimilarity(p, distance) / (R - k);
     double s  = sqrt(s2);
     double sM = pow(s, (double)M);
-    
+
+    // compute sizes of the clusters in the partition.
     size_t sizes[k];
     for (size_t i=0; i < k; i++) {
       sizes[i] = p.size(i);
     }
-    
+
+    // compute BIC from point probabilities
     double root2pi = sqrt(2 * M_PI);
     double lD = 0;
     for (size_t i=0; i < p.size(); i++) {
@@ -104,16 +106,7 @@ namespace cluster {
     }
 
     const size_t pj = (k-1) + M*k + 1;   // free parameter count
-
-/* Added BGLFE because no prototype exists for log(size_t). Only log(float) and
-   log(long double). See math.h. Works fine on the backend
-*/
-#ifdef BGLFE
-    return lD - pj/2 * log( (double) R);
-#else
-    return lD - pj/2 * log(R);
-#endif
-
+    return lD - pj/2 * log((double)R);
   }
 
 

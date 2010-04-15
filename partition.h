@@ -77,7 +77,8 @@ namespace cluster {
       member_writer(partition *_p, medoid_id _m) : p(_p), m(_m) { }
     };
     member_writer members(medoid_id m) { return member_writer(this, m); }
-  };
+
+  }; // struct partition
 
   inline std::ostream& operator<<(std::ostream& out, const partition::member_writer& mw) {
     mw.p->write_members_with_runs(mw.m, out);
@@ -94,7 +95,7 @@ namespace cluster {
   double mirkin_distance(const cluster_list& c1, const cluster_list& c2);
 
   /// Convenience overload for comparing partition objects directly
-  double mirkin_distance(partition& c1, partition& c2);
+  double mirkin_distance(const partition& c1, const partition& c2);
 
   /// Expand a cluster_list by l levels.  That is, replace each index i
   /// in the cluster_list with indices in [2^l * i ... 2^l * (i+1) - 1]

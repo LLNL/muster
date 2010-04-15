@@ -96,17 +96,11 @@ int main(int argc, char **argv) {
 
   get_args(&argc, &argv, rank);
 
-  uint32_t seed = 0;
-  if (rank == 0) {
-    struct timeval time;
-    gettimeofday(&time, 0);
-    seed = time.tv_sec * time.tv_usec;
-  }
-
-  MTRand rand(seed + rank);  // generator to make points.  Seed differently on each rank.
+  MTRand rand(get_time_seed() + rank);  // generator to make points.  Seed differently on each rank.
   vector<point> points;      // vector of local points  
   
   // generate randomly distributed, zero-centered points.
+  // TODO: use random gaussian points?
   for (size_t i=0; i < objects_per_process; i++) {
     int x = rand.randInt(5000) - 2500;
     int y = rand.randInt(5000) - 2500;

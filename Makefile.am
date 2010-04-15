@@ -3,16 +3,16 @@ lib_LTLIBRARIES = libcluster.la
 noinst_HEADERS = \
 	kmedoids.h \
 	random.h \
+	gaussian.h \
 	counter.h \
 	color.h \
+	spherical_clustering_generator.h \
 	dissimilarity.h \
 	partition.h \
 	MersenneTwister.h \
-	Stat.h \
 	point.h \
 	bic.h \
 	trial.h \
-	id_pair.h \
 	gaussian.h
 
 libcluster_la_SOURCES = \
@@ -25,11 +25,14 @@ if HAVE_MPI
 noinst_HEADERS += \
 	par_partition.h \
 	par_kmedoids.h \
-	multi_gather.h
+	multi_gather.h \
+	trial.h \
+	id_pair.h
 
 libcluster_la_SOURCES += \
 	par_partition.C \
-	par_kmedoids.C
+	par_kmedoids.C \
+	trial.C
 endif
 
 #test program for matrix
@@ -64,9 +67,11 @@ convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
 write_members_test_SOURCES = write_members_test.C
 
-LDADD = libcluster.la ../libwavelet/libwavelet.la ../callpath/libcallpath.la
+LDADD = \
+	libcluster.la \
+  ../libwavelet/libwavelet.la
 
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
-  -I$(top_srcdir)/libwavelet \
-  -I$(top_srcdir)/callpath
+	-I$(top_srcdir)/libwavelet
+

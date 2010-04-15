@@ -11,30 +11,28 @@ using namespace cluster;
 #include <sys/time.h>
 using namespace std;
 
-#include "counter.h"
-#include "matrix_utils.h"
+#include "random.h"
 #include "bic.h"
+#include "matrix_utils.h"
 
 namespace cluster {
   
   kmedoids::kmedoids(size_t num_objects) 
     : partition(num_objects), 
+      random(get_time_seed()),
+      rng(random),
       total_dissimilarity(std::numeric_limits<double>::infinity()),
       sort_medoids(true),
       epsilon(1e-15),
       init_size(40),
       max_reps(5),
       xcallback(NULL)
-  {
-    struct timeval time;
-    gettimeofday(&time, 0);
-    random.seed(time.tv_sec * time.tv_usec);
-  }
+  { }
 
 
   kmedoids::~kmedoids() {  }
 
-  double kmedoids::average_dissimilarity() {
+  double kmedoids::average_dissimilarity() const {
     return total_dissimilarity / cluster_ids.size();
   }
 
@@ -123,7 +121,7 @@ namespace cluster {
 
   void kmedoids::pam(const dissimilarity_matrix& distance, size_t k, const object_id *initial_medoids) {
     if (k > distance.size1()) {
-      throw std::logic_error("Attempt to instantiate kmedoids with more clusters than data.");
+      throw std::logic_error("Attempt to run PAM with more clusters than data.");
     }
 
     if (distance.size1() != distance.size2()) {
