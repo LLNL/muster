@@ -77,18 +77,21 @@ namespace cluster {
       // stop if this rank isn't a member of the gather.
       if (rank != root && find(begin_src, end_src, rank) == end_src) return;
 
-      // determine size and pack local data.
+      // determine size of local data.
       int packed_size = mpi_packed_size(1, MPI_SIZE_T, comm);  // num objects
       for (ObjIterator o=begin_obj; o != end_obj; o++) {       // size of each object
         packed_size += o->packed_size(comm);
       }
 
+      buffer *send_buffer = new buffer(packed_size);
       if (rank != root) {
-        MPI_Send(&packed_size, 1, MPI_INT, root, tag, comm);
+        buffers.push_back(NULL);          // no separate buffer for the size.
+        reqs.push_back(MPI_REQUEST_NULL);
+        MPI_Isend(&send_buffer->size, 1, MPI_INT, root, tag, comm, &reqs.back());
+        unfinished_reqs++;
       }
 
-      // pack up local data into a buffer
-      buffer *send_buffer = new buffer(packed_size);
+      // pack up local data into the buffer
       int pos = 0;
       size_t num_objects = distance(begin_obj, end_obj);
       MPI_Pack(&num_objects, 1, MPI_SIZE_T, send_buffer->buf, send_buffer->size, &pos, comm);
@@ -145,7 +148,7 @@ namespace cluster {
         for (int o=0; o < outcount; o++) {
           const int r = indices[o];   // index of received object.
 
-          if (!buffers[r]->is_send() && !buffers[r]->is_allocated()) {
+          if (buffers[r] && !buffers[r]->is_send() && !buffers[r]->is_allocated()) {
             // buffers[r] is a recv and we just received packed size.  Allocate space and recv data.
             int src = status[o].MPI_SOURCE;
             buffers[r]->allocate();
@@ -163,6 +166,8 @@ namespace cluster {
       // as unpacked data are only pushed onto the backs of destination vectors *after* everything
       // is received.  Buffers are still received in any order above, though.
       for (size_t i=0; i < buffers.size(); i++) {
+        if (!buffers[i]) continue;
+
         if (!buffers[i]->is_send()) {
           int pos = 0;
           size_t num_objects;
