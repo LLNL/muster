@@ -88,10 +88,8 @@ namespace cluster {
         multi_gather<T>      gather(comm);    // simultaneous, asynchronous local gathers for collecting samples.
         
         // start gathers for each trial to aggregate samples to single worker processes.
-        sequence worker_generator;
-        for (int workers=0; trials.has_next() && workers < size; workers++) {
+        for (int root=0; trials.has_next() && root < size; root++) {
           trial cur_trial = trials.next();    // generate a trial descriptor
-          int root = worker_generator();      // and a rank that will run the trial
           
           // Generate a set of indices for members of this k-medoids trial
           std::vector<size_t> sample_ids;
