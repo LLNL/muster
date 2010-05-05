@@ -18,8 +18,7 @@ noinst_HEADERS = \
 libcluster_la_SOURCES = \
 	partition.C \
 	kmedoids.C \
-	point.C \
-	trial.C
+	point.C
 
 if HAVE_MPI
 noinst_HEADERS += \
