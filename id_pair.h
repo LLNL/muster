@@ -1,13 +1,11 @@
 #ifndef ID_PAIR_H
 #define ID_PAIR_H
 
-#include "libra-config.h"
+#include "cluster-config.h"
 
-#ifdef LIBRA_HAVE_MPI
+#ifdef CLUSTER_HAVE_MPI
 #include <mpi.h>
-#endif // LIBRA_HAVE_MPI
-
-
+#endif // CLUSTER_HAVE_MPI
 
 #include <cstdlib>
 #include <ostream>
@@ -28,7 +26,7 @@ namespace cluster {
     id_pair() { }
     id_pair(const T& elt, size_t _id) : element(elt), id(_id) { }
 
-#ifdef LIBRA_HAVE_MPI
+#ifdef CLUSTER_HAVE_MPI
     int packed_size(MPI_Comm comm) const {
       return element.packed_size(comm) + mpi_packed_size(1, MPI_SIZE_T, comm);
     }
@@ -44,7 +42,7 @@ namespace cluster {
       MPI_Unpack(buf, bufsize, position, &id, 1, MPI_SIZE_T, comm);
       return id_pair(t, id);
     }
-#endif // LIBRA_HAVE_MPI
+#endif // CLUSTER_HAVE_MPI
   };
   
   /// Helper function for making id_pairs with type inference.

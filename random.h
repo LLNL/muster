@@ -1,5 +1,5 @@
-#ifndef LIBRA_RANDOM_H
-#define LIBRA_RANDOM_H
+#ifndef CLUSTER_RANDOM_H
+#define CLUSTER_RANDOM_H
 
 #include <sys/time.h>
 
@@ -44,4 +44,4 @@ inline long get_time_seed() {
 }
 
 
-#endif // LIBRA_RANDOM_H
+#endif // CLUSTER_RANDOM_H

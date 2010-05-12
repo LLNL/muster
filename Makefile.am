@@ -1,3 +1,20 @@
+AUTOMAKE_OPTIONS = foreign   # Don't require NEWS, README, INSTALL, etc.
+ACLOCAL_AMFLAGS = -I m4
+
+# Build-time configuration of libraries.
+include_HEADERS=cluster-config.h
+DISTCLEANFILES = cluster-config.h _configs.sed
+
+dist_noinst_SCRIPTS = \
+	build/do_configure_atlas \
+	build/do_configure_bgl \
+	build/do_configure_bgl_fen \
+	build/do_configure_bgp \
+	build/do_configure_bgp_fen \
+	build/do_configure_darwin
+
+EXTRA_DIST = LICENSE README
+
 lib_LTLIBRARIES = libcluster.la
 
 noinst_HEADERS = \
@@ -67,8 +84,7 @@ reuse_test_SOURCES = reuse_test.C
 write_members_test_SOURCES = write_members_test.C
 
 LDADD = \
-	libcluster.la \
-  ../libwavelet/libwavelet.la
+	libcluster.la 
 
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \

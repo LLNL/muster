@@ -1,11 +1,11 @@
-#ifndef LIBRA_TEST_POINT_H
-#define LIBRA_TEST_POINT_H
+#ifndef CLUSTER_TEST_POINT_H
+#define CLUSTER_TEST_POINT_H
 
-#include "libra-config.h"
+#include "cluster-config.h"
 
-#ifdef LIBRA_HAVE_MPI
+#ifdef CLUSTER_HAVE_MPI
 #include <mpi.h>
-#endif // LIBRA_HAVE_MPI 
+#endif // CLUSTER_HAVE_MPI 
 
 #include <cmath>
 #include <string>
@@ -82,7 +82,7 @@ namespace cluster {
       return p;
     }
 
-#ifdef LIBRA_HAVE_MPI
+#ifdef CLUSTER_HAVE_MPI
     /// Returns the size of a packed point
     int packed_size(MPI_Comm comm) const;
   
@@ -91,7 +91,7 @@ namespace cluster {
 
     /// Unpacks a point from an MPI packed buffer
     static point unpack(void *buf, int bufsize, int *position, MPI_Comm comm);
-#endif // LIBRA_HAVE_MPI
+#endif // CLUSTER_HAVE_MPI
   };
 
   std::ostream& operator<<(std::ostream& out, const point& p);
@@ -121,5 +121,5 @@ namespace cluster {
 
 } // namespace cluster
 
-#endif // LIBRA_TEST_POINT_H
+#endif // CLUSTER_TEST_POINT_H
 
