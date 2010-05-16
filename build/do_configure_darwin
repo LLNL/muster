@@ -6,8 +6,9 @@
 
 ../configure \
     CXX=mpicxx \
-    CPPFLAGS="-g3 -O3 -Wall" \
+    CPPFLAGS="-g3 -O3 -Wall -DOMPI_SKIP_MPICXX" \
     --with-boost="/opt/local" \
     --prefix=${HOME}/opt/cluster \
-    --with-tests
+    --with-tests \
+    $@
 
