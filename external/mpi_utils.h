@@ -6,7 +6,9 @@
 #include <stdint.h>
 #include <mpi.h>
 
-/// Overloaded function for getting corresponding MPI types for C types.
+///
+/// Overloaded functions for getting corresponding MPI types for C types.
+///
 inline MPI_Datatype mpi_typeof(char)                       {return MPI_CHAR;}
 inline MPI_Datatype mpi_typeof(signed short)               {return MPI_SHORT;}
 inline MPI_Datatype mpi_typeof(signed int)                 {return MPI_INT;}
@@ -24,19 +26,10 @@ inline MPI_Datatype mpi_typeof(std::pair<double,int>)      {return MPI_DOUBLE_IN
 inline MPI_Datatype mpi_typeof(std::pair<long double,int>) {return MPI_LONG_DOUBLE_INT;}
 inline MPI_Datatype mpi_typeof(std::pair<short,int>)       {return MPI_SHORT_INT;}
 
-
-// helper routine for packing functions below.
-// TODO: this really shouldn't call exit()
-inline int mpi_packed_size(int count, MPI_Datatype type, MPI_Comm comm) {
-  int size;
-  if (PMPI_Pack_size(count, type, comm, &size)) {
-    std::cerr << "Error getting size!" << std::endl;
-    exit(1);
-  }
-  return size;
-}
-
-/// Handy datatype for stdlib datatypes
+/// 
+/// Handy datatypes for stdlib datatypes
+/// TODO: this isn't going to work on heterogeneous machines.  We'll need to pick a type there.
+/// 
 #define MPI_SIZE_T      (mpi_typeof(size_t()))
 #define MPI_INTPTR_T    (mpi_typeof(intptr_t()))
 #define MPI_UINTPTR_T   (mpi_typeof(uintptr_t()))

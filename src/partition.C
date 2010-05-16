@@ -106,7 +106,7 @@ namespace cluster {
         size_t size;
         set_intersection(c1[i].begin(), c1[i].end(), 
                          c2[j].begin(), c2[j].end(),
-                         counter<unsigned>(size));
+                         counter(size));
         c1c2_sum2 += size * size;
       }
     }

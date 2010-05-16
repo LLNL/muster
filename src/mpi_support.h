@@ -46,5 +46,14 @@
 
 #endif // CLUSTER_USE_PMPI
 
+///
+/// Expression-ifies the overly C-ish MPI_Pack_size function.  Just returns 
+/// the size instead of requring a temporary.
+///
+inline int mpi_packed_size(int count, MPI_Datatype type, MPI_Comm comm) {
+  int size;
+  CMPI_Pack_size(count, type, comm, &size);
+  return size;
+}
 
 #endif // CLUSTER_MPI_TO_PMPI_H
