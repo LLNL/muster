@@ -97,7 +97,6 @@ static void print_cluster_info(const cluster::partition& km, double bic) {
   cout << "k:        " << km.num_clusters() << endl;
   cout << "BIC:      " << bic << endl;
   cout << "real bic: " << cluster::bic(km, matrix_distance(dissimilarity), dimensions) << endl;
-  cout << "old bic:  " << old_bic(km, matrix_distance(dissimilarity), dimensions) << endl;  
   if (debug) {
     cout << "medoids: ";
     for (size_t i=0; i < km.medoid_ids.size(); i++) {
