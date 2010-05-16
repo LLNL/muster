@@ -18,6 +18,7 @@
 #include "stl_utils.h"
 #include "MersenneTwister.h"
 #include "bic.h"
+#include "cluster_mpi_to_pmpi.h"
 
 
 namespace cluster {
@@ -77,8 +78,8 @@ namespace cluster {
                         std::vector<typename id_pair<T>::vector>& all_medoids, MPI_Comm comm)
     {
       int size, rank;
-      PMPI_Comm_size(comm, &size);
-      PMPI_Comm_rank(comm, &rank);
+      CMPI_Comm_size(comm, &size);
+      CMPI_Comm_rank(comm, &rank);
       
       for (size_t i=0; trials.has_next(); i++) {
         int my_k = -1;                        // trial id for local run of kmedoids
@@ -182,8 +183,8 @@ namespace cluster {
     void clara(const std::vector<T>& objects, D dmetric, size_t k, std::vector<T> *medoids = NULL) 
     {
       int size, rank;
-      PMPI_Comm_size(comm, &size);
-      PMPI_Comm_rank(comm, &rank);
+      CMPI_Comm_size(comm, &size);
+      CMPI_Comm_rank(comm, &rank);
 
       seed_random_uniform(comm); // seed RN generator uniformly across ranks.
 
@@ -220,8 +221,8 @@ namespace cluster {
       // to avoid FP error and guarantee that sums is the same across all processors.
       std::vector<double> sums(trials.count());         // destination vectors for reduction.
 
-      PMPI_Reduce(&all_dissimilarities[0],  &sums[0], trials.count(), MPI_DOUBLE, MPI_SUM, 0, comm);
-      PMPI_Bcast(&sums[0],  trials.count(), MPI_DOUBLE, 0, comm);
+      CMPI_Reduce(&all_dissimilarities[0],  &sums[0], trials.count(), MPI_DOUBLE, MPI_SUM, 0, comm);
+      CMPI_Bcast(&sums[0],  trials.count(), MPI_DOUBLE, 0, comm);
       timer.record("GlobalSums");
 
       // find minmum global dissimilarity among all trials.
@@ -294,8 +295,8 @@ namespace cluster {
                   std::vector<T> *medoids = NULL) 
     {
       int size, rank;
-      PMPI_Comm_size(comm, &size);
-      PMPI_Comm_rank(comm, &rank);
+      CMPI_Comm_size(comm, &size);
+      CMPI_Comm_rank(comm, &rank);
 
       seed_random_uniform(comm); // seed RN generator uniformly across ranks.
 
@@ -346,11 +347,11 @@ namespace cluster {
       std::vector<double> sums2(all_dissim2.size());
       std::vector<size_t> sizes(cluster_sizes.size());
 
-      PMPI_Reduce(&all_dissimilarities[0],  &sums[0], trials.count(), MPI_DOUBLE, MPI_SUM, 0, comm);
-      PMPI_Reduce(&all_dissim2[0], &sums2[0], sums2.size(), MPI_DOUBLE, MPI_SUM, 0, comm);
-      PMPI_Bcast(&sums[0],  trials.count(), MPI_DOUBLE, 0, comm);
-      PMPI_Bcast(&sums2[0], sums2.size(), MPI_DOUBLE, 0, comm);
-      PMPI_Allreduce(&cluster_sizes[0], &sizes[0], sizes.size(), MPI_SIZE_T, MPI_SUM, comm);
+      CMPI_Reduce(&all_dissimilarities[0],  &sums[0], trials.count(), MPI_DOUBLE, MPI_SUM, 0, comm);
+      CMPI_Reduce(&all_dissim2[0], &sums2[0], sums2.size(), MPI_DOUBLE, MPI_SUM, 0, comm);
+      CMPI_Bcast(&sums[0],  trials.count(), MPI_DOUBLE, 0, comm);
+      CMPI_Bcast(&sums2[0], sums2.size(), MPI_DOUBLE, 0, comm);
+      CMPI_Allreduce(&cluster_sizes[0], &sizes[0], sizes.size(), MPI_SIZE_T, MPI_SUM, comm);
       timer.record("GlobalSums");
 
       // find minmum global dissimilarity among all trials.
@@ -438,7 +439,7 @@ namespace cluster {
     template <class T>
     void bcast_vector(MPI_Comm comm, std::vector<T>& medoids, int root) {
       int rank;
-      PMPI_Comm_rank(comm, &rank);
+      CMPI_Comm_rank(comm, &rank);
 
       // figure out size of packed buffer
       int packed_size=0;
@@ -450,7 +451,7 @@ namespace cluster {
       }
 
       // broadcast size and allocate receive buffer.
-      PMPI_Bcast(&packed_size, 1, MPI_INT, root, comm);
+      CMPI_Bcast(&packed_size, 1, MPI_INT, root, comm);
       char packed_buffer[packed_size];
 
       // pack buffer with medoid objects
@@ -458,21 +459,21 @@ namespace cluster {
         int pos = 0;
 
         size_t num_medoids = medoids.size();
-        PMPI_Pack(&num_medoids, 1, MPI_SIZE_T, packed_buffer, packed_size, &pos, comm);
+        CMPI_Pack(&num_medoids, 1, MPI_SIZE_T, packed_buffer, packed_size, &pos, comm);
 
         for (size_t i=0; i < num_medoids; i++) {
           medoids[i].pack(packed_buffer, packed_size, &pos, comm);
         }
       }
 
-      PMPI_Bcast(&packed_buffer, packed_size, MPI_PACKED, root, comm);
+      CMPI_Bcast(&packed_buffer, packed_size, MPI_PACKED, root, comm);
 
       // unpack broadcast medoids.
       if (rank != root) {
         int pos = 0;
 
         size_t num_medoids;
-        PMPI_Unpack(packed_buffer, packed_size, &pos, &num_medoids, 1, MPI_SIZE_T, comm);
+        CMPI_Unpack(packed_buffer, packed_size, &pos, &num_medoids, 1, MPI_SIZE_T, comm);
         medoids.resize(num_medoids);
 
         for (size_t i=0; i < medoids.size(); i++) {

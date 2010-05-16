@@ -6,6 +6,7 @@
 using namespace std;
 
 #include "random.h"
+#include "cluster_mpi_to_pmpi.h"
 
 namespace cluster {
 
@@ -26,7 +27,7 @@ namespace cluster {
 
   double par_kmedoids::average_dissimilarity() {
     int size;
-    PMPI_Comm_size(comm, &size);
+    CMPI_Comm_size(comm, &size);
     return total_dissimilarity / size;
   }
 
@@ -36,11 +37,11 @@ namespace cluster {
 
   void par_kmedoids::seed_random_uniform(MPI_Comm comm) {
     int rank;
-    PMPI_Comm_rank(comm, &rank);
+    CMPI_Comm_rank(comm, &rank);
 
     // same seed on all processes.
     uint32_t seed = get_time_seed();
-    PMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
+    CMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
     random.seed(seed);
   }
 
