@@ -1,3 +1,5 @@
+#ifndef CLUSTER_MPI_TO_PMPI_H
+#define CLUSTER_MPI_TO_PMPI_H
 ///
 /// @file cluster_mpi_to_pmpi.h
 /// @brief <code>\#defines</code> for switching between MPI and PMPI bindings.
@@ -9,8 +11,6 @@
 /// This file should contain <code>\#defines</code> for all MPI calls used in 
 /// the cluster library, and needs to be kept current.
 ///
-#ifndef CLUSTER_MPI_TO_PMPI_H
-#define CLUSTER_MPI_TO_PMPI_H
 
 #ifdef HAVE_CONFIG_H
 #include "cluster-config.h"
