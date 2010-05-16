@@ -6,7 +6,6 @@
 using namespace std;
 
 #include "random.h"
-#include "cluster_mpi_to_pmpi.h"
 
 namespace cluster {
 

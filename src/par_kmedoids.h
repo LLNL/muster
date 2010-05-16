@@ -13,12 +13,10 @@
 #include "multi_gather.h"
 #include "trial.h"
 #include "id_pair.h"
-#include "mpi_utils.h"
 #include "par_partition.h"
 #include "stl_utils.h"
 #include "bic.h"
-#include "cluster_mpi_to_pmpi.h"
-
+#include "mpi_bindings.h"
 
 namespace cluster {
 
@@ -446,7 +444,7 @@ namespace cluster {
       // figure out size of packed buffer
       int packed_size=0;
       if (rank == root) {
-        packed_size += mpi_packed_size(1, MPI_SIZE_T, comm);   // num medoids for trial.
+        packed_size += cmpi_packed_size(1, MPI_SIZE_T, comm);   // num medoids for trial.
         for (size_t i=0; i < medoids.size(); i++) {         // size of medoids.
           packed_size += medoids[i].packed_size(comm);
         }

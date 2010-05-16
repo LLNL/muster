@@ -4,7 +4,7 @@
 
 #include "mpi_utils.h"
 #include "partition.h"
-#include "cluster_mpi_to_pmpi.h"
+#include "mpi_bindings.h"
 
 //#define DEBUG
 

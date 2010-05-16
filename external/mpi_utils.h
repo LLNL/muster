@@ -34,4 +34,24 @@ inline MPI_Datatype mpi_typeof(std::pair<short,int>)       {return MPI_SHORT_INT
 #define MPI_INTPTR_T    (mpi_typeof(intptr_t()))
 #define MPI_UINTPTR_T   (mpi_typeof(uintptr_t()))
 
+///
+/// Expression-ifies the overly C-ish MPI_Pack_size function.  Just returns 
+/// the size instead of requring a temporary.
+///
+inline int mpi_packed_size(int count, MPI_Datatype type, MPI_Comm comm) {
+  int size;
+  MPI_Pack_size(count, type, comm, &size);
+  return size;
+}
+
+///
+/// PMPI binding for mpi_packed_size().
+///
+inline int pmpi_packed_size(int count, MPI_Datatype type, MPI_Comm comm) {
+  int size;
+  PMPI_Pack_size(count, type, comm, &size);
+  return size;
+}
+
+
 #endif // MPI_UTILS_H

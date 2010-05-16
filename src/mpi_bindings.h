@@ -1,7 +1,7 @@
-#ifndef CLUSTER_MPI_TO_PMPI_H
-#define CLUSTER_MPI_TO_PMPI_H
+#ifndef CLUSTER_MPI_BINDINGS_H
+#define CLUSTER_MPI_BINDINGS_H
 ///
-/// @file cluster_mpi_to_pmpi.h
+/// @file mpi_bindings.h
 /// @brief <code>\#defines</code> for switching between MPI and PMPI bindings.
 /// 
 /// User of the API can <code>\#define</code> <code>CLUSTER_USE_PMPI</code> to use the 
@@ -16,6 +16,9 @@
 #include "cluster-config.h"
 #endif // HAVE_CONFIG_H
 
+// External header for MPI type information
+#include "mpi_utils.h"
+
 #ifdef CLUSTER_USE_PMPI
 
 #define CMPI_Allreduce PMPI_Allreduce
@@ -26,9 +29,12 @@
 #define CMPI_Irecv     PMPI_Irecv
 #define CMPI_Isend     PMPI_Isend
 #define CMPI_Pack      PMPI_Pack
+#define CMPI_Pack_size PMPI_Pack_size
 #define CMPI_Reduce    PMPI_Reduce
 #define CMPI_Unpack    PMPI_Unpack
 #define CMPI_Waitsome  PMPI_Waitsome
+
+#define cmpi_packed_size pmpi_packed_size
 
 #else  // CLUSTER_USE_PMPI
 
@@ -40,20 +46,15 @@
 #define CMPI_Irecv     MPI_Irecv
 #define CMPI_Isend     MPI_Isend
 #define CMPI_Pack      MPI_Pack
+#define CMPI_Pack_size MPI_Pack_size
 #define CMPI_Reduce    MPI_Reduce
 #define CMPI_Unpack    MPI_Unpack
 #define CMPI_Waitsome  MPI_Waitsome
 
+#define cmpi_packed_size mpi_packed_size
+
 #endif // CLUSTER_USE_PMPI
 
-///
-/// Expression-ifies the overly C-ish MPI_Pack_size function.  Just returns 
-/// the size instead of requring a temporary.
-///
-inline int mpi_packed_size(int count, MPI_Datatype type, MPI_Comm comm) {
-  int size;
-  CMPI_Pack_size(count, type, comm, &size);
-  return size;
-}
 
-#endif // CLUSTER_MPI_TO_PMPI_H
+
+#endif // CLUSTER_MPI_BINDINGS_H

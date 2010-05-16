@@ -7,7 +7,7 @@ include_HEADERS = \
 	dissimilarity.h \
 	partition.h \
 	bic.h \
-	cluster_mpi_to_pmpi.h
+	mpi_bindings.h
 
 EXTERNAL_SOURCES = \
 	../external/Timer.C \
