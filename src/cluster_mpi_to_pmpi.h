@@ -1,6 +1,10 @@
 #ifndef CLUSTER_MPI_TO_PMPI_H
 #define CLUSTER_MPI_TO_PMPI_H
 
+#ifdef HAVE_CONFIG_H
+#include "cluster-config.h"
+#endif // HAVE_CONFIG_H
+
 //
 // User of the API can #define CLUSTER_USE_PMPI to use the 
 // PMPI bindings instead of the plain MPI bindings.  Useful
