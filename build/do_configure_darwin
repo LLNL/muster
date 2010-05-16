@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# This is a sample configure script for Libra,
+# For a MacBook Pro laptop with various dependencies installed via MacPorts.
+# 
+
+../configure \
+    CXX=mpicxx \
+    CPPFLAGS="-g3 -O3 -Wall" \
+    --with-boost="/opt/local" \
+    --prefix=${HOME}/opt/cluster \
+    --with-tests
+
