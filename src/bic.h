@@ -81,12 +81,12 @@ namespace cluster {
   /// we assume that the sizes of the distributed clusters as well as the total squared intra-cluster
   /// dissimilarity (between each object and its medoid) is known.
   /// 
-  ///    @param[in] k                   Number of clusters in the clustering.  Same as k from k-means or k-medoids.
-  ///    @param[in] cluster_sizes       Start of range of k sizes.  
-  ///                                   <code>*cluster_sizes .. *(cluster_sizes + k)</code> should be the
-  ///                                   sizes of clusters 1 to k
-  ///    @param[in] sum2_dissimilarity  Sum of squared dissimilarities of each object w.r.t. its nearest medoid.
-  ///    @param[in] dimensionality      Dimensionality of clustered data.  e.g., 2 for 2-dimensional points.
+  ///    @param[in] k               Number of clusters in the clustering.  Same as k from k-means or k-medoids.
+  ///    @param[in] cluster_sizes   Start of range of k sizes.  
+  ///                               <code>*cluster_sizes .. *(cluster_sizes + k)</code> should be the
+  ///                               sizes of clusters 1 to k
+  ///    @param[in] sum2_dissim     Sum of squared dissimilarities of each object w.r.t. its nearest medoid.
+  ///    @param[in] dimensionality  Dimensionality of clustered data.  e.g., 2 for 2-dimensional points.
   ///
   template <typename SizeIterator, typename DissimIterator>
   double bic(size_t k, SizeIterator cluster_sizes, DissimIterator sum2_dissim, size_t dimensionality) {
