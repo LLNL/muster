@@ -1,3 +1,14 @@
+///
+/// @file cluster_mpi_to_pmpi.h
+/// @brief <code>\#defines</code> for switching between MPI and PMPI bindings.
+/// 
+/// User of the API can <code>\#define</code> <code>CLUSTER_USE_PMPI</code> to use the 
+/// PMPI bindings instead of the plain MPI bindings.  Useful
+/// for including this algorithm in tools.
+/// 
+/// This file should contain <code>\#defines</code> for all MPI calls used in 
+/// the cluster library, and needs to be kept current.
+///
 #ifndef CLUSTER_MPI_TO_PMPI_H
 #define CLUSTER_MPI_TO_PMPI_H
 
@@ -5,11 +16,6 @@
 #include "cluster-config.h"
 #endif // HAVE_CONFIG_H
 
-//
-// User of the API can #define CLUSTER_USE_PMPI to use the 
-// PMPI bindings instead of the plain MPI bindings.  Useful
-// for including this algorithm in tools.
-//
 #ifdef CLUSTER_USE_PMPI
 
 #define CMPI_Allreduce PMPI_Allreduce
