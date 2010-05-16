@@ -6,7 +6,6 @@
 #include <algorithm>
 
 #include "counter.h"
-#include "color.h"
 #include "stl_utils.h"
 
 using namespace std;
@@ -65,7 +64,7 @@ namespace cluster {
 
       for (cset::const_iterator obj=c.begin(); obj != c.end(); obj++) {
         if (medoid_ids && (*medoid_ids)[i] == *obj) {
-          out << Red << *obj << None << " ";
+          out << "[" << *obj << "] ";
         } else {
           out << *obj << " ";          
         }
