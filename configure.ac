@@ -3,7 +3,7 @@
 # This is the main autoconf file for building Libra.
 #############################################################
 AC_INIT
-AC_CONFIG_SRCDIR([kmedoids.C])
+AC_CONFIG_SRCDIR([src/kmedoids.C])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -44,32 +44,36 @@ AM_CONDITIONAL([HAVE_MPI], [test "x$have_mpi" == xyes])
 AC_CHECK_LIB(rt, clock_gettime)
 AC_CHECK_FUNCS(clock_gettime gettimeofday)
 
-# If this is provided, use PMPI bindings instead of MPI bindings.  
-AC_ARG_WITH([with-pmpi-bindings], 
-  AS_HELP_STRING([--with-pmpi-bindings], 
-                 [Optionally build the cluster library with name-shifted PMPI bindings instead of plain MPI bindings.  Default is to use MPI bindings.]),
-  [if [[ "x$withval" = xyes ]]; then
-      pmpi_bindings=no
-   else
-      pmpi_bindings=yes
-   fi],
-  [pmpi_bindings=no]
+# If this is provided, we'll install the test library and the tests along with the
+# cluster library headers.
+AC_ARG_WITH([tests], 
+    AS_HELP_STRING([--with-tests], 
+                   [If provided, we'll install the tests and the test library too.]),
+    [    if [[ "x$withval" = xyes ]]; then
+             install_tests=yes
+         else
+             install_tests=no
+         fi
+     ],
+    [    install_tests=no   
+     ]
 )
-if [[ "x$pmpi_bindings" = xyes ]]; then
-    AC_DEFINE([USE_PMPI], [1], [Define to 1 to use PMPI bindings instead of MPI bindings for communication.])
-    AC_MSG_NOTICE([Building with PMPI bindings.])
-else
-    AC_MSG_NOTICE([Building with MPI bindings.])
+AM_CONDITIONAL([INSTALL_TESTS], [test "x$install_tests" == xyes])
+if [[ "x$install_tests" = xyes ]]; then
+    AC_MSG_NOTICE([Will install test cases and tests library.])
 fi
+
 
 echo
 echo "========================================================"
 echo "==         Libra: final build configuration           =="
 echo "========================================================"
 echo "  MPI ............................................ $have_mpi"
-echo "  PMPI Bindings .................................. $pmpi_bindings"
+echo "  Install Tests .................................. $install_tests"
 echo "========================================================"
 echo
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile \
+                 src/Makefile \
+                 test/Makefile])
 AC_OUTPUT

@@ -79,9 +79,5 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define to 1 to use PMPI bindings instead of MPI bindings for communication.
-   */
-#undef USE_PMPI
-
 /* Version number of package */
 #undef VERSION
