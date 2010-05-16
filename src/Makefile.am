@@ -6,7 +6,6 @@ include_HEADERS = \
 	counter.h \
 	dissimilarity.h \
 	partition.h \
-	MersenneTwister.h \
 	bic.h \
 	cluster_mpi_to_pmpi.h
 

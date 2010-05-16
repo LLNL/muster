@@ -4,11 +4,12 @@
 #include <fstream>
 #include <sys/time.h>
 
+#include <boost/random.hpp>
+
 #include "timing.h"
 #include "point.h"
 #include "bic.h"
 #include "par_kmedoids.h"
-#include "MersenneTwister.h"
 
 using namespace cluster;
 using namespace std;
@@ -96,14 +97,19 @@ int main(int argc, char **argv) {
 
   get_args(&argc, &argv, rank);
 
-  MTRand rand(get_time_seed() + rank);  // generator to make points.  Seed differently on each rank.
-  vector<point> points;      // vector of local points  
+  // generator to make points.  Seed differently on each rank.
+  typedef boost::mt19937 random_t;
+  random_t random(get_time_seed() + rank);  
+  boost::random_number_generator<random_t> rng(random);
+
+  // vector of local points
+  vector<point> points;
   
   // generate randomly distributed, zero-centered points.
   // TODO: use random gaussian points?
   for (size_t i=0; i < objects_per_process; i++) {
-    int x = rand.randInt(5000) - 2500;
-    int y = rand.randInt(5000) - 2500;
+    int x = rng(5000+1) - 2500;
+    int y = rng(5000+1) - 2500;
     points.push_back(point(x,y));
   }
 

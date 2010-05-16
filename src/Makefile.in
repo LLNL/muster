@@ -113,9 +113,9 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 SOURCES = $(libcluster_la_SOURCES)
 DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST)
 am__include_HEADERS_DIST = kmedoids.h random.h counter.h \
-	dissimilarity.h partition.h MersenneTwister.h bic.h \
-	cluster_mpi_to_pmpi.h par_partition.h par_kmedoids.h \
-	multi_gather.h trial.h id_pair.h
+	dissimilarity.h partition.h bic.h cluster_mpi_to_pmpi.h \
+	par_partition.h par_kmedoids.h multi_gather.h trial.h \
+	id_pair.h
 HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
@@ -241,8 +241,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libcluster.la
 include_HEADERS = kmedoids.h random.h counter.h dissimilarity.h \
-	partition.h MersenneTwister.h bic.h cluster_mpi_to_pmpi.h \
-	$(am__append_1)
+	partition.h bic.h cluster_mpi_to_pmpi.h $(am__append_1)
 EXTERNAL_SOURCES = \
 	../external/Timer.C \
 	../external/timing.C

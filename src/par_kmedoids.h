@@ -16,7 +16,6 @@
 #include "mpi_utils.h"
 #include "par_partition.h"
 #include "stl_utils.h"
-#include "MersenneTwister.h"
 #include "bic.h"
 #include "cluster_mpi_to_pmpi.h"
 
@@ -94,7 +93,8 @@ namespace cluster {
           
           // Generate a set of indices for members of this k-medoids trial
           std::vector<size_t> sample_ids;
-          random_subset(trials.num_objects, cur_trial.sample_size, std::back_inserter(sample_ids), random);
+          boost::random_number_generator<random_t> rng(random);  // Boost adaptor for STL RNG's
+          random_subset(trials.num_objects, cur_trial.sample_size, std::back_inserter(sample_ids), rng);
 
           // figure out where the sample objects live, ASSUME objects.size() objs per process.
           std::vector<int> sources;
@@ -413,9 +413,11 @@ namespace cluster {
     const Timer& get_timer() { return timer; }
 
   protected:
-    MTRand random;                /// Random number generator, seeded the same on each process
+    typedef boost::mt19937 random_t;   ///< Type for random number generator used here.
+    random_t random;                   ///< Random number distribution to be used for samples
+    
     double total_dissimilarity;   /// Total dissimilarity bt/w objects and medoids for last clustering.
-    double best_bic_score;             /// BIC score for the clustering found.
+    double best_bic_score;        /// BIC score for the clustering found.
     size_t init_size;             /// baseline size for samples
     size_t max_reps;              /// Max repetitions of trials for a particular k.
     double epsilon;               /// Tolerance for convergence tests in kmedoids PAM runs.
