@@ -94,5 +94,5 @@ echo
 
 AC_CONFIG_FILES([Makefile \
                  src/Makefile \
-                 test/Makefile])
+                 tests/Makefile])
 AC_OUTPUT

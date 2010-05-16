@@ -2,9 +2,9 @@ AUTOMAKE_OPTIONS = foreign   # Don't require NEWS, README, INSTALL, etc.
 ACLOCAL_AMFLAGS = -I m4
 
 if INSTALL_TESTS
-TEST_DIR = test
+TEST_DIR = tests
 else
-TEST_DIR = test
+TEST_DIR = tests
 endif
 
 SUBDIRS = src $(TEST_DIR)
