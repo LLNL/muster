@@ -70,7 +70,7 @@ namespace cluster {
   /// @endcode
   ///
   template <class T>
-  counter_iterator counter(T& ref) {
+  counter_iterator<T> counter(T& ref) {
     return counter_iterator<T>(ref);
   }
 
