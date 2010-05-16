@@ -64,11 +64,30 @@ if [[ "x$install_tests" = xyes ]]; then
 fi
 
 
+# If this is provided, we'll install the test library and the tests along with the
+# cluster library headers.
+AC_ARG_WITH([pmpi-bindings], 
+    AS_HELP_STRING([--with-pmpi-bindings], 
+                   [If provided, build with PMPI bindings instead of raw MPI bindings.  Useful for including this library in tools.]),
+    [    if [[ "x$withval" = xyes ]]; then
+             pmpi_bindings=yes
+         else
+             pmpi_bindings=no
+         fi
+     ],
+    [    pmpi_bindings=no
+     ]
+)
+if [[ "x$pmpi_bindings" = xyes ]]; then
+    AC_DEFINE([USE_PMPI], [1], [Define to 1 to use PMPI bindings instead of raw MPI bindings.])
+fi
+
 echo
 echo "========================================================"
 echo "==         Libra: final build configuration           =="
 echo "========================================================"
 echo "  MPI ............................................ $have_mpi"
+echo "  PMPI Bindings .................................. $pmpi_bindings"
 echo "  Install Tests .................................. $install_tests"
 echo "========================================================"
 echo
