@@ -11,6 +11,9 @@
 #include <ostream>
 #include <stdint.h>
 
+///
+/// Namespace for everything in the cluster library.
+///
 namespace cluster {
 
   typedef size_t medoid_id;       ///< More descriptive type for medoid index
@@ -118,9 +121,12 @@ namespace cluster {
   /// Convenience overload for comparing partition objects directly
   double mirkin_distance(const partition& c1, const partition& c2);
 
+  /// 
   /// Expand a cluster_list by l levels.  That is, replace each index i
   /// in the cluster_list with indices in [2^l * i ... 2^l * (i+1) - 1]
-  /// TODO: deprecate and delete.
+  /// 
+  /// @todo deprecate and delete this.
+  /// 
   void expand(cluster_list& list, size_t level = 1);
 
   ///

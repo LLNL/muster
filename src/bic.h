@@ -17,8 +17,8 @@
 /// @par
 /// Dan Pelleg and Andrew Moore.  <a href="http://www.cs.cmu.edu/~dpelleg/download/xmeans.pdf">
 /// <b>X-Means: Extending K-Means with Efficient Estimation of the Number of Clusters</b></a>.
-/// <i>Proceedings of the Seventeenth International Conference on Machine Learning</i>,
-/// pp 727-734, Morgan Kaufman, San Francisco, CA.
+/// <i>Proceedings of the Seventeenth International Conference on Machine Learning</i>, 
+/// San Francisco, CA. June 29-July 2, 2000.  pp 727-734.
 /// 
 
 #include <stdint.h>

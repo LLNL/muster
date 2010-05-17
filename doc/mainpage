@@ -1,0 +1,167 @@
+// -*- c++ -*-
+
+/*! 
+  @mainpage
+    
+  <h2>Introduction</h2>
+
+  This library provides implementation of sequential and parallel K-Medoids clustering
+  algorithms.  It is intended as a general frameowrk for parallel cluster analysis, 
+  particularly for performance data analysis on systems with very large numbers of 
+  processes.
+
+  The parallel implementations in this library are designed to perform 
+  well even in environments where the data to be clustered is entirely distributed.  
+  For example, many performance tools need to analyze one data element from each
+  process in a system.  To analyze this data efficiently, clustering algorithms that move 
+  as little data as possible are required.  In this scalable clustering library, we
+  exploit sampled clustering algorithms to realize this efficiency.
+  
+  The parallel algorithms in this library are implemented using the Message Passing 
+  Interface (MPI), making them suitable for use on many of the world's largest 
+  supercomputers.  They should, however, also run efficiently on your laptop.
+  
+  <h2>Getting Started</h2>
+  
+  <h3>Partitions</h3>
+  The algorithms in this library are <i>partitioning algorithms</i>, that is, they divide
+  a data set up into a set of groups, or <i>clusters</i> of data objects.  Together, 
+  these groups are called a <i>clustering</i> or a <i>partitioning</i> of the data.
+
+  There are two classes that represent clusterings.  These are as follows:
+  <dl>
+  <dt>\link cluster::partition partition\endlink</dt>
+  <dd>This class represents a partitioning of a data set.  It stores the clusters in the 
+  data set along with <i>representatives</i> from each of the clusters.  It also stores,
+  for every object in the data set, the cluster to which that object has been assigned.
+
+  A \link cluster::partition partition\endlink is entirely local to the process that owns it.  It exists 
+  in one memory space and contains data about <i>all</i> objects in the data set it describes.
+  </dd>
+
+  <dt>\link cluster::par_partition par_partition\endlink</dt>
+  <dd>This class is similar to \link cluster::partition partition\endlink, but it is a distributed 
+  data structure. A \link cluster::par_partition par_partition\endlink object represents the 
+  results of parallel clustering algorithm.
+  Instead of storing the cluster assignments of <i>all</i> objects in the data set, each 
+  par_partition object stores only the cluster membership for objects that are local to the
+  the calling process.
+  </dd>
+  </dl>
+
+  Note that par_partition does not inherit from partition, because the classes are structurally
+  different.  One is a local, centralized data structure, and its state represents all data in the 
+  set, while the other is a distributed structure, and represents only a part of the full data set.
+  
+  If you need to, you can convert a par_partition to a partition with the 
+  \link cluster::par_partition::gather() par_partition::gather()\endlink method, but the two 
+  classes are not interchangeable.
+
+  <h3>Clustering Algorithms</h3>
+  Classes for clustering algorithms derive from either \link cluster::partition partition\endlink 
+  or \link cluster::par_partition par_partition\endlink.  The algorithms themselves are methods on these derived 
+  classes, and they store their output in the class.  This allows all (or at least most of)
+  the state for the algorithms and their output to be encapsulated in a single class.  
+
+  Algorithms themselves are template functions on the derived classes.  You can thus call them
+  on any type of object with any number of distance metrics.  Because they are template
+  fucntions, you don't need to explicitly indicate the types of the things you pass to the 
+  clustering algorithms; the types are inferred from the algorithms' parameters.
+  
+  There are two classes you should be concerned with:
+
+  <dl>
+  <dt>\link cluster::kmedoids kmedoids\endlink</dt>
+  <dd>This class inherits from \link cluster::partition partition\endlink and  contains implementations 
+  of the PAM and CLARA sequential clustering algorithms (Kaufman and Rousseeuw, 1990).
+  PAM is an \f$O(n^2)\f$, optimal K-medoids algorithm, and CLARA is an \f$O(n)\f$ implementation
+  that executes multiple trials of PAM.  These algorithms are implemented in the 
+  \link cluster::kmedoids::pam() pam()\endlink and \link cluster::kmedoids::clara() clara()\endlink methods.  
+
+  PAM and CLARA both require that the caller supply \f$k\f$, the number of clusters, as a 
+  parameter to the algorithm. We have adopted a technique used by the 
+  X-Means (Pelleg and Moore, 2000) algorithm to choose an "ideal" \f$k\f$ from many clustering
+  trials using the \link bic.h Bayesian Information Criterion (BIC)\endlink.  Insteady of supplying a 
+  specific \f$k\f$, the caller supplies a range of values for \f$k\f$, and the algorithms 
+  use the BIC to select the best fit from the range.
+
+  The BIC variants are implemented in 
+  \link cluster::kmedoids::xpam() xpam()\endlink and \link cluster::kmedoids::xclara() xclara()\endlink.  
+  They will be slower than the fixed-k versions, as they can require many iterations of PAM or CLARA be tested
+  to find the best \f$k\f$.
+  </dd>
+
+  <dt>\link cluster::par_kmedoids par_kmedoids\endlink</dt>
+  <dd>This class inherits from \link cluster::par_partition par_partition\endlink and it implements the CAPEK
+  parallel clustering algorithm.  Fucntionally, CAPEK is similar to CLARA, but it is 
+  distributed and runs in \f$O(\frac{n}{P}log(P))\f$ time for \f$n\f$ data objects and \f$P\f$
+  processes.  If \f$n = P\f$, that is, if there are only as many input data elements as processes,
+  CAPEK runs in \f$O(log(P))\f$ time.  
+
+  The fixed-k version of CAPEK is implemented in \link cluster::par_kmedoids::capek() capek()\endlink, 
+  and a variant using the BIC to select a best \f$k\f$ is in \link 
+  cluster::par_kmedoids::xcapek() capek()\endlink.
+  </dd>
+  </dl>
+  
+  <h3>Dissimilarity Functions and Matrices</h3>
+  Most of the algorithms here require some sort of dissimilarity metric to run.  As with
+  the STL, you can use any callable object (function or functor) as a distance function.
+  See the documentation for \link cluster::par_kmedoids::xcapek() xcapek()\endlink for an 
+  example a dissimilarity functor.
+
+  The PAM algorithm, which is the basis for all the algorithms in this package, requires a 
+  precomputed dissimilarity matrix in order to run efficiently.  Given a set of \f$n\f$
+  objects, a dissimilarity matrix is a triangular, \f$n \times n\f$ matrix \f$D\f$ where 
+  each element \f$D_{ij}\f$ represents the distance between the \f$i^{th}\f$ and \f$j^{th}\f$ 
+  objects in the data set.  It takes \f$O(n^2)\f$ time to compute a distance matrix like this.
+
+  We use the <code>boost::symmetric_matrix</code> class to represent dissimilarity matrices.  This class
+  provies a pcaked representation of an upper-triangular matrix, making it an efficient way to
+  store a dissimilarity matrix for clustering.  For convenience, we have typedef'd 
+  <code>boost::symmetric_matrix</code> to \link cluster::dissimilarity_matrix\endlink.
+  To construct a dissimilarity matrix, use \link cluster::build_dissimilarity_matrix()\endlink to do this.
+
+  PAM is the only algorithm
+  the package that requires the use to pass in the matrix explicitly.  This is for 
+  efficiency reasons.  A user (or another algorithm) may want to call PAM many times
+  using the same dissimilarity matrix, and with this design, the user can first build 
+  the matrix then call PAM without paying the (potentially very high) cost of building 
+  the matrix.  
+
+
+  <h2>Author</h2>
+  This library was implemented by Todd Gamblin at 
+  <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>.
+
+  Please send questions, bug reports, or suggestions 
+  to <a href="mailto:tgamblin@llnl.gov">tgamblin@llnl.gov</a>.
+
+
+  <h2>References</h2>
+  For more details on the algorithms implemented by this library, You can consult the following
+  sources:
+  
+  <ol>
+  <li>For more on CAPEK:
+  <p>
+  Todd Gamblin, Bronis R. de Supinski, Martin Schulz, Rob Fowler, and Daniel A. Reed.
+  <a href="http://www.cs.unc.edu/~tgamblin/pubs/scalable-cluster-ics10.pdf">
+  <b>Clustering Performance Data Efficiently at Massive Scales</b></a>.
+  <i>Proceedings of the International Conference on Supercomputing (ICS'10)</i>,
+  Tsukuba, Japan, June 1-4, 2010.
+
+  <li>For more on X-Means and the Bayesian Information Criterion:
+  <p>
+  Dan Pelleg and Andrew Moore.  <a href="http://www.cs.cmu.edu/~dpelleg/download/xmeans.pdf">
+  <b>X-Means: Extending K-Means with Efficient Estimation of the Number of Clusters</b></a>.
+  <i>Proceedings of the Seventeenth International Conference on Machine Learning</i>, 
+  San Francisco, CA. June 29-July 2, 2000.  pp 727-734.
+
+  <li>For more on PAM and CLARA:
+  <p>
+  Leonard Kaufman and Peter J. Rousseeuw.  
+  <b><a href="http://www.amazon.com/Finding-Groups-Data-Introduction-Probability/dp/0471735787">Finding Groups in Data: An Introduction to Cluster Analysis</a></b>. John Wiley & Sons, Inc., New York. 
+
+  </ol>
+*/

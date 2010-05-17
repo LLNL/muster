@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
   vector<point> points;
   
   // generate randomly distributed, zero-centered points.
-  // TODO: use random gaussian points?
+  // @todo use random gaussian points?
   for (size_t i=0; i < objects_per_process; i++) {
     int x = rng(5000+1) - 2500;
     int y = rng(5000+1) - 2500;

@@ -73,7 +73,6 @@ namespace cluster {
 
 
   std::ostream& operator<<(std::ostream& out, const par_partition& par) {
-    // TODO: fix this; it's hacky.
     cluster::partition p;
     p.medoid_ids = par.medoid_ids;
     p.cluster_ids = par.cluster_ids;

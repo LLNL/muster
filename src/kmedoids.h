@@ -56,6 +56,9 @@ namespace cluster {
     /// @param distance         dissimilarity matrix for all objects to cluster
     /// @param k                number of clusters to produce
     /// @param initial_medoids  Optionally supply k initial object ids to be used as initial medoids.
+    ///
+    /// @see \link build_dissimilarity_matrix()\endlink, a function to automatically
+    ///      construct a dissimilarity matrix given a vector of objects and a distance function.
     /// 
     void pam(const dissimilarity_matrix& distance, size_t k, const object_id *initial_medoids = NULL);
 
@@ -72,6 +75,9 @@ namespace cluster {
     /// @param dimensionality   Number of dimensions in clustered data, for BIC.
     ///
     /// @return the best BIC value found (the bic value of the final partitioning).
+    ///
+    /// @see \link build_dissimilarity_matrix()\endlink, a function to automatically
+    ///      construct a dissimilarity matrix given a vector of objects and a distance function.
     ///
     double xpam(const dissimilarity_matrix& distance, size_t max_k, size_t dimensionality);
 

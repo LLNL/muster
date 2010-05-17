@@ -62,7 +62,14 @@ namespace cluster {
     /// will not scale.
     void gather(partition& local, int root=0);
   };
-  
+
+  ///
+  /// Right now this just uses parition::operator<<() by making a 
+  /// partition with this par_partition's cluster_ids and medoid_ids vectors
+  /// and outputting it.
+  /// 
+  /// @todo fix the implementation; it's a little hacky.  
+  ///
   std::ostream& operator<<(std::ostream& out, const par_partition& par);
 
 } // namespace cluster
