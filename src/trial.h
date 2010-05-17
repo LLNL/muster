@@ -1,5 +1,9 @@
 #ifndef TRIAL_H
 #define TRIAL_H
+///
+/// @file trial.h
+/// @brief Data structure representing a trial run of a partitioned clustering algorithm.
+///
 
 #include <cstdlib>
 
@@ -9,6 +13,9 @@ namespace cluster {
   /// This struct represents parameters for a single trial run of kmedoids.
   /// We generate a bunch of these to farm all the trials out to processes when doing
   /// parallel clustering.
+  /// 
+  /// Each trial has a particular <i>k</i> (number of clusters), sample size, and 
+  /// repetition number (for successive samples with the same k).
   ///
   struct trial {
     size_t k;
@@ -41,21 +48,21 @@ namespace cluster {
     trial_generator(size_t min_k, size_t _max_k, 
                     size_t _max_reps, size_t _init_size, size_t _num_objects);
     
-    size_t count() const;       /// return iterations so far.
-    bool has_next() const;      /// whether there are trials remaining.
-    trial next();               /// return parameters for next trial
-    void reset();               /// return to initial state
-    size_t num_trials();        /// Return total number of trials this will generate.
+    size_t count() const;       ///< return iterations so far.
+    bool has_next() const;      ///< whether there are trials remaining.
+    trial next();               ///< return parameters for next trial
+    void reset();               ///< return to initial state
+    size_t num_trials();        ///< Return total number of trials this will generate.
 
-    const size_t max_k;         /// maximum k to try
-    const size_t max_reps;      /// max number of repetitions per k
-    const size_t init_size;     /// initial size for samples before factoring in k, as per CLARA paper.
-    const size_t num_objects;   /// number of elements in the data set; determines maximum sample size.
+    const size_t max_k;         ///< maximum k to try
+    const size_t max_reps;      ///< max number of repetitions per k
+    const size_t init_size;     ///< initial size for samples before factoring in k, as per CLARA paper.
+    const size_t num_objects;   ///< number of elements in the data set; determines maximum sample size.
 
   private:
-    trial cur_trial;            /// current state of the iterator.
-    size_t number_of_trials;    /// memoized total number of trials in this generator
-    size_t iterations;          /// number of iterations so far
+    trial cur_trial;            ///< current state of the iterator.
+    size_t number_of_trials;    ///< memoized total number of trials in this generator
+    size_t iterations;          ///< number of iterations so far
     
     /// size of the sample to cluster for particular k
     size_t get_sample_size(size_t k);

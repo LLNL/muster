@@ -15,7 +15,7 @@
 /// clustering without too many clusters.  For more on this technique and the approach
 /// we've based this implementation on, see this paper:
 /// @par
-/// Pelleg, Dan and Moore, Andrew.  <a href="http://www.cs.cmu.edu/~dpelleg/download/xmeans.pdf">
+/// Dan Pelleg and Andrew Moore.  <a href="http://www.cs.cmu.edu/~dpelleg/download/xmeans.pdf">
 /// <b>X-Means: Extending K-Means with Efficient Estimation of the Number of Clusters</b></a>.
 /// <i>Proceedings of the Seventeenth International Conference on Machine Learning</i>,
 /// pp 727-734, Morgan Kaufman, San Francisco, CA.

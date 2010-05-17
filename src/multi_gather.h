@@ -1,5 +1,10 @@
 #ifndef MULTI_GATHER_H
 #define MULTI_GATHER_H
+///
+/// @file multi_gather.h
+/// @brief Asynchronous, some-to-some gather operation used by parallel clustering algorithms
+/// to simultaneously send members of sample sets to a set of distributed worker processes.
+///
 
 #include <mpi.h>
 #include <vector>
@@ -10,18 +15,24 @@
 namespace cluster {
   
   ///
-  ///   T must support the following operations:
-  ///     - int packed_size(MPI_Comm comm) const
-  ///     - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-  ///     - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
+  /// Asynchronous, some-to-some gather operation used by parallel clustering algorithms
+  /// to simultaneously send members of sample sets to a set of distributed worker processes.
+  /// 
+  /// @tparam T Type of objects to be transferred by this multi_gather.
+  ///   Must support the following operations:
+  ///   - <code>int packed_size(MPI_Comm comm) const</code>
+  ///   - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
+  ///   - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
   ///
+  /// @see par_kmedoids::run_pam_trials(), which uses this class.
+  /// 
   template <class T>
   class multi_gather {
     /// internal struct for buffering sends and recvs.
     struct buffer {
-      int size;             /// buffer for size of Isend or Irecv
-      char *buf;            /// buffer for data to be sent/recv'd
-      std::vector<T> *dest; /// vector to push unpacked data onto
+      int size;             ///< buffer for size of Isend or Irecv
+      char *buf;            ///< buffer for data to be sent/recv'd
+      std::vector<T> *dest; ///< vector to push unpacked data onto
 
       /// constructor for receive buffers
       buffer(std::vector<T>& _dest) 
@@ -49,16 +60,18 @@ namespace cluster {
       bool is_send()   { return !dest; }
     };
 
+    MPI_Comm comm;                   ///< Communicator on which gather takes place
+    int tag;                         ///< tag for communication in multi_gathers.
 
-    MPI_Comm comm;                   /// Communicator on which gather takes place
-    int tag;                         /// tag for communication in multi_gathers.
-
-    std::vector<MPI_Request> reqs;   /// Oustanding requests to be completed.    
-    std::vector<buffer*> buffers;     /// Send and receive buffers for packed data in gathers.
-    size_t unfinished_reqs;          /// Number of still outstanding requests
+    std::vector<MPI_Request> reqs;   ///< Oustanding requests to be completed.    
+    std::vector<buffer*> buffers;    ///< Send and receive buffers for packed data in gathers.
+    size_t unfinished_reqs;          ///< Number of still outstanding requests
     
   public:
-
+    /// 
+    /// Construct a mult_gather on a communicator.  MPI communication will use 
+    /// the specified tag.
+    /// 
     multi_gather(MPI_Comm _comm, int _tag=0) 
       : comm(_comm), tag(_tag), unfinished_reqs(0) { }
 

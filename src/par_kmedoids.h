@@ -27,6 +27,14 @@ namespace cluster {
   ///
   /// This class implements the CAPEK and XCAPEK scalable parallel clustering algorithms.
   /// 
+  /// For more information on these algorithms, see this paper:
+  /// @par
+  /// Todd Gamblin, Bronis R. de Supinski, Martin Schulz, Rob Fowler, and Daniel A. Reed.
+  /// <a href="http://www.cs.unc.edu/~tgamblin/pubs/scalable-cluster-ics10.pdf">
+  /// <b>Clustering Performance Data Efficiently at Massive Scales</b></a>.
+  /// <i>Proceedings of the International Conference on Supercomputing (ICS'10)</i>,
+  /// Tsukuba, Japan, June 1-4, 2010.
+  ///
   /// <b>Example usage:</b>
   /// @code
   /// // This is a theoretical point struct to be clustered.
@@ -51,12 +59,22 @@ namespace cluster {
   /// 
   /// // Run xcapek(), finding a max of 20 clusters among the 2d points.
   /// parkm.xcapek(points, euclidean_distance(), 20, 2, &medoids);
+  /// @endcode
   /// 
-  /// // POST: 
-  /// //   parkm is a par_partition object containing:
-  /// //     1. The object id of the local cluster
-  /// //     2. The object ids of the cluster representatives
-  /// //   The medoids vector contains copies of the representatives for each cluster.
+  /// After this runs, these members of <code>parkm</code> are interesting:
+  /// - <code>parkm.\link par_partition::cluster_ids cluster_ids\endlink</code>: 
+  ///    A vector of cluster ids for the local objects in <code>points</code> 
+  /// - <code>parkm.\link par_partition::medoid_ids medoid_ids\endlink</code>:
+  ///    A vector of object ids for all the cluster representatives
+  /// 
+  /// Together, these define the clustering that the algorithm found. See par_partition 
+  /// for an explanation of how distributed partitions like this are represented.
+  /// 
+  /// The <code>medoids</code> vector contains actual copies of the representatives for each cluster.
+  /// The copies correspond to the object ids in <code>parkm.medoid_ids</code>.  Supplying
+  /// the <code>medoids</code> vector like this is optional, so if you don't need copies of
+  /// the representatives, you can omit it from the call.
+  /// 
   /// @endcode
   ///
   class par_kmedoids : public par_partition {

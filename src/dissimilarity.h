@@ -1,10 +1,12 @@
 #ifndef DISSIMILARITY_MATRIX_H
 #define DISSIMILARITY_MATRIX_H
+///
+/// @file dissimilarity.h
+/// @brief Data types and functions for dealing with dissimilarity matrices.
+///
 
 #include <vector>
 #include <boost/numeric/ublas/symmetric.hpp>
-
-
 #include <iostream>
 
 namespace cluster {
@@ -16,11 +18,11 @@ namespace cluster {
   ///
   /// Computes a dissimilarity matrix from a vector of objects.
   ///
-  /// Parameters:
-  ///     objects         Vector of any type T.
-  ///     dissimilarity   A dissimilarity measure that gives the distance between two T's.
-  ///                     Needs to be callable(T, T).
-  ///     mat             Output parameter.  Dissimiliarity matrix is stored here.
+  /// @param[in]  objects         Vector of any type T.
+  /// @param[in]  dissimilarity   A dissimilarity measure that gives the distance between two T's.
+  ///                             Needs to be callable on (T, T).
+  /// @param[out] mat             Output parameter.  Dissimiliarity matrix is stored here.
+  /// 
   template <class T, class D>
   void build_dissimilarity_matrix(const std::vector<T>& objects, D dissimilarity, 
                                   dissimilarity_matrix& mat) {
@@ -39,13 +41,12 @@ namespace cluster {
   ///
   /// Computes a dissimilarity matrix from a subset of a vector of objects.
   ///
-  /// Parameters:
-  ///     objects         Vector of any type T.
-  ///     subset          Indirection vector.  Contains indices into objects for 
-  ///                     elements to be compared.
-  ///     dissimilarity   A dissimilarity measure that gives the distance between two T's.
-  ///                     Needs to be callable(T, T).
-  ///     mat             Output parameter.  Dissimiliarity matrix is stored here.
+  /// @param objects         Vector of any type T.
+  /// @param subset          Indirection vector.  Contains indices into objects for 
+  ///                        elements to be compared.
+  /// @param dissimilarity   A dissimilarity measure that gives the distance between two T's.
+  ///                        Needs to be callable(T, T).
+  /// @param mat             Output parameter.  Dissimiliarity matrix is stored here.
   template <class T, class D>
   void build_dissimilarity_matrix(const std::vector<T>& objects, const std::vector<size_t>& subset,
                                   D dissimilarity, dissimilarity_matrix& mat) {

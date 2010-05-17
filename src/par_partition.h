@@ -15,7 +15,23 @@
 namespace cluster {
   
   ///
-  /// <code>par_partition</code> represents a partitioning of a distributed data set.
+  /// par_partition represents a partitioning of a distributed data set.
+  /// It is analogous to partition, but its object_ids are distributed across
+  /// the ranks of the communicator it is instantiated with.  Each process is assumed
+  /// to "own" some set of objects in the data set this describes, and each process's
+  /// par_partition object contains medoid_ids only for its own objects. Thus, the cluster_ids
+  /// array will contain different object_ids on different processes within the "same"
+  /// par_partition object.
+  /// 
+  /// While cluster_ids will vary, the "same" par_partition object on the same 
+  /// communicator will have the same medoid_ids.  If this is not true, then the medoid_ids
+  /// won't make any sense between processes.  Partitioning algorithms that use a 
+  /// par_partition for output should preserve this property.
+  /// 
+  /// You can convert a par_partition to a partition on a single process using 
+  /// the gather() method.  This is a collective operation.  It is not scalable, in that 
+  /// it will aggregate ids from <i>every</i> process in the communicator to <i>one</i> process.
+  /// However, it's useful for small systems and debugging.
   /// 
   /// @see partition, the non-distributed equivalent of this class.
   ///

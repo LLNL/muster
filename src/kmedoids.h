@@ -1,5 +1,10 @@
 #ifndef K_MEDOIDS_H
 #define K_MEDOIDS_H
+///
+/// @file kmedoids.h
+/// @brief Implementations of the classic clustering algorithms PAM and CLARA, from 
+/// <i>Finding Groups in Data</i>, by Kaufman and Rousseeuw.
+///
 
 #include <vector>
 #include <set>
@@ -47,10 +52,10 @@ namespace cluster {
     /// 
     /// Classic K-Medoids clustering, using the Partitioning-Around-Medoids (PAM)
     /// algorithm as described in Kaufman and Rousseeuw. 
-    /// Parameters:
-    ///   distance         dissimilarity matrix for all objects to cluster
-    ///   k                number of clusters to produce
-    ///   initial_medoids  Optionally supply k initial object ids to be used as initial medoids.
+    ///
+    /// @param distance         dissimilarity matrix for all objects to cluster
+    /// @param k                number of clusters to produce
+    /// @param initial_medoids  Optionally supply k initial object ids to be used as initial medoids.
     /// 
     void pam(const dissimilarity_matrix& distance, size_t k, const object_id *initial_medoids = NULL);
 
@@ -62,13 +67,11 @@ namespace cluster {
     /// 
     /// Based on X-Means, see Pelleg & Moore, 2000.
     /// 
-    /// Parameters:
-    ///   distance         dissimilarity matrix for all objects to cluster
-    ///   max_k            Upper limit on number of clusters to find.
-    ///   dimensionality   Number of dimensions in clustered data, for BIC.
+    /// @param distance         dissimilarity matrix for all objects to cluster
+    /// @param max_k            Upper limit on number of clusters to find.
+    /// @param dimensionality   Number of dimensions in clustered data, for BIC.
     ///
-    /// Return value:
-    ///   This routine returns the best BIC value found (the bic value of the final partitioning).
+    /// @return the best BIC value found (the bic value of the final partitioning).
     ///
     double xpam(const dissimilarity_matrix& distance, size_t max_k, size_t dimensionality);
 
@@ -77,17 +80,13 @@ namespace cluster {
     /// R. Ng and J. Han, "Efficient and Effective Clustering Methods 
     /// for Spatial Data Mining."
     /// 
-    /// Template parameters (inferred from args):
-    ///   T              Type of objects to be clustered.
-    ///   D              Dissimilarity metric type.  D should be callable 
-    ///                  on (T, T) and should return a double.
+    /// @tparam T    Type of objects to be clustered.
+    /// @tparam D    Dissimilarity metric type.  D should be callable 
+    ///              on (T, T) and should return a double.
     /// 
-    /// Parameters:
-    ///   objects        Objects to cluster
-    ///   dmetric        Distance metric to build dissimilarity matrices with
-    ///   k              Number of clusters to partition
-    ///   sample_size    defaults to 40+2*k, per Kaufman and Rousseeuw's recommendation
-    ///   iterations     Number of times to run PAM with sampled dataset
+    /// @param objects        Objects to cluster
+    /// @param dmetric        Distance metric to build dissimilarity matrices with
+    /// @param k              Number of clusters to partition
     /// 
     template <class T, class D>
     void clara(const std::vector<T>& objects, D dmetric, size_t k) {
@@ -149,10 +148,10 @@ namespace cluster {
     /// of each cluster.  This is O(n) and can give better representatives for CLARA clusterings.
     /// This is needed to apply gaussian-model BIC criteria to clusterings.
     /// 
-    /// This function requires that T support algebraic operations.
-    /// Specifically, T must support enough to construct a mean:
-    ///    - addition        T + T = T
-    ///    - scalar division T / c = T
+    /// @tparam T  To use this function, T needs to support algebraic operations.<br>
+    ///            Specifically, T must support enough to construct a mean:
+    ///            - addition        <code>T + T = T</code>
+    ///            - scalar division <code>T / c = T</code>
     ///
     template <class T, class D>
     void center_medoids(const std::vector<T>& objects, D distance) {
@@ -185,7 +184,14 @@ namespace cluster {
 
 
     ///
-    /// TODO: figure out better BIC criterion for this.
+    /// K-Agnostic version of CLARA.  This uses the BIC criterion as described in bic.h to
+    /// run clara() a number of times and to select a best run of clara() from the trials.
+    /// This will be slower than regular clara().  In particular, it's O(n*max_k).
+    /// 
+    /// @param[in]  objects         Objects to cluster
+    /// @param[in]  dmetric         Distance metric to build dissimilarity matrices with
+    /// @param[in]  max_k           Max number of clusters to find.
+    /// @param[in]  dimensionality  Dimensionality of objects, used by BIC.
     ///
     template <class T, class D>
     double xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality) {
@@ -242,12 +248,12 @@ namespace cluster {
 
 
     /// Assign each object to the cluster with the closest medoid.
-    /// Returns:
-    ///   Total dissimilarity of objects w/their medoids.
+    ///
+    /// @return Total dissimilarity of objects w/their medoids.
     /// 
-    /// DM should be a callable object that computes distances between indices, as a distance 
-    /// matrix would.  Algorithms are free to use real distance matrices (as in PAM) or to compute
-    /// lazily (as in CLARA medoid assignment).
+    /// @param distance a callable object that computes distances between indices, as a distance 
+    ///                 matrix would.  Algorithms are free to use real distance matrices (as in PAM) 
+    ///                 or to compute lazily (as in CLARA medoid assignment).
     template <class DM>
     double assign_objects_to_clusters(DM distance) {
       if (sec_nearest.size() != cluster_ids.size()) {
