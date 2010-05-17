@@ -1,5 +1,9 @@
 #ifndef PARTITION_H
 #define PARTITION_H
+///
+/// @file partition.h
+/// @brief Class to represent a partitioning of a data set.
+///
 
 #include <cstddef>
 #include <vector>
@@ -9,14 +13,31 @@
 
 namespace cluster {
 
-  typedef std::vector< std::set<size_t> > cluster_list;
-  typedef std::set<size_t> cset;
-  
-  typedef size_t medoid_id;       /// More descriptive type for medoid index
-  typedef size_t object_id;       /// More descriptive type for object index
+  typedef size_t medoid_id;       ///< More descriptive type for medoid index
+  typedef size_t object_id;       ///< More descriptive type for object index
 
-  /// Class to represent a partitioning of a dataset into 
-  /// clusters with medoids.
+  /// 
+  /// Explicit representation of a clustering.  Instead of a vecto of representative
+  /// ids, this has <i>k</i> sets of object_ids indicating which objects are in a 
+  /// particular cluster.  You can convert a partition to a cluster_list with 
+  /// to_cluster_list().
+  /// 
+  typedef std::vector< std::set<object_id> > cluster_list;
+  
+  ///
+  /// This represents a partitioning of a data set.  The data set consists of 
+  /// <i>objects</i>, each of which has an associated non-negative object_id.  
+  /// 
+  /// A partitioning divides a data set into groups, or <i>clusters</i>, and the
+  /// partition object stores information about these clusters internally.  In 
+  /// particular, it contains a vector of object_ids that indicate the 
+  /// <i>representative</i> object, or <i>medoid</i> of each cluster.  It also
+  /// contains a vector of medoid_ids indicating which cluster each object
+  /// in the data set belongs to.
+  /// 
+  /// Partition objects can be converted to a cluster_list, which is a more
+  /// explicit representation of the partitioning.
+  /// 
   struct partition {
     /// Gives the index of the object that is the ith medoid.
     /// medoids[i] == index in object array for last call to findClusters()

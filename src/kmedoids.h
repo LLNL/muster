@@ -17,8 +17,8 @@
 namespace cluster {
 
   /// 
-  /// Implementation of classical clustering methods PAM and CLARA, from 
-  /// "Finding Groups in Data", by Kaufman and Rousseeuw.  
+  /// Implementations of the classic clustering algorithms PAM and CLARA, from 
+  /// <i>Finding Groups in Data</i>, by Kaufman and Rousseeuw.
   /// 
   class kmedoids : public partition {
   public:

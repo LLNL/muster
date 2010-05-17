@@ -15,15 +15,15 @@ void usage() {
   cerr << "  Compare parallel clustering with sequential clustering." << endl;
   cerr << "Options:" << endl;
   cerr << "  -h         Show this message." << endl;
-  cerr << "  -x         Use BIC-scored versions of PAM and CLARA." << endl;
+  cerr << "  -x         Use BIC-scored versions of clustering algorithms." << endl;
   cerr << "  -v         Verbose mode.  Draws actual clusterings and outputs timings." << endl;
   cerr << "  -n         Number of points per process." << endl;
   cerr << "               Default is 1." << endl;
   cerr << "  -k         Max number of clusters to search for." << endl;
   cerr << "               Default is number of processes * points per process." << endl;
-  cerr << "  -i         Initial sample size in clara (before 2*k is added)." << endl;
+  cerr << "  -i         Initial sample size in CAPEK (before 2*k is added)." << endl;
   cerr << "               Default is 40." << endl;
-  cerr << "  -r         Number of repeated trials per k in clara." << endl;
+  cerr << "  -r         Number of repeated trials per k in CAPEK." << endl;
   cerr << "               Default is 5." << endl;
   exit(1);
 }
@@ -100,7 +100,7 @@ void print_cluster_info(const cluster::partition& gathered, const dissimilarity_
             << ", BIC: " << bic(km, matrix_distance(distance), 2);
     
     ostringstream parkm_msg;
-    parkm_msg << "Parallel CLARA" 
+    parkm_msg << "CAPEK" 
               << ", " << gathered.medoid_ids.size() << " clusters"
               << ", Avg. dissimilarity: " << parkm.average_dissimilarity()
               << ", BIC: " << parkm.bic_score();
@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
 
 
     km.pam(distance, k);
-    parkm.clara(my_points, point_distance(), k, &medoids);
+    parkm.capek(my_points, point_distance(), k, &medoids);
     parkm.gather(gathered);
 
     if (rank == 0) {
@@ -178,7 +178,7 @@ int main(int argc, char **argv) {
     }
 
     km.xpam(distance, k, 2);
-    parkm.xclara(my_points, point_distance(), k, 2, &medoids);
+    parkm.xcapek(my_points, point_distance(), k, 2, &medoids);
     parkm.gather(gathered);
 
     if (rank == 0) {

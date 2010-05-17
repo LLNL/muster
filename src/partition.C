@@ -22,7 +22,7 @@ namespace cluster {
 
   void partition::to_cluster_list(cluster_list& clusters) const {
     clusters.clear();
-    clusters.resize(medoid_ids.size(), cset());
+    clusters.resize(medoid_ids.size(), set<object_id>());
     for (unsigned object=0; object < cluster_ids.size(); object++) {
       clusters[cluster_ids[object]].insert(object);
     }
@@ -60,9 +60,9 @@ namespace cluster {
 
     for (unsigned i=0; i < clusters.size(); i++) {
       out << i << "\t";
-      const cset& c = clusters[i];
+      const set<object_id>& c = clusters[i];
 
-      for (cset::const_iterator obj=c.begin(); obj != c.end(); obj++) {
+      for (set<object_id>::const_iterator obj=c.begin(); obj != c.end(); obj++) {
         if (medoid_ids && (*medoid_ids)[i] == *obj) {
           out << "[" << *obj << "] ";
         } else {
@@ -136,7 +136,7 @@ namespace cluster {
 
     cluster_list expanded(list.size());
     for (size_t i=0; i < list.size(); i++) {
-      for (cset::iterator o=list[i].begin(); o != list[i].end(); o++) {
+      for (set<object_id>::iterator o=list[i].begin(); o != list[i].end(); o++) {
         size_t start = (1 << level) * (*o);
         size_t end   = (1 << level) * (*o + 1);
         for (size_t ex=start; ex < end; ex++) {

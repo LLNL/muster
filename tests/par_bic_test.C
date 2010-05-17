@@ -194,8 +194,7 @@ int main(int argc, char **argv) {
     long long start = get_time_ns();    
     double best_bic = 0;
     for (size_t i=0; i < speed_trials; i++) {
-      best_bic = parkm.xclara(points, point_distance(), num_clusters, dimensions);
-      //parkm.clara(points, point_distance(), num_clusters);
+      best_bic = parkm.xcapek(points, point_distance(), num_clusters, dimensions);
     }
     double total = get_time_ns() - start;
     double avg = total / speed_trials;
@@ -230,14 +229,14 @@ int main(int argc, char **argv) {
         double best_bic = km.xpam(dissimilarity, num_clusters, dimensions);
 
         print_cluster_info(km, best_bic, "XPAM");
-        print_cluster_info(parallel, 0, "PAR XCLARA");
+        print_cluster_info(parallel, 0, "PAR XCAPEK");
 
         cout << "k: " << num_clusters << endl;
 
         double mirkin = mirkin_distance(km, parallel);
         total_mirkin += mirkin;
 
-        cout << "  mirkin(xpam, par_xclara):    " << mirkin << endl;
+        cout << "  mirkin(xpam, par_xcapek):    " << mirkin << endl;
       }
     }
   }

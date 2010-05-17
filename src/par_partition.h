@@ -1,5 +1,9 @@
 #ifndef PAR_PARTITION_H
 #define PAR_PARTITION_H
+///
+/// @file par_partition.h
+/// @brief Distributed representation of a partitioning of a data set.
+///
 
 #include <mpi.h>
 #include <vector>
@@ -10,7 +14,11 @@
 
 namespace cluster {
   
-  /// Parallel partition object.  
+  ///
+  /// <code>par_partition</code> represents a partitioning of a distributed data set.
+  /// 
+  /// @see partition, the non-distributed equivalent of this class.
+  ///
   struct par_partition {
     /// Gives the object id for the ith medoid.  This object may not be local.
     std::vector<object_id> medoid_ids;

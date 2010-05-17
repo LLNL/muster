@@ -20,13 +20,13 @@ void usage() {
   cerr << "  Compare parallel clustering with sequential clustering." << endl;
   cerr << "Options:" << endl;
   cerr << "  -h         Show this message." << endl;
-  cerr << "  -x         Use BIC-scored versions of PAM and CLARA." << endl;
+  cerr << "  -x         Use BIC-scored versions of PAM and CAPEK." << endl;
   cerr << "  -t         Save details timing info in a file." << endl;
   cerr << "  -n         Number of points per process." << endl;
   cerr << "               Default is 1." << endl;
-  cerr << "  -i         Initial sample size in clara (before 2*k is added)." << endl;
+  cerr << "  -i         Initial sample size in CAPEK (before 2*k is added)." << endl;
   cerr << "               Default is 40." << endl;
-  cerr << "  -r         Number of trials per k in clara." << endl;
+  cerr << "  -r         Number of trials per k in CAPEK." << endl;
   cerr << "               Default is 5." << endl;
   cerr << "  -k         Max number of clusters to search for." << endl;
   cerr << "               Default is 10." << endl;
@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 
   long long start = get_time_ns();
   for (size_t i=0; i < trials; i++) {
-    parkm.clara(points, point_distance(), num_clusters);
+    parkm.capek(points, point_distance(), num_clusters);
   }
 
   double total = get_time_ns() - start;

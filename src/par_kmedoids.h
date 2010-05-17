@@ -1,5 +1,9 @@
 #ifndef PAR_KMEDOIDS_H
 #define PAR_KMEDOIDS_H
+///
+/// @file par_kmedoids.h
+/// @brief CAPEK and XCAPEK scalable parallel clustering algorithms.
+/// 
 
 #include <mpi.h>
 #include <ostream>
@@ -20,6 +24,41 @@
 
 namespace cluster {
 
+  ///
+  /// This class implements the CAPEK and XCAPEK scalable parallel clustering algorithms.
+  /// 
+  /// <b>Example usage:</b>
+  /// @code
+  /// // This is a theoretical point struct to be clustered.
+  /// struct point {
+  ///     double x, y;
+  /// };
+  /// 
+  /// // Euclidean distance functor to use for clustering.
+  /// struct euclidean_distance {
+  ///     double operator()(const point& lhs, const point& rhs) {
+  ///         double a = lhs.x - rhs.x;
+  ///         double b = lhs.y - rhs.y;
+  ///         return sqrt(a*a + b*b);
+  ///     }
+  /// };
+  ///
+  /// vector<point> points;
+  /// // ... Each process puts some local points in the vector ...
+  /// 
+  /// par_kmedoids parkm(MPI_COMM_WORLD);
+  /// vector<point> medoids;   // storage for reprsentatives
+  /// 
+  /// // Run xcapek(), finding a max of 20 clusters among the 2d points.
+  /// parkm.xcapek(points, euclidean_distance(), 20, 2, &medoids);
+  /// 
+  /// // POST: 
+  /// //   parkm is a par_partition object containing:
+  /// //     1. The object id of the local cluster
+  /// //     2. The object ids of the cluster representatives
+  /// //   The medoids vector contains copies of the representatives for each cluster.
+  /// @endcode
+  ///
   class par_kmedoids : public par_partition {
   public:
     ///
@@ -153,32 +192,34 @@ namespace cluster {
     }
 
     ///
-    /// Parallel version of the CLARA clustering algorithm.  Assumes that objects
-    /// to be clustered are fully distributed across parallel process, with the same 
-    /// number of objects per process.  
-    ///
-    /// Template parameters (inferred from args):
-    ///   T              Type of objects to be clustered.
-    ///                  T must also support the following operations:
-    ///                    - int packed_size(MPI_Comm comm) const
-    ///                    - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-    ///                    - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
-    ///   
-    ///   D              Dissimilarity metric type.  D should be callable 
-    ///                  on (T, T) and should return a double.
+    /// This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).
     /// 
-    /// Parameters:
-    ///   objects        Local objects to cluster (ASSUME: currently must be same number per process!)
-    ///   dmetric        Distance metric to build dissimilarity matrices with
-    ///   max_k          Max number of clusters to find.
-    ///   medoids        Output vector where global medoids will be stored along with their source ranks.
+    /// Assumes that objects to be clustered are fully distributed across parallel process, 
+    /// with the same number of objects per process.  
     ///
-    /// The parallel version of CLARA will run trials insatances of PAM on separate processors for 
-    /// each k in 1..max_k.  Each trial aggregates sample_size objects distributed over all
+    /// @tparam T     Type of objects to be clustered.
+    ///               T must support the following operations:
+    ///               - <code>int packed_size(MPI_Comm comm) const</code>
+    ///               - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
+    ///               - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
+    /// @tparam D     Dissimilarity metric type.  
+    ///               D should be callable on (T, T) and should return a double representing 
+    ///               the distance between the two T's.
+    /// 
+    /// @param[in]  objects   Local objects to cluster (ASSUME: currently must be same number per process!)
+    /// @param[in]  dmetric   Distance metric to build dissimilarity matrices with
+    /// @param[in]  k         Number of clusters to find.
+    /// @param[out] medoids   Optional output vector where global medoids will 
+    ///                       be stored along with their source ranks.
+    ///
+    /// CAPEK will run trials insatances of PAM on separate processors for each k in 1..max_k using the
+    /// run_pam_trials() routine. Each trial aggregates sample_size objects distributed over all 
     /// processes in the system.
     ///
+    /// @see xcapek() for a K-agnostic version of this algorithm.
+    ///
     template <class T, class D>
-    void clara(const std::vector<T>& objects, D dmetric, size_t k, std::vector<T> *medoids = NULL) 
+    void capek(const std::vector<T>& objects, D dmetric, size_t k, std::vector<T> *medoids = NULL) 
     {
       int size, rank;
       CMPI_Comm_size(comm, &size);
@@ -229,13 +270,13 @@ namespace cluster {
       size_t best = (min_sum - sums.begin());  // index of best trial.
 
 
-      // Finally set up the partition to correspond to trial with best dissimilarity found.
+      // Finally set up the partition to correspond to trial with best dissimilarity found
       medoid_ids.resize(all_medoids[best].size());
       for (size_t i = 0; i < medoid_ids.size(); i++) {
         medoid_ids[i] = all_medoids[best][i].id;
       }
 
-      // Make an indirection vector from the unsorted to sorted medoids.
+      // Make an indirection vector from the unsorted to sorted medoids
       std::vector<size_t> mapping(medoid_ids.size());
       std::generate(mapping.begin(), mapping.end(), sequence());
       std::sort(mapping.begin(), mapping.end(), indexed_lt(medoid_ids));
@@ -262,34 +303,36 @@ namespace cluster {
 
     
     ///
-    /// K-agnostic version of Parallel CLARA.  This version attempts to guess the best K
-    /// for the data using the Bayesian Information Criterion (BIC).  Evaluation of the BIC
-    /// is parallelized using global reduction operations.
+    /// K-agnostic version of capek().
+    /// This version attempts to guess the best K for the data using the 
+    /// Bayesian Information Criterion (BIC) described in bic.h.  Evaluation of the 
+    /// BIC is parallelized using global reduction operations.
     /// 
-    /// This requires more trials than the sequential version of CLARA.  In particular, it will
-    /// run (sum(1..max_k) * trials) total trials on successive MPI partitions.
+    /// Like capek(), this uses run_pam_trials() to farm out trials of the PAM clustering algorithm,
+    /// but it requires more trials than capek().  In particular, it will run 
+    /// (sum(1..max_k) * trials) total trials in parallel on MPI worker processes.
     ///
-    /// Template parameters (inferred from args):
-    ///   T              Type of objects to be clustered.
-    ///                  T must also support the following operations:
-    ///                    - int packed_size(MPI_Comm comm) const
-    ///                    - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-    ///                    - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
-    ///   
-    ///   D              Dissimilarity metric type.  D should be callable 
-    ///                  on (T, T) and should return a double.
+    /// @tparam T     Type of objects to be clustered.
+    ///               T must support the following operations:
+    ///                - <code>int packed_size(MPI_Comm comm) const</code>
+    ///                - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
+    ///                - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
+    /// @tparam D     Dissimilarity metric type.  
+    ///               D should be callable on (T, T) and should return a double representing 
+    ///               the distance between the two T's.
     /// 
-    /// Parameters:
-    ///   objects        Local objects to cluster (ASSUME: currently must be same number per process!)
-    ///   dmetric        Distance metric to build dissimilarity matrices with
-    ///   max_k          Max number of clusters to find.
-    ///   medoids        Output vector where global medoids will be stored along with their source ranks.
+    /// @param[in]  objects         Local objects to cluster (ASSUME: currently must be same number per process!)
+    /// @param[in]  dmetric         Distance metric to build dissimilarity matrices with
+    /// @param[in]  max_k           Max number of clusters to find.
+    /// @param[in]  dimensionality  Dimensionality of objects, used by BIC.
+    /// @param[out] medoids         Optional output vector where global medoids will be stored 
+    ///                             along with their source ranks.
     ///
-    /// Return value:
-    ///   Returns the best BIC value found, that is, the BIC value of the final clustering.
+    /// @return
+    /// The best BIC value found, that is, the BIC value of the final clustering.
     ///
     template <class T, class D>
-    double xclara(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality,
+    double xcapek(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality,
                   std::vector<T> *medoids = NULL) 
     {
       int size, rank;
@@ -405,22 +448,21 @@ namespace cluster {
       timer.record("BicScore");
       return best_bic_score;
     }    
-
     
-    /// Get the timer with info on the 
+    /// Get the Timer with info on the last run of either capek() or xcapek().
     const Timer& get_timer() { return timer; }
 
   protected:
     typedef boost::mt19937 random_t;   ///< Type for random number generator used here.
     random_t random;                   ///< Random number distribution to be used for samples
     
-    double total_dissimilarity;   /// Total dissimilarity bt/w objects and medoids for last clustering.
-    double best_bic_score;        /// BIC score for the clustering found.
-    size_t init_size;             /// baseline size for samples
-    size_t max_reps;              /// Max repetitions of trials for a particular k.
-    double epsilon;               /// Tolerance for convergence tests in kmedoids PAM runs.
+    double total_dissimilarity;   ///< Total dissimilarity bt/w objects and medoids for last clustering.
+    double best_bic_score;        ///< BIC score for the clustering found.
+    size_t init_size;             ///< baseline size for samples
+    size_t max_reps;              ///< Max repetitions of trials for a particular k.
+    double epsilon;               ///< Tolerance for convergence tests in kmedoids PAM runs.
 
-    Timer timer;                  /// Performance timer.
+    Timer timer;                  ///< Performance timer.
 
     /// 
     /// Seeds random number generators across all processes with the same number,
@@ -485,11 +527,15 @@ namespace cluster {
     ///
     /// Find the closest object in the medoids vector to the object passed in.
     /// Returns a pair of the closest medoid's id and its distance from the object.
-    ///   
+    /// 
+    /// @param[in] object   Object to compare to medoids.
+    /// @param[in] oid      ID of the object (need this so medoids prefer themselves as their own medoids).
+    /// @param[in] medoids  Vector of medoids to find the closest from.
+    /// @param[in] dmetric  Distance metric to assess closeness with.
     ///
     template <typename T, typename D>
     std::pair<double, size_t> closest_medoid(
-      const T& object, object_id oid, std::vector< id_pair<T> >& medoids, D dmetric
+      const T& object, object_id oid, const std::vector< id_pair<T> >& medoids, D dmetric
     ) {
       double min_distance = DBL_MAX;
       size_t min_id = medoids.size();
