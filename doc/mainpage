@@ -5,26 +5,26 @@
     
   <h2>Introduction</h2>
 
-  This library provides implementation of sequential and parallel K-Medoids clustering
+  The Muster library provides implementation of sequential and parallel K-Medoids clustering
   algorithms.  It is intended as a general frameowrk for parallel cluster analysis, 
   particularly for performance data analysis on systems with very large numbers of 
   processes.
 
-  The parallel implementations in this library are designed to perform 
+  The parallel implementations in the Muster are designed to perform 
   well even in environments where the data to be clustered is entirely distributed.  
   For example, many performance tools need to analyze one data element from each
   process in a system.  To analyze this data efficiently, clustering algorithms that move 
-  as little data as possible are required.  In this scalable clustering library, we
+  as little data as possible are required.  In Muster, we
   exploit sampled clustering algorithms to realize this efficiency.
   
-  The parallel algorithms in this library are implemented using the Message Passing 
+  The parallel algorithms in Muster are implemented using the Message Passing 
   Interface (MPI), making them suitable for use on many of the world's largest 
   supercomputers.  They should, however, also run efficiently on your laptop.
   
   <h2>Getting Started</h2>
   
   <h3>Partitions</h3>
-  The algorithms in this library are <i>partitioning algorithms</i>, that is, they divide
+  The algorithms in Muster are <i>partitioning algorithms</i>, that is, they divide
   a data set up into a set of groups, or <i>clusters</i> of data objects.  Together, 
   these groups are called a <i>clustering</i> or a <i>partitioning</i> of the data.
 
@@ -131,7 +131,7 @@
 
 
   <h2>Author</h2>
-  This library was implemented by Todd Gamblin at 
+  Muster was implemented by Todd Gamblin at 
   <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>.
 
   Please send questions, bug reports, or suggestions 
@@ -139,7 +139,7 @@
 
 
   <h2>References</h2>
-  For more details on the algorithms implemented by this library, You can consult the following
+  For more details on the algorithms implemented in Muster, You can consult the following
   sources:
   
   <ol>
