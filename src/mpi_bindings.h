@@ -1,10 +1,10 @@
-#ifndef CLUSTER_MPI_BINDINGS_H
-#define CLUSTER_MPI_BINDINGS_H
+#ifndef MUSTER_MPI_BINDINGS_H
+#define MUSTER_MPI_BINDINGS_H
 ///
 /// @file mpi_bindings.h
 /// @brief <code>\#defines</code> for switching between MPI and PMPI bindings.
 /// 
-/// User of the API can <code>\#define</code> <code>CLUSTER_USE_PMPI</code> to use the 
+/// User of the API can <code>\#define</code> <code>MUSTER_USE_PMPI</code> to use the 
 /// PMPI bindings instead of the plain MPI bindings.  Useful
 /// for including this algorithm in tools.
 /// 
@@ -13,13 +13,13 @@
 ///
 
 #ifdef HAVE_CONFIG_H
-#include "cluster-config.h"
+#include "muster-config.h"
 #endif // HAVE_CONFIG_H
 
 // External header for MPI type information
 #include "mpi_utils.h"
 
-#ifdef CLUSTER_USE_PMPI
+#ifdef MUSTER_USE_PMPI
 
 #define CMPI_Allreduce PMPI_Allreduce
 #define CMPI_Bcast     PMPI_Bcast
@@ -36,7 +36,7 @@
 
 #define cmpi_packed_size pmpi_packed_size
 
-#else  // CLUSTER_USE_PMPI
+#else  // MUSTER_USE_PMPI
 
 #define CMPI_Allreduce MPI_Allreduce
 #define CMPI_Bcast     MPI_Bcast
@@ -53,8 +53,8 @@
 
 #define cmpi_packed_size mpi_packed_size
 
-#endif // CLUSTER_USE_PMPI
+#endif // MUSTER_USE_PMPI
 
 
 
-#endif // CLUSTER_MPI_BINDINGS_H
+#endif // MUSTER_MPI_BINDINGS_H

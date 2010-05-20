@@ -1,5 +1,5 @@
-#ifndef CLUSTER_RANDOM_H
-#define CLUSTER_RANDOM_H
+#ifndef MUSTER_RANDOM_H
+#define MUSTER_RANDOM_H
 ///
 /// @file random.h
 /// @brief Helper functions for taking random samples and seeding 
@@ -51,4 +51,4 @@ namespace cluster {
 
 } // namespace cluster
 
-#endif // CLUSTER_RANDOM_H
+#endif // MUSTER_RANDOM_H

@@ -1,11 +1,11 @@
-#ifndef CLUSTER_TEST_POINT_H
-#define CLUSTER_TEST_POINT_H
+#ifndef MUSTER_TEST_POINT_H
+#define MUSTER_TEST_POINT_H
 
-#include "cluster-config.h"
+#include "muster-config.h"
 
-#ifdef CLUSTER_HAVE_MPI
+#ifdef MUSTER_HAVE_MPI
 #include <mpi.h>
-#endif // CLUSTER_HAVE_MPI 
+#endif // MUSTER_HAVE_MPI 
 
 #include <cmath>
 #include <string>
@@ -82,7 +82,7 @@ namespace cluster {
       return p;
     }
 
-#ifdef CLUSTER_HAVE_MPI
+#ifdef MUSTER_HAVE_MPI
     /// Returns the size of a packed point
     int packed_size(MPI_Comm comm) const;
   
@@ -91,7 +91,7 @@ namespace cluster {
 
     /// Unpacks a point from an MPI packed buffer
     static point unpack(void *buf, int bufsize, int *position, MPI_Comm comm);
-#endif // CLUSTER_HAVE_MPI
+#endif // MUSTER_HAVE_MPI
   };
 
   std::ostream& operator<<(std::ostream& out, const point& p);
@@ -121,5 +121,5 @@ namespace cluster {
 
 } // namespace cluster
 
-#endif // CLUSTER_TEST_POINT_H
+#endif // MUSTER_TEST_POINT_H
 
