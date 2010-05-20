@@ -6,5 +6,6 @@
 make distcheck DISTCHECK_CONFIGURE_FLAGS="\
     CXX=mpicxx \
     CPPFLAGS=\"-g3 -O3 -Wall\" \
-    --with-boost=/opt/local" \
+    --with-boost=/opt/local \
+    --with-tests" \
     MAKEFLAGS="-j2"

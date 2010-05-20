@@ -56,7 +56,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/lx_detect_bluegene.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/lx_mpi.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -282,8 +282,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_HEADERS = \
 	point.h \
-	gaussian.h
+	gaussian.h \
+	color.h \
+	spherical_clustering_generator.h
 
+EXTRA_DIST = $(noinst_HEADERS)
 noinst_LTLIBRARIES = \
 	libtestsupport.la
 
@@ -292,16 +295,16 @@ libtestsupport_la_SOURCES = \
 
 mirkin_test_SOURCES = mirkin_test.C
 point_cluster_test_SOURCES = point_cluster_test.C
-par_cluster_test_SOURCES = par_cluster_test.C
-par_bic_test_SOURCES = par_bic_test.C
 bic_test_SOURCES = bic_test.C
-par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
-multi_gather_test_SOURCES = multi_gather_test.C
 pathological_cluster_test_SOURCES = pathological_cluster_test.C
 nondistinct_test_SOURCES = nondistinct_test.C
 convergence_test_SOURCES = convergence_test.C
 reuse_test_SOURCES = reuse_test.C
 write_members_test_SOURCES = write_members_test.C
+par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
+par_cluster_test_SOURCES = par_cluster_test.C
+par_bic_test_SOURCES = par_bic_test.C
+multi_gather_test_SOURCES = multi_gather_test.C
 LDADD = \
 	libtestsupport.la \
 	../src/libcluster.la
@@ -684,8 +687,6 @@ uninstall-am: uninstall-binPROGRAMS
 	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
 	tags uninstall uninstall-am uninstall-binPROGRAMS
 
-	color.h \
-	spherical_clustering_generator.h
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

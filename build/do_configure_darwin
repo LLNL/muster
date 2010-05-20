@@ -3,7 +3,6 @@
 # This is a sample configure script for Libra,
 # For a MacBook Pro laptop with various dependencies installed via MacPorts.
 # 
-
 ../configure \
     CXX=mpicxx \
     CPPFLAGS="-g3 -O3 -Wall -DOMPI_SKIP_MPICXX" \

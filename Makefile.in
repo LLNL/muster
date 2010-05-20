@@ -49,7 +49,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/ax_boost_base.m4 \
 	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
 	$(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/lx_detect_bluegene.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/lx_mpi.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -98,7 +98,7 @@ AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
 	distdir dist dist-all distcheck
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = src tests
+DIST_SUBDIRS = src tests external
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 distdir = $(PACKAGE)-$(VERSION)
 top_distdir = $(distdir)
@@ -258,11 +258,11 @@ AUTOMAKE_OPTIONS = foreign   # Don't require NEWS, README, INSTALL, etc.
 ACLOCAL_AMFLAGS = -I m4
 @INSTALL_TESTS_FALSE@TEST_DIR = tests
 @INSTALL_TESTS_TRUE@TEST_DIR = tests
-SUBDIRS = src $(TEST_DIR)
+SUBDIRS = src $(TEST_DIR) external
 
 # Build-time configuration of libraries.
-include_HEADERS = cluster-config.h
-DISTCLEANFILES = cluster-config.h _configs.sed
+include_HEADERS = muster-config.h
+DISTCLEANFILES = muster-config.h _configs.sed
 dist_noinst_SCRIPTS = \
 	build/do_configure_darwin
 

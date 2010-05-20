@@ -7,11 +7,11 @@ else
 TEST_DIR = tests
 endif
 
-SUBDIRS = src $(TEST_DIR)
+SUBDIRS = src $(TEST_DIR) external
 
 # Build-time configuration of libraries.
-include_HEADERS=cluster-config.h
-DISTCLEANFILES = cluster-config.h _configs.sed
+include_HEADERS=muster-config.h
+DISTCLEANFILES = muster-config.h _configs.sed
 
 dist_noinst_SCRIPTS = \
 	build/do_configure_darwin
