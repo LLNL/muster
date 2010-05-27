@@ -8,7 +8,7 @@
   <h2>Introduction</h2>
 
   The Muster library provides implementation of sequential and parallel K-Medoids clustering
-  algorithms.  It is intended as a general frameowrk for parallel cluster analysis, 
+  algorithms.  It is intended as a general framework for parallel cluster analysis, 
   particularly for performance data analysis on systems with very large numbers of 
   processes.
 
@@ -47,7 +47,7 @@
   results of parallel clustering algorithm.
   Instead of storing the cluster assignments of <i>all</i> objects in the data set, each 
   par_partition object stores only the cluster membership for objects that are local to the
-  the calling process.
+  calling process.
   </dd>
   </dl>
 
@@ -67,7 +67,7 @@
 
   Algorithms themselves are template functions on the derived classes.  You can thus call them
   on any type of object with any number of distance metrics.  Because they are template
-  fucntions, you don't need to explicitly indicate the types of the things you pass to the 
+  functions, you don't need to explicitly indicate the types of the things you pass to the 
   clustering algorithms; the types are inferred from the algorithms' parameters.
   
   There are two classes you should be concerned with:
@@ -83,7 +83,7 @@
   PAM and CLARA both require that the caller supply \f$k\f$, the number of clusters, as a 
   parameter to the algorithm. We have adopted a technique used by the 
   X-Means (Pelleg and Moore, 2000) algorithm to choose an "ideal" \f$k\f$ from many clustering
-  trials using the \link bic.h Bayesian Information Criterion (BIC)\endlink.  Insteady of supplying a 
+  trials using the \link bic.h Bayesian Information Criterion (BIC)\endlink.  Instead of supplying a 
   specific \f$k\f$, the caller supplies a range of values for \f$k\f$, and the algorithms 
   use the BIC to select the best fit from the range.
 
@@ -95,7 +95,7 @@
 
   <dt>\link cluster::par_kmedoids par_kmedoids\endlink</dt>
   <dd>This class inherits from \link cluster::par_partition par_partition\endlink and it implements the CAPEK
-  parallel clustering algorithm.  Fucntionally, CAPEK is similar to CLARA, but it is 
+  parallel clustering algorithm.  Functionally, CAPEK is similar to CLARA, but it is 
   distributed and runs in \f$O(\frac{n}{P}log(P))\f$ time for \f$n\f$ data objects and \f$P\f$
   processes.  If \f$n = P\f$, that is, if there are only as many input data elements as processes,
   CAPEK runs in \f$O(log(P))\f$ time.  
@@ -119,7 +119,7 @@
   objects in the data set.  It takes \f$O(n^2)\f$ time to compute a distance matrix like this.
 
   We use the <code>boost::symmetric_matrix</code> class to represent dissimilarity matrices.  This class
-  provies a pcaked representation of an upper-triangular matrix, making it an efficient way to
+  provides a packed representation of an upper-triangular matrix, making it an efficient way to
   store a dissimilarity matrix for clustering.  For convenience, we have typedef'd 
   <code>boost::symmetric_matrix</code> to \link cluster::dissimilarity_matrix\endlink.
   To construct a dissimilarity matrix, use \link cluster::build_dissimilarity_matrix()\endlink to do this.
