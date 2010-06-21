@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# This is a sample configure script for Libra,
+# This is a sample configure script for Muster,
 # For a MacBook Pro laptop with various dependencies installed via MacPorts.
 # 
 ../configure \
