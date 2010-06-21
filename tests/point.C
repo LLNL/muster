@@ -32,14 +32,11 @@
 
 
 #include "point.h"
+#include "muster-config.h"
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif // HAVE_CONFIG_H
-
-#ifdef HAVE_MPI
+#ifdef MUSTER_HAVE_MPI
 #include "mpi_utils.h"
-#endif // HAVE_MPI
+#endif // MUSTER_HAVE_MPI
 #include "color.h"
 
 #include <iomanip>
@@ -60,7 +57,7 @@ namespace cluster {
   point::point(const point& other) : x(other.x), y(other.y) { }
 
 
-#ifdef HAVE_MPI
+#ifdef MUSTER_HAVE_MPI
   /// Returns the size of a packed point
   int point::packed_size(MPI_Comm comm) const {
     return 2 * mpi_packed_size(1, MPI_DOUBLE, comm);
@@ -79,7 +76,7 @@ namespace cluster {
     PMPI_Unpack(buf, bufsize, position, &p.y, 1, MPI_DOUBLE,  comm);
     return p;
   }
-#endif // HAVE_MPI
+#endif // MUSTER_HAVE_MPI
 
 
   ostream& operator<<(ostream& out, const point& p) {

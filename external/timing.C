@@ -1,14 +1,11 @@
 #include "timing.h"
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif //HAVE_CONFIG_H
+#include "muster-config.h"
 
 #include <cmath>
 using namespace std;
 
 
-#if defined(BLUEGENE_L)
+#if defined(MUSTER_BLUEGENE_L)
 // -------------------------------------------------------- //
 // Timing code for BlueGene/L
 // -------------------------------------------------------- //
@@ -31,7 +28,7 @@ timing_t get_time_ns () {
 }
 
 
-#elif defined(BLUEGENE_P)
+#elif defined(MUSTER_BLUEGENE_P)
 // -------------------------------------------------------- //
 // Timing code for BlueGene/P
 // -------------------------------------------------------- //
@@ -72,7 +69,7 @@ timing_t get_time_ns() {
 
 
 
-#elif (defined(HAVE_CLOCK_GETTIME) || defined(HAVE_LIBRT))
+#elif (defined(MUSTER_HAVE_CLOCK_GETTIME))
 // -------------------------------------------------------- //
 // Timing code using Linux hires timers.
 // -------------------------------------------------------- //
@@ -87,7 +84,7 @@ timing_t get_time_ns() {
 }
 
 
-#elif defined(HAVE_GETTIMEOFDAY)
+#elif defined(MUSTER_HAVE_GETTIMEOFDAY)
 // -------------------------------------------------------- //
 // Generic timing code using gettimeofday.
 // -------------------------------------------------------- //
