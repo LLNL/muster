@@ -23,12 +23,11 @@ option(MUSTER_USE_PMPI "Build with PMPI bindings?" FALSE)
 # Tests are off by default.  Set this to ON to build tests.
 option(BUILD_TESTS "Do you want to build the test programs?" FALSE)
 
-
 # Muster requires boost for matrices and random number generators.
-include(FindBoost)
+find_package(Boost REQUIRED)
 
 # Find the MPI library and set some definitions
-include(FindMPI)
+find_package(MPI QUIET)
 if (MPI_FOUND)
   set(MUSTER_HAVE_MPI TRUE)
 endif()

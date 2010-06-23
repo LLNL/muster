@@ -20,7 +20,7 @@ include_directories(
   ${PROJECT_SOURCE_DIR}/external
   ${Boost_INCLUDE_DIR}
   ${PROJECT_BINARY_DIR}
-  ${MPI_INCLUDE_DIR})
+  ${MPI_INCLUDE_PATH})
 
 # include_HEADERS = \
 # 	kmedoids.h \
