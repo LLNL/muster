@@ -76,58 +76,57 @@ PROGRAMS = $(bin_PROGRAMS)
 am_bic_test_OBJECTS = bic_test.$(OBJEXT)
 bic_test_OBJECTS = $(am_bic_test_OBJECTS)
 bic_test_LDADD = $(LDADD)
-bic_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+bic_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_convergence_test_OBJECTS = convergence_test.$(OBJEXT)
 convergence_test_OBJECTS = $(am_convergence_test_OBJECTS)
 convergence_test_LDADD = $(LDADD)
-convergence_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+convergence_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
-mirkin_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+mirkin_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_multi_gather_test_OBJECTS = multi_gather_test.$(OBJEXT)
 multi_gather_test_OBJECTS = $(am_multi_gather_test_OBJECTS)
 multi_gather_test_LDADD = $(LDADD)
-multi_gather_test_DEPENDENCIES = libtestsupport.la \
-	../src/libcluster.la
+multi_gather_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_nondistinct_test_OBJECTS = nondistinct_test.$(OBJEXT)
 nondistinct_test_OBJECTS = $(am_nondistinct_test_OBJECTS)
 nondistinct_test_LDADD = $(LDADD)
-nondistinct_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+nondistinct_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_par_bic_test_OBJECTS = par_bic_test.$(OBJEXT)
 par_bic_test_OBJECTS = $(am_par_bic_test_OBJECTS)
 par_bic_test_LDADD = $(LDADD)
-par_bic_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+par_bic_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_par_cluster_speed_test_OBJECTS = par_cluster_speed_test.$(OBJEXT)
 par_cluster_speed_test_OBJECTS = $(am_par_cluster_speed_test_OBJECTS)
 par_cluster_speed_test_LDADD = $(LDADD)
 par_cluster_speed_test_DEPENDENCIES = libtestsupport.la \
-	../src/libcluster.la
+	../src/libmuster.la
 am_par_cluster_test_OBJECTS = par_cluster_test.$(OBJEXT)
 par_cluster_test_OBJECTS = $(am_par_cluster_test_OBJECTS)
 par_cluster_test_LDADD = $(LDADD)
-par_cluster_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+par_cluster_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_pathological_cluster_test_OBJECTS =  \
 	pathological_cluster_test.$(OBJEXT)
 pathological_cluster_test_OBJECTS =  \
 	$(am_pathological_cluster_test_OBJECTS)
 pathological_cluster_test_LDADD = $(LDADD)
 pathological_cluster_test_DEPENDENCIES = libtestsupport.la \
-	../src/libcluster.la
+	../src/libmuster.la
 am_point_cluster_test_OBJECTS = point_cluster_test.$(OBJEXT)
 point_cluster_test_OBJECTS = $(am_point_cluster_test_OBJECTS)
 point_cluster_test_LDADD = $(LDADD)
 point_cluster_test_DEPENDENCIES = libtestsupport.la \
-	../src/libcluster.la
+	../src/libmuster.la
 am_reuse_test_OBJECTS = reuse_test.$(OBJEXT)
 reuse_test_OBJECTS = $(am_reuse_test_OBJECTS)
 reuse_test_LDADD = $(LDADD)
-reuse_test_DEPENDENCIES = libtestsupport.la ../src/libcluster.la
+reuse_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_write_members_test_OBJECTS = write_members_test.$(OBJEXT)
 write_members_test_OBJECTS = $(am_write_members_test_OBJECTS)
 write_members_test_LDADD = $(LDADD)
 write_members_test_DEPENDENCIES = libtestsupport.la \
-	../src/libcluster.la
+	../src/libmuster.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -307,7 +306,7 @@ par_bic_test_SOURCES = par_bic_test.C
 multi_gather_test_SOURCES = multi_gather_test.C
 LDADD = \
 	libtestsupport.la \
-	../src/libcluster.la
+	../src/libmuster.la
 
 INCLUDES = \
 	-I$(top_srcdir)/external \

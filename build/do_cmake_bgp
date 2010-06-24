@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Sample cmake invocation for building Muster on a BG/P
+#
+
+cmake \
+    -D Boost_INCLUDE_DIR=/g/g21/gamblin2/opt/boost/include/boost-1_34_1 \
+    -D CMAKE_TOOLCHAIN_FILE=~/src/muster/BlueGeneP.cmake \
+    -D BUILD_TESTS=TRUE \
+    ..
+

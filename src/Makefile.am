@@ -1,4 +1,4 @@
-lib_LTLIBRARIES = libcluster.la
+lib_LTLIBRARIES = libmuster.la
 
 include_HEADERS = \
 	kmedoids.h \
@@ -13,7 +13,7 @@ EXTERNAL_SOURCES = \
 	../external/Timer.C \
 	../external/timing.C
 
-libcluster_la_SOURCES = \
+libmuster_la_SOURCES = \
 	partition.C \
 	kmedoids.C \
 	$(EXTERNAL_SOURCES)
@@ -26,7 +26,7 @@ include_HEADERS += \
 	trial.h \
 	id_pair.h
 
-libcluster_la_SOURCES += \
+libmuster_la_SOURCES += \
 	par_partition.C \
 	par_kmedoids.C \
 	trial.C
