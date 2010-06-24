@@ -87,16 +87,16 @@ am__base_list = \
   sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
-libcluster_la_LIBADD =
-am__libcluster_la_SOURCES_DIST = partition.C kmedoids.C \
+libmuster_la_LIBADD =
+am__libmuster_la_SOURCES_DIST = partition.C kmedoids.C \
 	../external/Timer.C ../external/timing.C par_partition.C \
 	par_kmedoids.C trial.C
 am__objects_1 = Timer.lo timing.lo
 @HAVE_MPI_TRUE@am__objects_2 = par_partition.lo par_kmedoids.lo \
 @HAVE_MPI_TRUE@	trial.lo
-am_libcluster_la_OBJECTS = partition.lo kmedoids.lo $(am__objects_1) \
+am_libmuster_la_OBJECTS = partition.lo kmedoids.lo $(am__objects_1) \
 	$(am__objects_2)
-libcluster_la_OBJECTS = $(am_libcluster_la_OBJECTS)
+libmuster_la_OBJECTS = $(am_libmuster_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -110,8 +110,8 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libcluster_la_SOURCES)
-DIST_SOURCES = $(am__libcluster_la_SOURCES_DIST)
+SOURCES = $(libmuster_la_SOURCES)
+DIST_SOURCES = $(am__libmuster_la_SOURCES_DIST)
 am__include_HEADERS_DIST = kmedoids.h random.h counter.h \
 	dissimilarity.h partition.h bic.h mpi_bindings.h \
 	par_partition.h par_kmedoids.h multi_gather.h trial.h \
@@ -239,14 +239,14 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-lib_LTLIBRARIES = libcluster.la
+lib_LTLIBRARIES = libmuster.la
 include_HEADERS = kmedoids.h random.h counter.h dissimilarity.h \
 	partition.h bic.h mpi_bindings.h $(am__append_1)
 EXTERNAL_SOURCES = \
 	../external/Timer.C \
 	../external/timing.C
 
-libcluster_la_SOURCES = partition.C kmedoids.C $(EXTERNAL_SOURCES) \
+libmuster_la_SOURCES = partition.C kmedoids.C $(EXTERNAL_SOURCES) \
 	$(am__append_2)
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
@@ -265,9 +265,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/Makefile
+	  $(AUTOMAKE) --foreign src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -317,8 +317,8 @@ clean-libLTLIBRARIES:
 	  echo "rm -f \"$${dir}/so_locations\""; \
 	  rm -f "$${dir}/so_locations"; \
 	done
-libcluster.la: $(libcluster_la_OBJECTS) $(libcluster_la_DEPENDENCIES) 
-	$(CXXLINK) -rpath $(libdir) $(libcluster_la_OBJECTS) $(libcluster_la_LIBADD) $(LIBS)
+libmuster.la: $(libmuster_la_OBJECTS) $(libmuster_la_DEPENDENCIES) 
+	$(CXXLINK) -rpath $(libdir) $(libmuster_la_OBJECTS) $(libmuster_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)

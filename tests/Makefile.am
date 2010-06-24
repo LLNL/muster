@@ -47,7 +47,7 @@ multi_gather_test_SOURCES = multi_gather_test.C
 
 LDADD = \
 	libtestsupport.la \
-	../src/libcluster.la
+	../src/libmuster.la
 
 INCLUDES = \
 	-I$(top_srcdir)/external \
