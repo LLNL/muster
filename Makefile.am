@@ -3,8 +3,6 @@ ACLOCAL_AMFLAGS = -I m4
 
 if INSTALL_TESTS
 TEST_DIR = tests
-else
-TEST_DIR = tests
 endif
 
 SUBDIRS = src $(TEST_DIR) external

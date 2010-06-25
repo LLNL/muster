@@ -11,4 +11,5 @@
     LDFLAGS="-dynamic" \
     --prefix=${HOME}/opt/muster/bgp_cnk \
     --host=powerpc-bgp-linux-gnu \
+    --with-tests \
     --with-boost=${HOME}/opt/boost

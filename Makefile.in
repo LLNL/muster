@@ -256,7 +256,6 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign   # Don't require NEWS, README, INSTALL, etc.
 ACLOCAL_AMFLAGS = -I m4
-@INSTALL_TESTS_FALSE@TEST_DIR = tests
 @INSTALL_TESTS_TRUE@TEST_DIR = tests
 SUBDIRS = src $(TEST_DIR) external
 
