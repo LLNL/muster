@@ -1,0 +1,121 @@
+==============================================================================
+ Building and Installing
+==============================================================================
+
+Muster is designed to be simple to build and install.  In the most basic
+case, you can simply do this:
+
+    $ tar xzf muster.tar.gz
+    $ cd muster
+    $ ./configure --prefix=/path/to/install/location
+    $ make
+    $ make install
+
+
+------------------------------------------------------------------------------
+ MPI Support
+------------------------------------------------------------------------------
+For MPI support, you should configure Muster with your MPI C++ compiler, 
+like this:
+
+    $ ./configure CXX=mpicxx --prefix=/path/to/install/location
+
+Building and installing are the same as for a sequential build:
+
+    $ make
+    $ make install
+
+
+------------------------------------------------------------------------------
+ External Dependencies
+------------------------------------------------------------------------------
+Muster requires a header-only installation of the Boost C++ libraries.  Since
+it does not depend on the compiled boost libraries, this means that you can
+build Muster with either a fully installed Boost, or with just the headers.
+
+If your system does not have boost headers in a standard location (e.g.,
+/usr/include, /usr/local/include, etc.), then you can download boost and
+point Muster at your boost installation like this:
+
+    $ ./configure \
+          CXX=mpicxx \
+          --prefix=/path/to/install/location \
+          --with-boost=/path/to/boost
+
+The Muster build is able to handle paths to full boost installations or 
+header-only installations.
+
+
+------------------------------------------------------------------------------
+ Building Muster for Parallel Performance Tools
+------------------------------------------------------------------------------
+Muster was designed to be used inside of instrumentation in MPI applications.
+The PMPI interface is a common method of instrumenting MPI applications, but
+PMPI tools cannot themselves contain direct calls to MPI.  They must instead
+use calls to the name-shifted PMPI_* equivalents of the standard MPI calls.
+
+If you are using Muster in a performance tool, you should build with this 
+option:
+
+    $ ./configure \
+          CXX=mpicxx \
+          --prefix=/path/to/install/location \
+          --with-boost=/path/to/boost \
+          --with-pmpi-bindings
+
+This will #define all of the MPI calls in Muster to their PMPI equivalents,
+making the library safe for use in tools.
+
+
+------------------------------------------------------------------------------
+ Muster Test Programs
+------------------------------------------------------------------------------
+By default, the Muster build does not include the various test programs that
+we used to debug the library.  However, many of these are of interest as 
+examples for users learning the library.  You can build the test programs
+by configuring with the --with-tests option, e.g.:
+
+    $ ./configure \
+          CXX=mpicxx \
+          --prefix=/path/to/install/location \
+          --with-boost=/path/to/boost \
+          --with-tests
+
+Tests will be installed in the /bin directory under the Muster prefix. Or,
+you can simply run the tests from the 'tests' directory in the Muster 
+source tree.
+
+
+------------------------------------------------------------------------------
+ Muster on Blue Gene/P and other platforms
+------------------------------------------------------------------------------
+The Muster build is designed to support many platforms.  To support this, the
+build can be run in a separate directory outside of the source tree, like so:
+
+    $ tar xzf muster.tar.gz
+    $ cd muster
+    $ mkdir linux-x86_64
+    $ cd linux-x86_64
+    $ ../configure CXX=mpicxx --prefix=/path/to/install/location
+    $ make
+    $ make install
+
+To simplify this process, there are a number of sample configure scripts in the
+build directory of the source tree.  For example, there are currently scripts
+for configuring on Blue Gene architectures.  You could build for the BlueGene/P 
+compute node kernel like this:
+
+    $ tar xzf muster.tar.gz
+    $ cd muster
+    $ mkdir bgp-cnk
+    $ cp build/do_configure_bgp bgp-cnk/
+    $ cd bgp-cnk
+    $ <edit script to adjust prefixes and compiler flags>
+    $ ./do_configure_bgp
+    $ make
+    $ make install
+
+For help building on other platforms, please contact the Muster author,
+Todd Gamblin, tgamblin@llnl.gov.
+
+

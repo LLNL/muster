@@ -1,8 +1,55 @@
-==========================================
+==============================================================================
  Muster: Massively Scalable Clustering
  by Todd Gamblin
  tgamblin@llnl.gov
-==========================================
+==============================================================================
 
+The Muster library provides implementations of serial and parallel K-Medoids 
+clustering algorithms.  It is intended as a general framework for parallel 
+cluster analysis, particularly for performance data analysis on systems with 
+very large numbers of processes.
+
+The parallel implementations in the Muster are designed to perform well even
+in environments where the data to be clustered is entirely distributed.  For
+example, many performance tools need to analyze one data element from each
+process in a system.  To analyze this data efficiently, clustering algorithms 
+that move as little data as possible are required.  In Muster, we exploit 
+sampled clustering algorithms to realize this efficiency.
+
+The parallel algorithms in Muster are implemented using the Message Passing 
+Interface (MPI), making them suitable for use on many of the world's largest 
+supercomputers.  They should, however, also run efficiently on your laptop.
+  
+
+------------------------------------------------------------------------------
+ Documentation 
+------------------------------------------------------------------------------
+More extensive documentation for Muster is available through the Doxygen
+documentation system.  Doxygen is available for download from:
+
+    http://www.doxygen.org
+
+Once you have installed Doxygen on your system, you can generate documentation
+for Muster by simply running doxygen in the project root directory, e.g.:
+
+    $ tar xzf muster.tar.gz
+    $ cd muster
+    $ doxygen
+
+This will generate html documentation in doc/html. Open doc/html/index.html 
+in your favorite web browser to view the documentation.
+
+
+------------------------------------------------------------------------------
+ License
+------------------------------------------------------------------------------
 See the LICENSE file for license and distribution information.
+
+
+------------------------------------------------------------------------------
+ Building and Installing
+------------------------------------------------------------------------------
+More extensive information on building and installing Muster can be found
+in the INSTALL file.
+
 
