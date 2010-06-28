@@ -1,0 +1,13 @@
+\form#0:$O(n^2)$
+\form#1:$O(n)$
+\form#2:$k$
+\form#3:$O(\frac{n}{P}log(P))$
+\form#4:$n$
+\form#5:$P$
+\form#6:$n = P$
+\form#7:$O(log(P))$
+\form#8:$n \times n$
+\form#9:$D$
+\form#10:$D_{ij}$
+\form#11:$i^{th}$
+\form#12:$j^{th}$
