@@ -11,6 +11,10 @@ case, you can simply do this:
     $ make
     $ make install
 
+Currently the Muster build uses autoconf, but we are slowly transitioning to
+CMake.  Thus, you may notice CMake build files in the source tree.  The CMake
+build is currently undocumented, but these instructions will be updated when
+the transition is complete.
 
 ------------------------------------------------------------------------------
  MPI Support
