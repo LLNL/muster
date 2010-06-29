@@ -1,5 +1,5 @@
 # Support files for tests that don't need to be in the main muster library.
-add_library(testsupport point.C)
+add_library(testsupport point.cpp)
 if (MUSTER_HAVE_MPI)
   target_link_libraries(testsupport ${MPI_LIBRARIES})
 endif()
@@ -22,19 +22,19 @@ function(add_mpi_test test_name src_name)
 endfunction()
 
 
-add_test(point-cluster-test point_cluster_test.C)
-add_test(mirkin-test mirkin_test.C)
-add_test(pathological-cluster-test pathological_cluster_test.C)
-add_test(nondistinct-test nondistinct_test.C)
-add_test(convergence-test convergence_test.C)
-add_test(write-members-test write_members_test.C)
-add_test(bic-test bic_test.C)
-add_test(reuse-test reuse_test.C)
+add_test(point-cluster-test point_cluster_test.cpp)
+add_test(mirkin-test mirkin_test.cpp)
+add_test(pathological-cluster-test pathological_cluster_test.cpp)
+add_test(nondistinct-test nondistinct_test.cpp)
+add_test(convergence-test convergence_test.cpp)
+add_test(write-members-test write_members_test.cpp)
+add_test(bic-test bic_test.cpp)
+add_test(reuse-test reuse_test.cpp)
 
-add_mpi_test(par-cluster-test par_cluster_test.C)
-add_mpi_test(par-cluster-speed-test par_cluster_speed_test.C)
-add_mpi_test(par-bic-test par_bic_test.C)
-add_mpi_test(multi-gather-test multi_gather_test.C)
+add_mpi_test(par-cluster-test par_cluster_test.cpp)
+add_mpi_test(par-cluster-speed-test par_cluster_speed_test.cpp)
+add_mpi_test(par-bic-test par_bic_test.cpp)
+add_mpi_test(multi-gather-test multi_gather_test.cpp)
 
 include_directories(
 	${PROJECT_SOURCE_DIR}/external

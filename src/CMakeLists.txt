@@ -1,14 +1,14 @@
 set(MUSTER_SOURCES
-	partition.C
-	kmedoids.C
-  ../external/Timer.C
-  ../external/timing.C)
+	partition.cpp
+	kmedoids.cpp
+  ../external/Timer.cpp
+  ../external/timing.cpp)
 
 if (MUSTER_HAVE_MPI)
   set(MUSTER_SOURCES ${MUSTER_SOURCES}
-    par_partition.C 
-    par_kmedoids.C 
-    trial.C)
+    par_partition.cpp 
+    par_kmedoids.cpp 
+    trial.cpp)
 endif()
 
 add_library(muster ${MUSTER_SOURCES})

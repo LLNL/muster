@@ -43,9 +43,9 @@ host_triplet = @host@
 @HAVE_MPI_TRUE@	id_pair.h
 
 @HAVE_MPI_TRUE@am__append_2 = \
-@HAVE_MPI_TRUE@	par_partition.C \
-@HAVE_MPI_TRUE@	par_kmedoids.C \
-@HAVE_MPI_TRUE@	trial.C
+@HAVE_MPI_TRUE@	par_partition.cpp \
+@HAVE_MPI_TRUE@	par_kmedoids.cpp \
+@HAVE_MPI_TRUE@	trial.cpp
 
 subdir = src
 DIST_COMMON = $(am__include_HEADERS_DIST) $(srcdir)/Makefile.am \
@@ -88,9 +88,9 @@ am__base_list = \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libmuster_la_LIBADD =
-am__libmuster_la_SOURCES_DIST = partition.C kmedoids.C \
-	../external/Timer.C ../external/timing.C par_partition.C \
-	par_kmedoids.C trial.C
+am__libmuster_la_SOURCES_DIST = partition.cpp kmedoids.cpp \
+	../external/Timer.cpp ../external/timing.cpp par_partition.cpp \
+	par_kmedoids.cpp trial.cpp
 am__objects_1 = Timer.lo timing.lo
 @HAVE_MPI_TRUE@am__objects_2 = par_partition.lo par_kmedoids.lo \
 @HAVE_MPI_TRUE@	trial.lo
@@ -243,10 +243,10 @@ lib_LTLIBRARIES = libmuster.la
 include_HEADERS = kmedoids.h random.h counter.h dissimilarity.h \
 	partition.h bic.h mpi_bindings.h $(am__append_1)
 EXTERNAL_SOURCES = \
-	../external/Timer.C \
-	../external/timing.C
+	../external/Timer.cpp \
+	../external/timing.cpp
 
-libmuster_la_SOURCES = partition.C kmedoids.C $(EXTERNAL_SOURCES) \
+libmuster_la_SOURCES = partition.cpp kmedoids.cpp $(EXTERNAL_SOURCES) \
 	$(am__append_2)
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
@@ -255,7 +255,7 @@ INCLUDES = \
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .C .lo .o .obj
+.SUFFIXES: .cpp .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -265,9 +265,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -334,40 +334,40 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/trial.Plo@am__quote@
 
-.C.o:
+.cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ $<
 
-.C.obj:
+.cpp.obj:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-.C.lo:
+.cpp.lo:
 @am__fastdepCXX_TRUE@	$(LTCXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LTCXXCOMPILE) -c -o $@ $<
 
-Timer.lo: ../external/Timer.C
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Timer.lo -MD -MP -MF $(DEPDIR)/Timer.Tpo -c -o Timer.lo `test -f '../external/Timer.C' || echo '$(srcdir)/'`../external/Timer.C
+Timer.lo: ../external/Timer.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT Timer.lo -MD -MP -MF $(DEPDIR)/Timer.Tpo -c -o Timer.lo `test -f '../external/Timer.cpp' || echo '$(srcdir)/'`../external/Timer.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/Timer.Tpo $(DEPDIR)/Timer.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../external/Timer.C' object='Timer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../external/Timer.cpp' object='Timer.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Timer.lo `test -f '../external/Timer.C' || echo '$(srcdir)/'`../external/Timer.C
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o Timer.lo `test -f '../external/Timer.cpp' || echo '$(srcdir)/'`../external/Timer.cpp
 
-timing.lo: ../external/timing.C
-@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT timing.lo -MD -MP -MF $(DEPDIR)/timing.Tpo -c -o timing.lo `test -f '../external/timing.C' || echo '$(srcdir)/'`../external/timing.C
+timing.lo: ../external/timing.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT timing.lo -MD -MP -MF $(DEPDIR)/timing.Tpo -c -o timing.lo `test -f '../external/timing.cpp' || echo '$(srcdir)/'`../external/timing.cpp
 @am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/timing.Tpo $(DEPDIR)/timing.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../external/timing.C' object='timing.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='../external/timing.cpp' object='timing.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o timing.lo `test -f '../external/timing.C' || echo '$(srcdir)/'`../external/timing.C
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o timing.lo `test -f '../external/timing.cpp' || echo '$(srcdir)/'`../external/timing.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo

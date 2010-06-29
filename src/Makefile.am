@@ -10,12 +10,12 @@ include_HEADERS = \
 	mpi_bindings.h
 
 EXTERNAL_SOURCES = \
-	../external/Timer.C \
-	../external/timing.C
+	../external/Timer.cpp \
+	../external/timing.cpp
 
 libmuster_la_SOURCES = \
-	partition.C \
-	kmedoids.C \
+	partition.cpp \
+	kmedoids.cpp \
 	$(EXTERNAL_SOURCES)
 
 if HAVE_MPI
@@ -27,9 +27,9 @@ include_HEADERS += \
 	id_pair.h
 
 libmuster_la_SOURCES += \
-	par_partition.C \
-	par_kmedoids.C \
-	trial.C
+	par_partition.cpp \
+	par_kmedoids.cpp \
+	trial.cpp
 endif
 
 INCLUDES = \

@@ -2,7 +2,7 @@
 # This is the main autoconf file for building Muster
 #############################################################
 AC_INIT
-AC_CONFIG_SRCDIR([src/kmedoids.C])
+AC_CONFIG_SRCDIR([src/kmedoids.cpp])
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_MACRO_DIR([m4])
 

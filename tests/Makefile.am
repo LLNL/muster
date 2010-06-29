@@ -10,7 +10,7 @@ noinst_LTLIBRARIES = \
 	libtestsupport.la
 
 libtestsupport_la_SOURCES = \
-	point.C
+	point.cpp
 
 #test program for matrix
 bin_PROGRAMS = \
@@ -31,19 +31,19 @@ bin_PROGRAMS += \
 	multi-gather-test
 endif
 
-mirkin_test_SOURCES = mirkin_test.C
-point_cluster_test_SOURCES = point_cluster_test.C
-bic_test_SOURCES = bic_test.C
-pathological_cluster_test_SOURCES = pathological_cluster_test.C
-nondistinct_test_SOURCES = nondistinct_test.C
-convergence_test_SOURCES = convergence_test.C
-reuse_test_SOURCES = reuse_test.C
-write_members_test_SOURCES = write_members_test.C
+mirkin_test_SOURCES = mirkin_test.cpp
+point_cluster_test_SOURCES = point_cluster_test.cpp
+bic_test_SOURCES = bic_test.cpp
+pathological_cluster_test_SOURCES = pathological_cluster_test.cpp
+nondistinct_test_SOURCES = nondistinct_test.cpp
+convergence_test_SOURCES = convergence_test.cpp
+reuse_test_SOURCES = reuse_test.cpp
+write_members_test_SOURCES = write_members_test.cpp
 
-par_cluster_speed_test_SOURCES = par_cluster_speed_test.C
-par_cluster_test_SOURCES = par_cluster_test.C
-par_bic_test_SOURCES = par_bic_test.C
-multi_gather_test_SOURCES = multi_gather_test.C
+par_cluster_speed_test_SOURCES = par_cluster_speed_test.cpp
+par_cluster_test_SOURCES = par_cluster_test.cpp
+par_bic_test_SOURCES = par_bic_test.cpp
+multi_gather_test_SOURCES = multi_gather_test.cpp
 
 LDADD = \
 	libtestsupport.la \
