@@ -40,5 +40,5 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/external
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}
-  ${MPI_INCLUDE_PATH}
-  ${Boost_INCLUDE_DIR})
+  ${Boost_INCLUDE_DIR}
+  ${MPI_INCLUDE_PATH})
