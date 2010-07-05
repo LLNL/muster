@@ -3,9 +3,14 @@
 # Sample cmake invocation for building Muster on a BG/P
 #
 
+type=gnu
+if [ "" != "$1" ]; then
+    type="$1"
+fi
+
 cmake \
     -D Boost_INCLUDE_DIR=/g/g21/gamblin2/opt/boost/include/boost-1_34_1 \
-    -D CMAKE_TOOLCHAIN_FILE=~/src/muster/BlueGeneP.cmake \
+    -D CMAKE_TOOLCHAIN_FILE=../cmake/BlueGeneP-${type}.cmake \
     -D BUILD_TESTS=TRUE \
     ..
 
