@@ -1,5 +1,5 @@
 # the name of the target operating system
-set(CMAKE_SYSTEM_NAME BlueGeneP)
+set(CMAKE_SYSTEM_NAME BlueGeneP-dynamic)
 
 # Set search paths to prefer local, admin-installed wrappers for the BG backend compilers
 set(BGP_GNU_COMPILER_SEARCH_PATHS
