@@ -39,7 +39,8 @@ host_triplet = @host@
 bin_PROGRAMS = point-cluster-test$(EXEEXT) mirkin-test$(EXEEXT) \
 	pathological-cluster-test$(EXEEXT) nondistinct-test$(EXEEXT) \
 	convergence-test$(EXEEXT) write-members-test$(EXEEXT) \
-	bic-test$(EXEEXT) reuse-test$(EXEEXT) $(am__EXEEXT_1)
+	bic-test$(EXEEXT) reuse-test$(EXEEXT) dbscan-test$(EXEEXT) \
+	$(am__EXEEXT_1)
 @HAVE_MPI_TRUE@am__append_1 = \
 @HAVE_MPI_TRUE@	par-cluster-test \
 @HAVE_MPI_TRUE@	par-cluster-speed-test \
@@ -81,6 +82,10 @@ am_convergence_test_OBJECTS = convergence_test.$(OBJEXT)
 convergence_test_OBJECTS = $(am_convergence_test_OBJECTS)
 convergence_test_LDADD = $(LDADD)
 convergence_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
+am_dbscan_test_OBJECTS = dbscan_test.$(OBJEXT)
+dbscan_test_OBJECTS = $(am_dbscan_test_OBJECTS)
+dbscan_test_LDADD = $(LDADD)
+dbscan_test_DEPENDENCIES = libtestsupport.la ../src/libmuster.la
 am_mirkin_test_OBJECTS = mirkin_test.$(OBJEXT)
 mirkin_test_OBJECTS = $(am_mirkin_test_OBJECTS)
 mirkin_test_LDADD = $(LDADD)
@@ -141,18 +146,18 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libtestsupport_la_SOURCES) $(bic_test_SOURCES) \
-	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
-	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
-	$(par_bic_test_SOURCES) $(par_cluster_speed_test_SOURCES) \
-	$(par_cluster_test_SOURCES) \
+	$(convergence_test_SOURCES) $(dbscan_test_SOURCES) \
+	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
+	$(nondistinct_test_SOURCES) $(par_bic_test_SOURCES) \
+	$(par_cluster_speed_test_SOURCES) $(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
 	$(write_members_test_SOURCES)
 DIST_SOURCES = $(libtestsupport_la_SOURCES) $(bic_test_SOURCES) \
-	$(convergence_test_SOURCES) $(mirkin_test_SOURCES) \
-	$(multi_gather_test_SOURCES) $(nondistinct_test_SOURCES) \
-	$(par_bic_test_SOURCES) $(par_cluster_speed_test_SOURCES) \
-	$(par_cluster_test_SOURCES) \
+	$(convergence_test_SOURCES) $(dbscan_test_SOURCES) \
+	$(mirkin_test_SOURCES) $(multi_gather_test_SOURCES) \
+	$(nondistinct_test_SOURCES) $(par_bic_test_SOURCES) \
+	$(par_cluster_speed_test_SOURCES) $(par_cluster_test_SOURCES) \
 	$(pathological_cluster_test_SOURCES) \
 	$(point_cluster_test_SOURCES) $(reuse_test_SOURCES) \
 	$(write_members_test_SOURCES)
@@ -292,6 +297,9 @@ noinst_LTLIBRARIES = \
 libtestsupport_la_SOURCES = \
 	point.cpp
 
+dbscan_test_SOURCES = \
+	dbscan_test.cpp
+
 mirkin_test_SOURCES = mirkin_test.cpp
 point_cluster_test_SOURCES = point_cluster_test.cpp
 bic_test_SOURCES = bic_test.cpp
@@ -326,9 +334,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign tests/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu tests/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign tests/Makefile
+	  $(AUTOMAKE) --gnu tests/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -407,6 +415,9 @@ bic-test$(EXEEXT): $(bic_test_OBJECTS) $(bic_test_DEPENDENCIES)
 convergence-test$(EXEEXT): $(convergence_test_OBJECTS) $(convergence_test_DEPENDENCIES) 
 	@rm -f convergence-test$(EXEEXT)
 	$(CXXLINK) $(convergence_test_OBJECTS) $(convergence_test_LDADD) $(LIBS)
+dbscan-test$(EXEEXT): $(dbscan_test_OBJECTS) $(dbscan_test_DEPENDENCIES) 
+	@rm -f dbscan-test$(EXEEXT)
+	$(CXXLINK) $(dbscan_test_OBJECTS) $(dbscan_test_LDADD) $(LIBS)
 mirkin-test$(EXEEXT): $(mirkin_test_OBJECTS) $(mirkin_test_DEPENDENCIES) 
 	@rm -f mirkin-test$(EXEEXT)
 	$(CXXLINK) $(mirkin_test_OBJECTS) $(mirkin_test_LDADD) $(LIBS)
@@ -446,6 +457,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bic_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/convergence_test.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dbscan_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mirkin_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/multi_gather_test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/nondistinct_test.Po@am__quote@

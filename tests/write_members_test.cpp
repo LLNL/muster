@@ -35,6 +35,7 @@
 #include <iterator>
 #include <sstream>
 #include <algorithm>
+#include <string.h>
 #include "partition.h"
 
 using namespace cluster;

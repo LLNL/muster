@@ -51,7 +51,17 @@ namespace cluster {
   /// Simple 2 dimensional point class for testing medoids algorithms.
   struct point {
   public:
+
+    static double max_x;
+    static double max_y;
+    static double min_x;
+    static double min_y;
+
     double x, y;
+
+    bool   normalized;
+
+    double norm_x, norm_y;
     
     /// New point with position (x,y)
     point(double x, double y);
@@ -64,9 +74,29 @@ namespace cluster {
 
     // Distance between this point and another. 
     double distance(const point& other) const {
-      double dx = other.x - x;
-      double dy = other.y - y;
+      double dx, dy;
+      if (normalized)
+      {
+        dx = other.norm_x - norm_x;
+        dy = other.norm_y - norm_y;
+      }else
+      {
+        dx = other.x - x;
+        dy = other.y - y;
+      }
       return ::sqrt(dx*dx + dy*dy);
+    }
+
+    // Range normalization
+    void normalize(void)
+    {
+      if (normalized)
+        return;
+
+      norm_x = (x - point::min_x)/(point::max_x - point::min_x);
+      norm_y = (y - point::min_y)/(point::max_y - point::min_y);
+      
+      normalized = true;
     }
   
     point& operator+=(const point& other) {
@@ -136,6 +166,14 @@ namespace cluster {
   ///
   void parse_points(const std::string& str, std::vector<point>& points);
 
+  ///
+  /// Parses a line containing a point with dimensions separated by colons:
+  ///  "x, y"
+  /// Appends parsed points to points vector.
+  ///
+  void parse_point_csv(const std::string& str, std::vector<point>& points);
+    
+    
   ///
   /// Draws a set of points in ascii with console colors.  Colors are assigned based on
   /// the partition provided.  Indices in points vector should correspond to ids in the 

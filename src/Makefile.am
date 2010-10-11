@@ -2,6 +2,7 @@ lib_LTLIBRARIES = libmuster.la
 
 include_HEADERS = \
 	kmedoids.h \
+	density_based.h \
 	random.h \
 	counter.h \
 	dissimilarity.h \
@@ -16,6 +17,7 @@ EXTERNAL_SOURCES = \
 libmuster_la_SOURCES = \
 	partition.cpp \
 	kmedoids.cpp \
+	density_based.cpp \
 	$(EXTERNAL_SOURCES)
 
 if HAVE_MPI

@@ -89,13 +89,13 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(includedir)"
 LTLIBRARIES = $(lib_LTLIBRARIES)
 libmuster_la_LIBADD =
 am__libmuster_la_SOURCES_DIST = partition.cpp kmedoids.cpp \
-	../external/Timer.cpp ../external/timing.cpp par_partition.cpp \
-	par_kmedoids.cpp trial.cpp
+	density_based.cpp ../external/Timer.cpp ../external/timing.cpp \
+	par_partition.cpp par_kmedoids.cpp trial.cpp
 am__objects_1 = Timer.lo timing.lo
 @HAVE_MPI_TRUE@am__objects_2 = par_partition.lo par_kmedoids.lo \
 @HAVE_MPI_TRUE@	trial.lo
-am_libmuster_la_OBJECTS = partition.lo kmedoids.lo $(am__objects_1) \
-	$(am__objects_2)
+am_libmuster_la_OBJECTS = partition.lo kmedoids.lo density_based.lo \
+	$(am__objects_1) $(am__objects_2)
 libmuster_la_OBJECTS = $(am_libmuster_la_OBJECTS)
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -112,8 +112,8 @@ CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	$(LDFLAGS) -o $@
 SOURCES = $(libmuster_la_SOURCES)
 DIST_SOURCES = $(am__libmuster_la_SOURCES_DIST)
-am__include_HEADERS_DIST = kmedoids.h random.h counter.h \
-	dissimilarity.h partition.h bic.h mpi_bindings.h \
+am__include_HEADERS_DIST = kmedoids.h density_based.h random.h \
+	counter.h dissimilarity.h partition.h bic.h mpi_bindings.h \
 	par_partition.h par_kmedoids.h multi_gather.h trial.h \
 	id_pair.h
 HEADERS = $(include_HEADERS)
@@ -240,14 +240,15 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 lib_LTLIBRARIES = libmuster.la
-include_HEADERS = kmedoids.h random.h counter.h dissimilarity.h \
-	partition.h bic.h mpi_bindings.h $(am__append_1)
+include_HEADERS = kmedoids.h density_based.h random.h counter.h \
+	dissimilarity.h partition.h bic.h mpi_bindings.h \
+	$(am__append_1)
 EXTERNAL_SOURCES = \
 	../external/Timer.cpp \
 	../external/timing.cpp
 
-libmuster_la_SOURCES = partition.cpp kmedoids.cpp $(EXTERNAL_SOURCES) \
-	$(am__append_2)
+libmuster_la_SOURCES = partition.cpp kmedoids.cpp density_based.cpp \
+	$(EXTERNAL_SOURCES) $(am__append_2)
 INCLUDES = \
 	$(BOOST_CPPFLAGS) \
 	-I$(top_srcdir)/external
@@ -265,9 +266,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign src/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign src/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -327,6 +328,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Timer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/density_based.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_kmedoids.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/par_partition.Plo@am__quote@

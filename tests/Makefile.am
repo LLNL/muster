@@ -21,7 +21,11 @@ bin_PROGRAMS = \
 	convergence-test \
 	write-members-test \
 	bic-test \
-	reuse-test
+	reuse-test \
+	dbscan-test
+
+dbscan_test_SOURCES = \
+	dbscan_test.cpp
 
 if HAVE_MPI
 bin_PROGRAMS += \

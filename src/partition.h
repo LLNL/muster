@@ -52,6 +52,10 @@ namespace cluster {
   typedef size_t medoid_id;       ///< More descriptive type for medoid index
   typedef size_t object_id;       ///< More descriptive type for object index
 
+  const medoid_id unclassified  = 0;
+  const medoid_id noise         = 1;
+  const medoid_id first_cluster = 2;
+
   /// 
   /// Explicit representation of a clustering.  Instead of a vecto of representative
   /// ids, this has <i>k</i> sets of object_ids indicating which objects are in a 
@@ -112,6 +116,15 @@ namespace cluster {
     
     /// Number of objects in cluster i
     size_t size(size_t i) const;
+
+    /// Medoid id of i-th element
+    medoid_id get_cluster(size_t i) const 
+    {
+      if ( i >= 0 && i < cluster_ids.size())
+        return cluster_ids[i];
+      else
+        return cluster::unclassified;
+    }
     
     /// Write the members of cluster m out to the output stream as object_ids
     template <class OutputIterator>

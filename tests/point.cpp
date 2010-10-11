@@ -39,6 +39,7 @@
 #endif // MUSTER_HAVE_MPI
 #include "color.h"
 
+#include <limits>
 #include <iomanip>
 #include <cstdlib>
 #include <boost/numeric/ublas/matrix.hpp>
@@ -50,11 +51,42 @@ using namespace std;
 
 namespace cluster {
 
-  point::point(double _x, double _y) : x(_x), y(_y) { }
+  double point::max_x = std::numeric_limits<double>::min();
+  double point::max_y = std::numeric_limits<double>::min();
+  double point::min_x = std::numeric_limits<double>::max();
+  double point::min_y = std::numeric_limits<double>::max();
+  
+  point::point(double _x, double _y) : 
+    x(_x),
+    y(_y),
+    normalized(false)
+  {
+    if (_x > point::max_x)
+      point::max_x = _x;
 
-  point::point() : x(0), y(0) { }
+    if (_x < point::min_x)
+      point::min_x = _x;
+    
+    if (_y > point::max_y)
+      point::max_y = _y;
 
-  point::point(const point& other) : x(other.x), y(other.y) { }
+    if (_y < point::min_y)
+      point::min_y = _y;
+  }
+
+  point::point() : 
+    x(0),
+    y(0),
+    normalized(false)
+  { }
+
+  point::point(const point& other) : 
+    x(other.x),
+    y(other.y),
+    norm_x(other.norm_x),
+    norm_y(other.norm_y),
+    normalized(other.normalized)
+  { }
 
 
 #ifdef MUSTER_HAVE_MPI
@@ -101,6 +133,33 @@ namespace cluster {
     }
   }
 
+  void parse_point_csv(const std::string& str, std::vector<point>& points)
+  {
+    double X, Y;
+
+    char  *err;
+    
+    string trimmed = trim_copy_if(str, is_any_of(","));
+
+    vector<string> parts;
+    split(parts, str, is_any_of(","));
+
+    if (parts.size() < 2)
+      return;
+
+    X = strtod(parts[0].c_str(), &err);
+
+    if (*err)
+      return;
+    
+    Y = strtod(parts[1].c_str(), &err);
+
+    if (*err)
+      return;
+
+    points.push_back(point(X,Y));
+  }
+  
 
   void draw(string label, vector<point>& points, const partition& parts, ostream& out) {
     static const char *colors[] = {
