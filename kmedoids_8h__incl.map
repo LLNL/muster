@@ -1,0 +1,6 @@
+<map id="G" name="G">
+<area shape="rect" id="node15" href="$random_8h.html" title="Helper functions for taking random samples and seeding RNGs from the system clock." alt="" coords="1059,83,1141,112"/>
+<area shape="rect" id="node19" href="$dissimilarity_8h.html" title="Data types and functions for dealing with dissimilarity matrices." alt="" coords="109,160,216,189"/>
+<area shape="rect" id="node25" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="576,160,661,189"/>
+<area shape="rect" id="node35" href="$bic_8h.html" title="Template function implementations of the Bayesian Information Criterion." alt="" coords="377,83,428,112"/>
+</map>

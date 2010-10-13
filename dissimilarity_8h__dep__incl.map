@@ -1,0 +1,7 @@
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$bic_8h.html" title="Template function implementations of the Bayesian Information Criterion." alt="" coords="129,83,204,112"/>
+<area shape="rect" id="node5" href="$kmedoids_8h.html" title="Implementations of the classic clustering algorithms PAM and CLARA, from Finding Groups in Data..." alt="" coords="17,160,135,189"/>
+<area shape="rect" id="node7" href="$kmedoids_8cpp.html" title="src/kmedoids.cpp" alt="" coords="5,237,139,267"/>
+<area shape="rect" id="node9" href="$par__kmedoids_8h.html" title="CAPEK and XCAPEK scalable parallel clustering algorithms." alt="" coords="163,237,309,267"/>
+<area shape="rect" id="node11" href="$par__kmedoids_8cpp.html" title="src/par_kmedoids.cpp" alt="" coords="155,315,317,344"/>
+</map>
