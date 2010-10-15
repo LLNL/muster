@@ -51,6 +51,7 @@ configure_file(
 # Configure subdirectories here, after everything else, so that they 
 # inherit variables set in the global scope.
 add_subdirectory(src)
+add_subdirectory(libANN)
 if (BUILD_TESTS)
   add_subdirectory(tests)
 endif()

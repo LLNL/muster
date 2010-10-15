@@ -2,7 +2,7 @@
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
 // Written by Juan Gonzalez, juan.gonzalez@bsc.es
-// LLNL-CODE-433662
+
 // All rights reserved.  
 //
 // This file is part of Muster. For details, see http://github.com/tgamblin/muster. 
@@ -30,10 +30,9 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include <iostream>
 #include <fstream>
-#include <cstring>
+#include <string.h>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 
@@ -41,6 +40,8 @@
 #include "Timer.h"
 #include "point.h"
 #include "spherical_clustering_generator.h"
+
+#include "cdbw.h"
 
 using namespace std;
 using namespace cluster;
@@ -92,7 +93,8 @@ void get_args(int *argc, char ***argv)
   int c;
   char *err;
 
-  if (*argc == 0) {
+  if (*argc == 0)
+  {
     cout << "Execution of 10,000 random points using epsilon = 0.01 and min_points = 4" << endl;
     cout << "Results written in output file 'dbscan_random_execution.csv'" << endl;
 
@@ -261,6 +263,7 @@ int main(int argc, char **argv)
   
   density_based clustering = density_based();
   
+  
   get_args(&argc, &argv);
 
   if (random_run)
@@ -300,6 +303,17 @@ int main(int argc, char **argv)
     flush_points(clustering);
     timer.record("Output file write ends");
   }
+  
+  // Checking the CDbw
+  timer.record("CDbw starts");
+  CDbw validation = CDbw(clustering, points);
+  double current_cdbw = validation.compute(10); // 10 representatives per cluster
+  timer.record("CDbw ends");
+
+  cout << "CDbw = ";
+  // cout.setf(ios_base::scientific);
+  cout << current_cdbw << endl;
+  
 
   // Write timing
   if (timing)
@@ -311,4 +325,3 @@ int main(int argc, char **argv)
   
   exit (EXIT_SUCCESS);
 }
-

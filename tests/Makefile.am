@@ -22,7 +22,12 @@ bin_PROGRAMS = \
 	write-members-test \
 	bic-test \
 	reuse-test \
-	dbscan-test
+	dbscan-test \
+	cdbw-test
+
+cdbw_test_SOURCES = \
+	cdbw_test.cpp\
+	cdbw.cpp
 
 dbscan_test_SOURCES = \
 	dbscan_test.cpp
@@ -51,10 +56,12 @@ multi_gather_test_SOURCES = multi_gather_test.cpp
 
 LDADD = \
 	libtestsupport.la \
-	../src/libmuster.la
+	../src/libmuster.la \
+	../libANN/libANN.la
 
 INCLUDES = \
 	-I$(top_srcdir)/external \
 	-I$(top_srcdir)/src \
+	-I$(top_srcdir)/libANN \
 	$(BOOST_CPPFLAGS)
 

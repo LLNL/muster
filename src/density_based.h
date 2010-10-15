@@ -2,7 +2,7 @@
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
 // Written by Juan Gonzalez, juan.gonzalez@bsc.es
-
+// LLNL-CODE-433662
 // All rights reserved.  
 //
 // This file is part of Muster. For details, see http://github.com/tgamblin/muster. 
@@ -34,7 +34,7 @@
 #ifndef K_MEDOIDS_H
 #define K_MEDOIDS_H
 ///
-/// @file kmedoids.h
+/// @file density_based.h
 /// @brief Implementations of the classic clustering algorithms PAM and CLARA, from 
 /// <i>Finding Groups in Data</i>, by Kaufman and Rousseeuw.
 ///
@@ -52,9 +52,6 @@
 #include "dissimilarity.h"
 #include "partition.h"
 #include "bic.h"
-
-using std::cout;
-using std::endl;
 
 namespace cluster {
 
@@ -83,22 +80,17 @@ namespace cluster {
     ///
     /// 
     template <class T, class D>
-    void dbscan(const std::vector<T>& objects, D dmetric, double _epsilon, size_t _min_points )
-    {
+    void dbscan(const std::vector<T>& objects, D dmetric, double _epsilon, size_t _min_points ) {
       epsilon    = _epsilon;
       min_points = _min_points;
 
-      for (size_t i = 0; i < objects.size(); i++)
-      {
+      for (size_t i = 0; i < objects.size(); i++) {
         cluster_ids.push_back(cluster::unclassified);
       }
 
-      for (size_t i = 0; i < objects.size(); i++)
-      {
-        if (cluster_ids[i] == cluster::unclassified)
-        {
-          if (expand_cluster(objects, dmetric, i))
-          {
+      for (size_t i = 0; i < objects.size(); i++) {
+        if (cluster_ids[i] == cluster::unclassified) {
+          if (expand_cluster(objects, dmetric, i)) {
             medoid_ids.push_back(i);
             current_cluster_id++;
             total_clusters++;
@@ -122,30 +114,24 @@ namespace cluster {
     size_t total_clusters;
 
     template <class T, class D>
-    bool expand_cluster(const std::vector<T>& objects, D dmetric, size_t current_object)
-    {
+    bool expand_cluster(const std::vector<T>& objects, D dmetric, size_t current_object) {
       std::list<size_t> seed_list = epsilon_range_query(objects, dmetric, current_object);
       std::list<size_t>::iterator seed_list_iterator;
 
-      if (seed_list.size() < min_points)
-      {
+      if (seed_list.size() < min_points) {
         cluster_ids[current_object] = cluster::noise;
         return false;
       }
 
       /* Assign current cluster id to current object neighborhood */
       seed_list_iterator = seed_list.begin();
-      while (seed_list_iterator != seed_list.end())
-      {
+      while (seed_list_iterator != seed_list.end()) {
         size_t current_seed = (*seed_list_iterator);
         cluster_ids[current_seed] = current_cluster_id;
 
-        if (current_seed == current_object)
-        {
+        if (current_seed == current_object) {
           seed_list_iterator = seed_list.erase(seed_list_iterator);
-        }
-        else
-        {
+        } else {
           seed_list_iterator++;
         }
       }
@@ -162,19 +148,15 @@ namespace cluster {
 
         neighbour_seed_list = epsilon_range_query(objects, dmetric, current_neighbour);
 
-        if (neighbour_seed_list.size() >= min_points)
-        {
+        if (neighbour_seed_list.size() >= min_points) {
           for (neighbour_seed_list_iterator  = neighbour_seed_list.begin();
                neighbour_seed_list_iterator != neighbour_seed_list.end();
-               neighbour_seed_list_iterator++)
-          {
+               neighbour_seed_list_iterator++) {
             size_t current_neighbour_neighbour = (*neighbour_seed_list_iterator);
 
             if (cluster_ids[current_neighbour_neighbour] == cluster::unclassified ||
-                cluster_ids[current_neighbour_neighbour] == cluster::noise)
-            {
-              if (cluster_ids[current_neighbour_neighbour] == cluster::unclassified)
-              {
+                cluster_ids[current_neighbour_neighbour] == cluster::noise) {
+              if (cluster_ids[current_neighbour_neighbour] == cluster::unclassified) {
                 seed_list.push_back(current_neighbour_neighbour);
               }
               cluster_ids[current_neighbour_neighbour] = current_cluster_id;
@@ -188,31 +170,24 @@ namespace cluster {
     }
 
     template <class T, class D>
-    std::list<size_t> epsilon_range_query(const std::vector<T>& objects, D dmetric, size_t current_object)
-    {
+    std::list<size_t> epsilon_range_query(const std::vector<T>& objects, D dmetric, size_t current_object) {
       std::list<size_t> result;
 
-      double distance;
-      
-      for (size_t i = 0; i < objects.size(); i++)
-      {
-        if ( i == current_object)
-        {
+      for (size_t i = 0; i < objects.size(); i++) {
+        if ( i == current_object) {
           result.push_back(i);
           continue;
         }
 
         /* Check the distance between current_object and i-th object */
-        if (dmetric(objects[current_object], objects[i]) < epsilon)
-        {
+        if (dmetric(objects[current_object], objects[i]) < epsilon) {
           result.push_back(i);
         }
-
       }
 
       return result;
     }
-  };
+  }; // class density_based
 
 } // namespace cluster
 

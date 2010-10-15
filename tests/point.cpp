@@ -83,9 +83,9 @@ namespace cluster {
   point::point(const point& other) : 
     x(other.x),
     y(other.y),
+    normalized(other.normalized),
     norm_x(other.norm_x),
-    norm_y(other.norm_y),
-    normalized(other.normalized)
+    norm_y(other.norm_y)
   { }
 
 

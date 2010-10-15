@@ -2,8 +2,11 @@
 #
 # Sample cmake invocation for building Muster on a BG/P
 #
-
-type=gnu
+# build type options are:
+#   gnu-dynamic   xl-dynamic
+#   gnu-static    xl-static
+#
+type=gnu-dynamic
 if [ "" != "$1" ]; then
     type="$1"
 fi

@@ -5,7 +5,7 @@ if (MUSTER_HAVE_MPI)
 endif()
 
 # This lists all the libraries tests should need to compile.
-set(TEST_LIBS testsupport muster)
+set(TEST_LIBS testsupport muster ANN)
 
 # Simple function to add an executable and link it to the test libraries.
 function(add_test test_name src_name)
@@ -30,6 +30,10 @@ add_test(convergence-test convergence_test.cpp)
 add_test(write-members-test write_members_test.cpp)
 add_test(bic-test bic_test.cpp)
 add_test(reuse-test reuse_test.cpp)
+add_test(dbscan-test dbscan_test.cpp)
+
+add_executable(cdbw-test cdbw_test.cpp cdbw.cpp)
+target_link_libraries(cdbw-test ${TEST_LIBS})
 
 add_mpi_test(par-cluster-test par_cluster_test.cpp)
 add_mpi_test(par-cluster-speed-test par_cluster_speed_test.cpp)
@@ -37,7 +41,8 @@ add_mpi_test(par-bic-test par_bic_test.cpp)
 add_mpi_test(multi-gather-test multi_gather_test.cpp)
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/external
+  ${PROJECT_SOURCE_DIR}/external
+  ${PROJECT_SOURCE_DIR}/libANN
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}

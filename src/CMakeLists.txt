@@ -1,6 +1,7 @@
 set(MUSTER_SOURCES
 	partition.cpp
 	kmedoids.cpp
+	density_based.cpp
   ../external/Timer.cpp
   ../external/timing.cpp)
 
@@ -19,8 +20,11 @@ endif()
 include_directories(
   ${PROJECT_SOURCE_DIR}/external
   ${Boost_INCLUDE_DIR}
-  ${PROJECT_BINARY_DIR}
-  ${MPI_INCLUDE_PATH})
+  ${PROJECT_BINARY_DIR})
+
+if (MUSTER_HAVE_MPI)
+	include_directories(${MPI_INCLUDE_PATH})
+endif()
 
 # include_HEADERS = \
 # 	kmedoids.h \

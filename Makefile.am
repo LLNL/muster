@@ -3,9 +3,10 @@ ACLOCAL_AMFLAGS = -I m4
 
 if INSTALL_TESTS
 TEST_DIR = tests
+ANN_DIR  = libANN
 endif
 
-SUBDIRS = src $(TEST_DIR) external
+SUBDIRS = src $(ANN_DIR) $(TEST_DIR) external
 
 # Build-time configuration of libraries.
 include_HEADERS=muster-config.h
