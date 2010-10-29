@@ -1,7 +1,8 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$kmedoids_8h.html" title="Implementations of the classic clustering algorithms PAM and CLARA, from Finding Groups in Data..." alt="" coords="477,83,573,112"/>
-<area shape="rect" id="node17" href="$random_8h.html" title="Helper functions for taking random samples and seeding RNGs from the system clock." alt="" coords="873,160,956,189"/>
-<area shape="rect" id="node37" href="$bic_8h.html" title="Template function implementations of the Bayesian Information Criterion." alt="" coords="613,160,664,189"/>
-<area shape="rect" id="node21" href="$dissimilarity_8h.html" title="Data types and functions for dealing with dissimilarity matrices." alt="" coords="233,237,340,267"/>
-<area shape="rect" id="node27" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="516,237,601,267"/>
+<area shape="rect" id="node3" href="$kmedoids_8h.html" title="Implementations of the classic clustering algorithms PAM and CLARA, from Finding Groups in Data..." alt="" coords="304,83,400,112"/>
+<area shape="rect" id="node17" href="$random_8h.html" title="Helper functions for taking random samples and seeding RNGs from the system clock." alt="" coords="738,160,821,189"/>
+<area shape="rect" id="node37" href="$bic_8h.html" title="Template function implementations of the Bayesian Information Criterion." alt="" coords="664,160,714,189"/>
+<area shape="rect" id="node61" href="$matrix__utils_8h.html" title="matrix_utils.h" alt="" coords="1088,83,1194,112"/>
+<area shape="rect" id="node21" href="$dissimilarity_8h.html" title="Data types and functions for dealing with dissimilarity matrices." alt="" coords="498,237,605,267"/>
+<area shape="rect" id="node27" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="237,237,322,267"/>
 </map>

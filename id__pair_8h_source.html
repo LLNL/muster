@@ -87,18 +87,18 @@
 <a name="l00069"></a>00069     <a class="code" href="structcluster_1_1id__pair.html#af3835b53c53cd342ef2441c82e63ca9a">id_pair</a>(<span class="keyword">const</span> T&amp; elt, <span class="keywordtype">size_t</span> _id) : <a class="code" href="structcluster_1_1id__pair.html#ae58d2ea25d0c6de1cfc5997a49a7835e" title="The object wrapped by this id_pair.">element</a>(elt), <a class="code" href="structcluster_1_1id__pair.html#a3670f4bed50c88882ceba330ffeb095c" title="Id of the rank where element came from.">id</a>(_id) { }
 <a name="l00070"></a>00070 
 <a name="l00071"></a>00071     <span class="keywordtype">int</span> <a class="code" href="structcluster_1_1id__pair.html#a7f367e3650b80003f4b70b4fc0fb95db">packed_size</a>(MPI_Comm comm)<span class="keyword"> const </span>{
-<a name="l00072"></a>00072       <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1id__pair.html#ae58d2ea25d0c6de1cfc5997a49a7835e" title="The object wrapped by this id_pair.">element</a>.packed_size(comm) + <a class="code" href="mpi__bindings_8h.html#a19f4c652252a22e96d5238908f6cb6d4">cmpi_packed_size</a>(1, MPI_SIZE_T, comm);
+<a name="l00072"></a>00072       <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1id__pair.html#ae58d2ea25d0c6de1cfc5997a49a7835e" title="The object wrapped by this id_pair.">element</a>.packed_size(comm) + <a class="code" href="mpi__bindings_8h.html#a19f4c652252a22e96d5238908f6cb6d4">cmpi_packed_size</a>(1, <a class="code" href="mpi__utils_8h.html#aaae430420e25984e327a89b068e1582b">MPI_SIZE_T</a>, comm);
 <a name="l00073"></a>00073     }
 <a name="l00074"></a>00074 
 <a name="l00075"></a>00075     <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1id__pair.html#a1f59d19280573d1a101ec60a20d43c87">pack</a>(<span class="keywordtype">void</span> *buf, <span class="keywordtype">int</span> bufsize, <span class="keywordtype">int</span> *position, MPI_Comm comm)<span class="keyword"> const </span>{
 <a name="l00076"></a>00076       <a class="code" href="structcluster_1_1id__pair.html#ae58d2ea25d0c6de1cfc5997a49a7835e" title="The object wrapped by this id_pair.">element</a>.pack(buf, bufsize, position, comm);
-<a name="l00077"></a>00077       MPI_Pack(const_cast&lt;size_t*&gt;(&amp;<span class="keywordtype">id</span>), 1, MPI_SIZE_T, buf, bufsize, position, comm);
+<a name="l00077"></a>00077       MPI_Pack(const_cast&lt;size_t*&gt;(&amp;<span class="keywordtype">id</span>), 1, <a class="code" href="mpi__utils_8h.html#aaae430420e25984e327a89b068e1582b">MPI_SIZE_T</a>, buf, bufsize, position, comm);
 <a name="l00078"></a>00078     }
 <a name="l00079"></a>00079 
 <a name="l00080"></a>00080     <span class="keyword">static</span> <a class="code" href="structcluster_1_1id__pair.html#af3835b53c53cd342ef2441c82e63ca9a">id_pair</a> <a class="code" href="structcluster_1_1id__pair.html#ada390a80df41d31a22b6779778c38984">unpack</a>(<span class="keywordtype">void</span> *buf, <span class="keywordtype">int</span> bufsize, <span class="keywordtype">int</span> *position, MPI_Comm comm) {
 <a name="l00081"></a>00081       T t = <a class="code" href="structcluster_1_1id__pair.html#ada390a80df41d31a22b6779778c38984">T::unpack</a>(buf, bufsize, position, comm);
 <a name="l00082"></a>00082       <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1id__pair.html#a3670f4bed50c88882ceba330ffeb095c" title="Id of the rank where element came from.">id</a>;
-<a name="l00083"></a>00083       MPI_Unpack(buf, bufsize, position, &amp;<span class="keywordtype">id</span>, 1, MPI_SIZE_T, comm);
+<a name="l00083"></a>00083       MPI_Unpack(buf, bufsize, position, &amp;<span class="keywordtype">id</span>, 1, <a class="code" href="mpi__utils_8h.html#aaae430420e25984e327a89b068e1582b">MPI_SIZE_T</a>, comm);
 <a name="l00084"></a>00084       <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1id__pair.html#af3835b53c53cd342ef2441c82e63ca9a">id_pair</a>(t, <span class="keywordtype">id</span>);
 <a name="l00085"></a>00085     }
 <a name="l00086"></a>00086   };
@@ -127,6 +127,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Wed Oct 13 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

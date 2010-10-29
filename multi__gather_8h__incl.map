@@ -1,3 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node9" href="$mpi__bindings_8h.html" title="#defines for switching between MPI and PMPI bindings." alt="" coords="275,83,392,112"/>
+<area shape="rect" id="node9" href="$mpi__bindings_8h.html" title="#defines for switching between MPI and PMPI bindings." alt="" coords="189,83,307,112"/>
+<area shape="rect" id="node13" href="$mpi__utils_8h.html" title="Overloaded utility functions to convert between arbitrary C/C++ types and MPI types, custom typedefs for cstdlib types like size_t, and a wrapper for MPI_Pack_Size." alt="" coords="72,160,163,189"/>
 </map>

@@ -1,3 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$structcluster_1_1lazy__distance__functor.html" title="Functor for computing distance lazily from an object array and a distance metric." alt="" coords="7,5,220,35"/>
+<area shape="rect" id="node1" href="$structget__first.html" title="Functor to get the first element of a pair. Use with STL functions like transform()." alt="" coords="5,5,80,35"/>
 </map>

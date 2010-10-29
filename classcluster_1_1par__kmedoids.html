@@ -59,7 +59,7 @@ Collaboration diagram for par_kmedoids:</div>
 <div class="dyncontent">
 <div class="center"><img src="classcluster_1_1par__kmedoids__coll__graph.png" border="0" usemap="#par__kmedoids_coll__map" alt="Collaboration graph"/></div>
 <map name="par__kmedoids_coll__map" id="par__kmedoids_coll__map">
-<area shape="rect" id="node2" href="structcluster_1_1par__partition.html" title="par_partition represents a partitioning of a distributed data set." alt="" coords="11,5,112,35"/></map>
+<area shape="rect" id="node2" href="structcluster_1_1par__partition.html" title="par_partition represents a partitioning of a distributed data set." alt="" coords="5,5,107,35"/><area shape="rect" id="node4" href="class_timer.html" title="Timer" alt="" coords="131,5,189,35"/></map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 
 <p><a href="classcluster_1_1par__kmedoids-members.html">List of all members.</a></p>
@@ -92,8 +92,8 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memTemplParams" colspan="2">template&lt;class T , class D &gt; </td></tr>
 <tr><td class="memTemplItemLeft" align="right" valign="top">double&nbsp;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855">xcapek</a> (const std::vector&lt; T &gt; &amp;objects, D dmetric, size_t max_k, size_t dimensionality, std::vector&lt; T &gt; *medoids=NULL)</td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">K-agnostic version of <a class="el" href="classcluster_1_1par__kmedoids.html#a9e6466011d78034865dfcb0b15e33bf2" title="This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).">capek()</a>.  <a href="#a6d10b9b98495838ee9425932c6529855"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">const Timer &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#a41466ea324bfff7bec48d504692e135b">get_timer</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the Timer with info on the last run of either <a class="el" href="classcluster_1_1par__kmedoids.html#a9e6466011d78034865dfcb0b15e33bf2" title="This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).">capek()</a> or <a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855" title="K-agnostic version of capek().">xcapek()</a>.  <a href="#a41466ea324bfff7bec48d504692e135b"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_timer.html">Timer</a> &amp;&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#a41466ea324bfff7bec48d504692e135b">get_timer</a> ()</td></tr>
+<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Get the <a class="el" href="class_timer.html">Timer</a> with info on the last run of either <a class="el" href="classcluster_1_1par__kmedoids.html#a9e6466011d78034865dfcb0b15e33bf2" title="This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).">capek()</a> or <a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855" title="K-agnostic version of capek().">xcapek()</a>.  <a href="#a41466ea324bfff7bec48d504692e135b"></a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="pro-types"></a>
 Protected Types</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">typedef boost::mt19937&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#ac5c6013aecf88eb9e9a3011a2158f867">random_t</a></td></tr>
@@ -122,7 +122,7 @@ Protected Attributes</h2></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Max repetitions of trials for a particular k.  <a href="#af4c641bc801fd71d691835566187f4b3"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">double&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#a4904cc82627458fdf6672ccc0b2802c7">epsilon</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Tolerance for convergence tests in kmedoids PAM runs.  <a href="#a4904cc82627458fdf6672ccc0b2802c7"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">Timer&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#aaf7e0389622e8f7b78393ee10d8e93a4">timer</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_timer.html">Timer</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="classcluster_1_1par__kmedoids.html#aaf7e0389622e8f7b78393ee10d8e93a4">timer</a></td></tr>
 <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Performance timer.  <a href="#aaf7e0389622e8f7b78393ee10d8e93a4"></a><br/></td></tr>
 </table>
 <hr/><a name="_details"></a><h2>Detailed Description</h2>
@@ -136,7 +136,7 @@ Protected Attributes</h2></td></tr>
  };
  
  <span class="comment">// Euclidean distance functor to use for clustering.</span>
- <span class="keyword">struct </span>euclidean_distance {
+ <span class="keyword">struct </span><a class="code" href="matrix__utils_8h.html#ae2dd7fd8dcf62e028ff2825e87478511">euclidean_distance</a> {
      <span class="keywordtype">double</span> operator()(<span class="keyword">const</span> point&amp; lhs, <span class="keyword">const</span> point&amp; rhs) {
          <span class="keywordtype">double</span> a = lhs.x - rhs.x;
          <span class="keywordtype">double</span> b = lhs.y - rhs.y;
@@ -151,7 +151,7 @@ Protected Attributes</h2></td></tr>
  vector&lt;point&gt; medoids;   <span class="comment">// storage for reprsentatives</span>
  
  <span class="comment">// Run xcapek(), finding a max of 20 clusters among the 2d points.</span>
- parkm.xcapek(points, euclidean_distance(), 20, 2, &amp;medoids);
+ parkm.xcapek(points, <a class="code" href="matrix__utils_8h.html#ae2dd7fd8dcf62e028ff2825e87478511">euclidean_distance</a>(), 20, 2, &amp;medoids);
 </pre></div><p>After this runs, these members of <code>parkm</code> are interesting:</p>
 <ul>
 <li><code>parkm.<a class="el" href="structcluster_1_1par__partition.html#afd520c040af2b60ff8950a86fcc370f9">cluster_ids</a></code>: A vector of cluster ids for the local objects in <code>points</code></li>
@@ -455,7 +455,7 @@ Protected Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const Timer&amp; get_timer </td>
+          <td class="memname">const <a class="el" href="class_timer.html">Timer</a>&amp; get_timer </td>
           <td>(</td>
           <td class="paramname"></td>
           <td>&nbsp;)&nbsp;</td>
@@ -465,7 +465,7 @@ Protected Attributes</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Get the Timer with info on the last run of either <a class="el" href="classcluster_1_1par__kmedoids.html#a9e6466011d78034865dfcb0b15e33bf2" title="This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).">capek()</a> or <a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855" title="K-agnostic version of capek().">xcapek()</a>. </p>
+<p>Get the <a class="el" href="class_timer.html">Timer</a> with info on the last run of either <a class="el" href="classcluster_1_1par__kmedoids.html#a9e6466011d78034865dfcb0b15e33bf2" title="This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).">capek()</a> or <a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855" title="K-agnostic version of capek().">xcapek()</a>. </p>
 
 </div>
 </div>
@@ -754,7 +754,7 @@ Protected Attributes</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">Timer <a class="el" href="classcluster_1_1par__kmedoids.html#aaf7e0389622e8f7b78393ee10d8e93a4">timer</a><code> [protected]</code></td>
+          <td class="memname"><a class="el" href="class_timer.html">Timer</a> <a class="el" href="classcluster_1_1par__kmedoids.html#aaf7e0389622e8f7b78393ee10d8e93a4">timer</a><code> [protected]</code></td>
         </tr>
       </table>
 </div>
@@ -792,6 +792,6 @@ Protected Attributes</h2></td></tr>
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Wed Oct 13 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

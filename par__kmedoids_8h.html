@@ -40,13 +40,13 @@
 <code>#include &lt;vector&gt;</code><br/>
 <code>#include &lt;functional&gt;</code><br/>
 <code>#include &lt;boost/iterator/permutation_iterator.hpp&gt;</code><br/>
-<code>#include &quot;Timer.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="_timer_8h_source.html">Timer.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="kmedoids_8h_source.html">kmedoids.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="multi__gather_8h_source.html">multi_gather.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="trial_8h_source.html">trial.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="id__pair_8h_source.html">id_pair.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="par__partition_8h_source.html">par_partition.h</a>&quot;</code><br/>
-<code>#include &quot;stl_utils.h&quot;</code><br/>
+<code>#include &quot;<a class="el" href="stl__utils_8h_source.html">stl_utils.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="bic_8h_source.html">bic.h</a>&quot;</code><br/>
 <code>#include &quot;<a class="el" href="mpi__bindings_8h_source.html">mpi_bindings.h</a>&quot;</code><br/>
 <div class="dynheader">
@@ -54,7 +54,7 @@ Include dependency graph for par_kmedoids.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="par__kmedoids_8h__incl.png" border="0" usemap="#src_2par__kmedoids_8h" alt=""/></div>
 <map name="src_2par__kmedoids_8h" id="src_2par__kmedoids_8h">
-<area shape="rect" id="node15" href="kmedoids_8h.html" title="Implementations of the classic clustering algorithms PAM and CLARA, from Finding Groups in Data..." alt="" coords="371,83,467,112"/><area shape="rect" id="node47" href="bic_8h.html" title="Template function implementations of the Bayesian Information Criterion." alt="" coords="669,160,720,189"/><area shape="rect" id="node58" href="multi__gather_8h.html" title="Asynchronous, some&#45;to&#45;some gather operation used by parallel clustering algorithms to simultaneously ..." alt="" coords="1399,83,1513,112"/><area shape="rect" id="node63" href="mpi__bindings_8h.html" title="#defines for switching between MPI and PMPI bindings." alt="" coords="1576,160,1693,189"/><area shape="rect" id="node71" href="trial_8h.html" title="Data structure representing a trial run of a partitioned clustering algorithm." alt="" coords="1737,83,1796,112"/><area shape="rect" id="node75" href="id__pair_8h.html" title="MPI&#45;packable, templated struct for shipping around an MPI&#45;packable object plus the id of the process ..." alt="" coords="1588,83,1663,112"/><area shape="rect" id="node81" href="par__partition_8h.html" title="Distributed representation of a partitioning of a data set." alt="" coords="1260,83,1375,112"/><area shape="rect" id="node28" href="random_8h.html" title="Helper functions for taking random samples and seeding RNGs from the system clock." alt="" coords="8,160,91,189"/><area shape="rect" id="node32" href="dissimilarity_8h.html" title="Data types and functions for dealing with dissimilarity matrices." alt="" coords="507,237,613,267"/><area shape="rect" id="node38" href="partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="923,237,1008,267"/></map>
+<area shape="rect" id="node13" href="_timer_8h.html" title="Timer.h" alt="" coords="91,237,160,267"/><area shape="rect" id="node24" href="kmedoids_8h.html" title="Implementations of the classic clustering algorithms PAM and CLARA, from Finding Groups in Data..." alt="" coords="829,83,925,112"/><area shape="rect" id="node55" href="bic_8h.html" title="Template function implementations of the Bayesian Information Criterion." alt="" coords="336,160,387,189"/><area shape="rect" id="node66" href="multi__gather_8h.html" title="Asynchronous, some&#45;to&#45;some gather operation used by parallel clustering algorithms to simultaneously ..." alt="" coords="1195,83,1309,112"/><area shape="rect" id="node71" href="mpi__bindings_8h.html" title="#defines for switching between MPI and PMPI bindings." alt="" coords="1623,160,1740,189"/><area shape="rect" id="node84" href="trial_8h.html" title="Data structure representing a trial run of a partitioned clustering algorithm." alt="" coords="2084,83,2143,112"/><area shape="rect" id="node87" href="id__pair_8h.html" title="MPI&#45;packable, templated struct for shipping around an MPI&#45;packable object plus the id of the process ..." alt="" coords="1857,83,1932,112"/><area shape="rect" id="node93" href="par__partition_8h.html" title="Distributed representation of a partitioning of a data set." alt="" coords="1381,160,1496,189"/><area shape="rect" id="node99" href="stl__utils_8h.html" title="stl_utils.h" alt="" coords="965,237,1048,267"/><area shape="rect" id="node22" href="timing_8h.html" title="timing.h" alt="" coords="88,315,163,344"/><area shape="rect" id="node36" href="random_8h.html" title="Helper functions for taking random samples and seeding RNGs from the system clock." alt="" coords="512,160,595,189"/><area shape="rect" id="node40" href="dissimilarity_8h.html" title="Data types and functions for dealing with dissimilarity matrices." alt="" coords="469,237,576,267"/><area shape="rect" id="node46" href="partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="1224,237,1309,267"/><area shape="rect" id="node75" href="mpi__utils_8h.html" title="Overloaded utility functions to convert between arbitrary C/C++ types and MPI types, custom typedefs for cstdlib types like size_t, and a wrapper for MPI_Pack_Size." alt="" coords="1767,237,1857,267"/></map>
 </div>
 <div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
@@ -89,6 +89,6 @@ Namespaces</h2></td></tr>
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Wed Oct 13 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

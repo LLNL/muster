@@ -1,4 +1,5 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="163,83,248,112"/>
-<area shape="rect" id="node25" href="$counter_8h.html" title="Dummy output iterator that counts how many times it was assigned to." alt="" coords="699,83,781,112"/>
+<area shape="rect" id="node3" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="209,83,295,112"/>
+<area shape="rect" id="node25" href="$counter_8h.html" title="Dummy output iterator that counts how many times it was assigned to." alt="" coords="912,83,995,112"/>
+<area shape="rect" id="node30" href="$stl__utils_8h.html" title="stl_utils.h" alt="" coords="429,83,512,112"/>
 </map>

@@ -126,7 +126,7 @@
 <a name="l00124"></a>00124       <span class="keywordflow">if</span> (rank != root &amp;&amp; find(begin_src, end_src, rank) == end_src) <span class="keywordflow">return</span>;
 <a name="l00125"></a>00125 
 <a name="l00126"></a>00126       <span class="comment">// determine size of local data.</span>
-<a name="l00127"></a>00127       <span class="keywordtype">int</span> packed_size = <a class="code" href="mpi__bindings_8h.html#a19f4c652252a22e96d5238908f6cb6d4">cmpi_packed_size</a>(1, MPI_SIZE_T, comm);  <span class="comment">// num objects</span>
+<a name="l00127"></a>00127       <span class="keywordtype">int</span> packed_size = <a class="code" href="mpi__bindings_8h.html#a19f4c652252a22e96d5238908f6cb6d4">cmpi_packed_size</a>(1, <a class="code" href="mpi__utils_8h.html#aaae430420e25984e327a89b068e1582b">MPI_SIZE_T</a>, comm);  <span class="comment">// num objects</span>
 <a name="l00128"></a>00128       <span class="keywordflow">for</span> (ObjIterator o=begin_obj; o != end_obj; o++) {       <span class="comment">// size of each object</span>
 <a name="l00129"></a>00129         packed_size += o-&gt;packed_size(comm);
 <a name="l00130"></a>00130       }
@@ -142,7 +142,7 @@
 <a name="l00140"></a>00140       <span class="comment">// pack up local data into the buffer</span>
 <a name="l00141"></a>00141       <span class="keywordtype">int</span> pos = 0;
 <a name="l00142"></a>00142       <span class="keywordtype">size_t</span> num_objects = distance(begin_obj, end_obj);
-<a name="l00143"></a>00143       <a class="code" href="mpi__bindings_8h.html#abc3639efb607f9c5918a5a79765d389c">CMPI_Pack</a>(&amp;num_objects, 1, MPI_SIZE_T, send_buffer-&gt;buf, send_buffer-&gt;size, &amp;pos, comm);
+<a name="l00143"></a>00143       <a class="code" href="mpi__bindings_8h.html#abc3639efb607f9c5918a5a79765d389c">CMPI_Pack</a>(&amp;num_objects, 1, <a class="code" href="mpi__utils_8h.html#aaae430420e25984e327a89b068e1582b">MPI_SIZE_T</a>, send_buffer-&gt;buf, send_buffer-&gt;size, &amp;pos, comm);
 <a name="l00144"></a>00144       <span class="keywordflow">for</span> (ObjIterator o=begin_obj; o != end_obj; o++) {
 <a name="l00145"></a>00145         o-&gt;pack(send_buffer-&gt;buf, packed_size, &amp;pos, comm);
 <a name="l00146"></a>00146       }
@@ -217,7 +217,7 @@
 <a name="l00218"></a>00218           <span class="keywordtype">int</span> pos = 0;
 <a name="l00219"></a>00219           <span class="keywordtype">size_t</span> num_objects;
 <a name="l00220"></a>00220 
-<a name="l00221"></a>00221           <a class="code" href="mpi__bindings_8h.html#a0ca041799a1675718d678bc1a7882b92">CMPI_Unpack</a>(buffers[i]-&gt;buf, buffers[i]-&gt;size, &amp;pos, &amp;num_objects, 1, MPI_SIZE_T, comm);
+<a name="l00221"></a>00221           <a class="code" href="mpi__bindings_8h.html#a0ca041799a1675718d678bc1a7882b92">CMPI_Unpack</a>(buffers[i]-&gt;buf, buffers[i]-&gt;size, &amp;pos, &amp;num_objects, 1, <a class="code" href="mpi__utils_8h.html#aaae430420e25984e327a89b068e1582b">MPI_SIZE_T</a>, comm);
 <a name="l00222"></a>00222           <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> o=0; o &lt; num_objects; o++) {
 <a name="l00223"></a>00223             buffers[i]-&gt;dest-&gt;push_back(T::unpack(buffers[i]-&gt;buf, buffers[i]-&gt;size, &amp;pos, comm));
 <a name="l00224"></a>00224           }
@@ -247,6 +247,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Wed Oct 13 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

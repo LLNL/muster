@@ -1,3 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$structcluster_1_1counter__iterator_1_1target.html" title="struct representation of a no&#45;op. Makes assignment to target do nothing." alt="" coords="7,5,215,35"/>
+<area shape="rect" id="node1" href="$structcluster_1_1counter__iterator.html" title="Counting output iterator that records how many times an output iterator was assigned to..." alt="" coords="5,5,168,35"/>
 </map>

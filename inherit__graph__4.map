@@ -1,3 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$structcluster_1_1matrix__distance.html" title="Adaptor for passing a matrix by reference to template functions that take a callable distance functio..." alt="" coords="7,5,129,35"/>
+<area shape="rect" id="node1" href="$structget__second.html" title="Functor to get the second element of a pair. Use with STL functions like transform()." alt="" coords="5,5,101,35"/>
 </map>

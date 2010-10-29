@@ -1,5 +1,6 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$par__partition_8h.html" title="Distributed representation of a partitioning of a data set." alt="" coords="87,83,201,112"/>
-<area shape="rect" id="node11" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="196,160,281,189"/>
-<area shape="rect" id="node26" href="$mpi__bindings_8h.html" title="#defines for switching between MPI and PMPI bindings." alt="" coords="428,83,545,112"/>
+<area shape="rect" id="node3" href="$par__partition_8h.html" title="Distributed representation of a partitioning of a data set." alt="" coords="161,83,276,112"/>
+<area shape="rect" id="node11" href="$partition_8h.html" title="Class to represent a partitioning of a data set." alt="" coords="176,160,261,189"/>
+<area shape="rect" id="node23" href="$mpi__utils_8h.html" title="Overloaded utility functions to convert between arbitrary C/C++ types and MPI types, custom typedefs for cstdlib types like size_t, and a wrapper for MPI_Pack_Size." alt="" coords="375,160,465,189"/>
+<area shape="rect" id="node31" href="$mpi__bindings_8h.html" title="#defines for switching between MPI and PMPI bindings." alt="" coords="449,83,567,112"/>
 </map>
