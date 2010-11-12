@@ -159,6 +159,8 @@ Protected Attributes</h2></td></tr>
 </ul>
 <p>Together, these define the clustering that the algorithm found. See <a class="el" href="structcluster_1_1par__partition.html" title="par_partition represents a partitioning of a distributed data set.">par_partition</a> for an explanation of how distributed partitions like this are represented.</p>
 <p>The <code>medoids</code> vector contains actual copies of the representatives for each cluster. The copies correspond to the object ids in <code>parkm.medoid_ids</code>. Supplying the <code>medoids</code> vector like this is optional, so if you don't need copies of the representatives, you can omit it from the call.</p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00113">113</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 <hr/><h2>Member Typedef Documentation</h2>
 <a class="anchor" id="ac5c6013aecf88eb9e9a3011a2158f867"></a><!-- doxytag: member="cluster::par_kmedoids::random_t" ref="ac5c6013aecf88eb9e9a3011a2158f867" args="" -->
 <div class="memitem">
@@ -172,6 +174,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Type for random number generator used here. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00507">507</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -196,6 +200,8 @@ Protected Attributes</h2></td></tr>
 <p>This is a collective operation, and needs to be called by all processes.</p>
 <p><a class="el" href="classcluster_1_1par__kmedoids.html" title="This class implements the CAPEK and XCAPEK scalable parallel clustering algorithms.">par_kmedoids</a> assumes that there is one object to be clustered per process. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8cpp_source.html#l00045">45</a> of file <a class="el" href="par__kmedoids_8cpp_source.html">par_kmedoids.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a4a1cd2eabb5bc734250e034d7a658a58"></a><!-- doxytag: member="cluster::par_kmedoids::~par_kmedoids" ref="a4a1cd2eabb5bc734250e034d7a658a58" args="()" -->
@@ -212,6 +218,8 @@ Protected Attributes</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00123">123</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -232,6 +240,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Get the average dissimilarity of objects w/their medoids for the last run. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8cpp_source.html#l00060">60</a> of file <a class="el" href="par__kmedoids_8cpp_source.html">par_kmedoids.cpp</a>.</p>
 
 </div>
 </div>
@@ -274,6 +284,8 @@ Protected Attributes</h2></td></tr>
 <li>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm) </li>
 </ul>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00533">533</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a78a7d200bc68f11fc75d6a426f96a7da"></a><!-- doxytag: member="cluster::par_kmedoids::bic_score" ref="a78a7d200bc68f11fc75d6a426f96a7da" args="()" -->
@@ -292,6 +304,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>BIC score for selected clustering. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8cpp_source.html#l00066">66</a> of file <a class="el" href="par__kmedoids_8cpp_source.html">par_kmedoids.cpp</a>.</p>
 
 </div>
 </div>
@@ -359,6 +373,8 @@ Protected Attributes</h2></td></tr>
 <p>CAPEK will run trials insatances of PAM on separate processors for each k in 1..max_k using the <a class="el" href="classcluster_1_1par__kmedoids.html#a850aeb878057a5dee35ce4be4006c7b7" title="Farms out trials of PAM to worker processes then collects medoids from all trials to all processors...">run_pam_trials()</a> routine. Each trial aggregates sample_size objects distributed over all processes in the system.</p>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855" title="K-agnostic version of capek().">xcapek()</a> for a K-agnostic version of this algorithm. </dd></dl>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00273">273</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a315db34b268616a19223f5b29f8e6886"></a><!-- doxytag: member="cluster::par_kmedoids::closest_medoid" ref="a315db34b268616a19223f5b29f8e6886" args="(const T &amp;object, object_id oid, const std::vector&lt; id_pair&lt; T &gt; &gt; &amp;medoids, D dmetric)" -->
@@ -410,6 +426,8 @@ Protected Attributes</h2></td></tr>
   </dd>
 </dl>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00588">588</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a31833400b7e60ff1c4cf21a5bcfbc225"></a><!-- doxytag: member="cluster::par_kmedoids::get_init_size" ref="a31833400b7e60ff1c4cf21a5bcfbc225" args="()" -->
@@ -428,6 +446,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Baseline size for samples, added to 2*k. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00151">151</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -448,6 +468,8 @@ Protected Attributes</h2></td></tr>
 
 <p>Max number of times to run PAM with each sampled dataset. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00140">140</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a41466ea324bfff7bec48d504692e135b"></a><!-- doxytag: member="cluster::par_kmedoids::get_timer" ref="a41466ea324bfff7bec48d504692e135b" args="()" -->
@@ -466,6 +488,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Get the <a class="el" href="class_timer.html">Timer</a> with info on the last run of either <a class="el" href="classcluster_1_1par__kmedoids.html#a9e6466011d78034865dfcb0b15e33bf2" title="This is the Clustering Algorithm with Parallel Extensions to K-Medoids (CAPEK).">capek()</a> or <a class="el" href="classcluster_1_1par__kmedoids.html#a6d10b9b98495838ee9425932c6529855" title="K-agnostic version of capek().">xcapek()</a>. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00504">504</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -515,6 +539,8 @@ Protected Attributes</h2></td></tr>
 <p>Farms out trials of PAM to worker processes then collects medoids from all trials to all processors. </p>
 <p>Puts resulting medoids in all_medoids when done. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00164">164</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="aa77d09e372e07cc7db51b3f9000348c8"></a><!-- doxytag: member="cluster::par_kmedoids::seed_random_uniform" ref="aa77d09e372e07cc7db51b3f9000348c8" args="(MPI_Comm comm)" -->
@@ -534,6 +560,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Seeds random number generators across all processes with the same number, taken from the time in microseconds since the epoch on the process 0. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8cpp_source.html#l00070">70</a> of file <a class="el" href="par__kmedoids_8cpp_source.html">par_kmedoids.cpp</a>.</p>
 
 </div>
 </div>
@@ -556,6 +584,8 @@ Protected Attributes</h2></td></tr>
 <p>Set tolerance for convergence. </p>
 <p>This is relative error, not absolute error. It will be multiplied by the mean distance before it is used to test convergence. Defaults to 1e-15; may need to be higher if there exist clusterings with very similar quality. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8cpp_source.html#l00055">55</a> of file <a class="el" href="par__kmedoids_8cpp_source.html">par_kmedoids.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a82827f8d32b0003429a4c3c17af6a25e"></a><!-- doxytag: member="cluster::par_kmedoids::set_init_size" ref="a82827f8d32b0003429a4c3c17af6a25e" args="(size_t size)" -->
@@ -577,6 +607,8 @@ Protected Attributes</h2></td></tr>
 <p>Sets init_size, baseline size for samples, added to 2*k. </p>
 <p>Defaults to 40, per Kaufman and Rousseeuw. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00146">146</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a05e1f5c528ed8d41479b6d81ec7874e4"></a><!-- doxytag: member="cluster::par_kmedoids::set_max_reps" ref="a05e1f5c528ed8d41479b6d81ec7874e4" args="(size_t reps)" -->
@@ -597,6 +629,8 @@ Protected Attributes</h2></td></tr>
 
 <p>Sets max_reps, Max number of times to run PAM with each sampled dataset. </p>
 <p>Default is 5, per Kaufman and Rousseeuw. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00135">135</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -671,6 +705,8 @@ Protected Attributes</h2></td></tr>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>The best BIC value found, that is, the BIC value of the final clustering. </dd></dl>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00386">386</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
@@ -687,6 +723,8 @@ Protected Attributes</h2></td></tr>
 
 <p>BIC score for the clustering found. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00511">511</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a4904cc82627458fdf6672ccc0b2802c7"></a><!-- doxytag: member="cluster::par_kmedoids::epsilon" ref="a4904cc82627458fdf6672ccc0b2802c7" args="" -->
@@ -701,6 +739,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Tolerance for convergence tests in kmedoids PAM runs. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00514">514</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -717,6 +757,8 @@ Protected Attributes</h2></td></tr>
 
 <p>baseline size for samples </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00512">512</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="af4c641bc801fd71d691835566187f4b3"></a><!-- doxytag: member="cluster::par_kmedoids::max_reps" ref="af4c641bc801fd71d691835566187f4b3" args="" -->
@@ -731,6 +773,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Max repetitions of trials for a particular k. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00513">513</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -747,6 +791,8 @@ Protected Attributes</h2></td></tr>
 
 <p>Random number distribution to be used for samples. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00508">508</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="aaf7e0389622e8f7b78393ee10d8e93a4"></a><!-- doxytag: member="cluster::par_kmedoids::timer" ref="aaf7e0389622e8f7b78393ee10d8e93a4" args="" -->
@@ -761,6 +807,8 @@ Protected Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Performance timer. </p>
+
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00516">516</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
 
 </div>
 </div>
@@ -777,11 +825,13 @@ Protected Attributes</h2></td></tr>
 
 <p>Total dissimilarity bt/w objects and medoids for last clustering. </p>
 
+<p>Definition at line <a class="el" href="par__kmedoids_8h_source.html#l00510">510</a> of file <a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="par__kmedoids_8h_source.html">par_kmedoids.h</a></li>
-<li>src/<a class="el" href="par__kmedoids_8cpp.html">par_kmedoids.cpp</a></li>
+<li>src/<a class="el" href="par__kmedoids_8cpp_source.html">par_kmedoids.cpp</a></li>
 </ul>
 </div>
 <hr class="footer"/>
@@ -792,6 +842,6 @@ Protected Attributes</h2></td></tr>
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

@@ -97,6 +97,8 @@ Public Attributes</h2></td></tr>
 <p>The data set consists of <em>objects</em>, each of which has an associated non-negative object_id.</p>
 <p>A partitioning divides a data set into groups, or <em>clusters</em>, and the partition object stores information about these clusters internally. In particular, it contains a vector of object_ids that indicate the <em>representative</em> object, or <em>medoid</em> of each cluster. It also contains a vector of medoid_ids indicating which cluster each object in the data set belongs to.</p>
 <p>Partition objects can be converted to a cluster_list, which is a more explicit representation of the partitioning. </p>
+
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00077">77</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a0f33d833142c442e1e1eb2f0c05192a9"></a><!-- doxytag: member="cluster::partition::partition" ref="a0f33d833142c442e1e1eb2f0c05192a9" args="(size_t num_objects=0)" -->
 <div class="memitem">
@@ -117,6 +119,8 @@ Public Attributes</h2></td></tr>
 <p>Constructor. </p>
 <p>Can optionall supply the number of objects to be partitioned and this will start out with one cluster containing all of them. </p>
 
+<p>Definition at line <a class="el" href="partition_8cpp_source.html#l00048">48</a> of file <a class="el" href="partition_8cpp_source.html">partition.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a8ce4b68a08ebf7e0b267836e585140ec"></a><!-- doxytag: member="cluster::partition::~partition" ref="a8ce4b68a08ebf7e0b267836e585140ec" args="()" -->
@@ -133,6 +137,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Definition at line <a class="el" href="partition_8cpp_source.html#l00053">53</a> of file <a class="el" href="partition_8cpp_source.html">partition.cpp</a>.</p>
 
 </div>
 </div>
@@ -155,6 +161,8 @@ Public Attributes</h2></td></tr>
 
 <p>True if and only if object i is a medoid. </p>
 
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00093">93</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="aa18ac9ffe7fd353b51e0256459c6b442"></a><!-- doxytag: member="cluster::partition::members" ref="aa18ac9ffe7fd353b51e0256459c6b442" args="(medoid_id m)" -->
@@ -172,6 +180,8 @@ Public Attributes</h2></td></tr>
       </table>
 </div>
 <div class="memdoc">
+
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00136">136</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
 
 </div>
 </div>
@@ -192,6 +202,8 @@ Public Attributes</h2></td></tr>
 
 <p>Total number of clusters in the partition. </p>
 
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00111">111</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="aac782da1f912bceb5d8ad00c8dc892ac"></a><!-- doxytag: member="cluster::partition::size" ref="aac782da1f912bceb5d8ad00c8dc892ac" args="() const " -->
@@ -210,6 +222,8 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Total number of objects in the partition. </p>
+
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00108">108</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
 
 </div>
 </div>
@@ -231,6 +245,8 @@ Public Attributes</h2></td></tr>
 
 <p>Number of objects in cluster i. </p>
 
+<p>Definition at line <a class="el" href="partition_8cpp_source.html#l00116">116</a> of file <a class="el" href="partition_8cpp_source.html">partition.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a47fdc9eea42b6975cdc835bb2e08810e"></a><!-- doxytag: member="cluster::partition::sort" ref="a47fdc9eea42b6975cdc835bb2e08810e" args="()" -->
@@ -249,6 +265,8 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>puts medoids in order by their object id, and adjusts cluster_ids accordingly. </p>
+
+<p>Definition at line <a class="el" href="partition_8cpp_source.html#l00071">71</a> of file <a class="el" href="partition_8cpp_source.html">partition.cpp</a>.</p>
 
 </div>
 </div>
@@ -270,6 +288,8 @@ Public Attributes</h2></td></tr>
 
 <p>Fast swap with other patrition objects. </p>
 
+<p>Definition at line <a class="el" href="partition_8cpp_source.html#l00065">65</a> of file <a class="el" href="partition_8cpp_source.html">partition.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a0663ee221a9688f3b0baf7e026a7799e"></a><!-- doxytag: member="cluster::partition::to_cluster_list" ref="a0663ee221a9688f3b0baf7e026a7799e" args="(cluster_list &amp;list) const " -->
@@ -289,6 +309,8 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Creates a list of std::sets from the partition info in medoids and cluster_ids. </p>
+
+<p>Definition at line <a class="el" href="partition_8cpp_source.html#l00056">56</a> of file <a class="el" href="partition_8cpp_source.html">partition.cpp</a>.</p>
 
 </div>
 </div>
@@ -318,6 +340,8 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Write the members of cluster m out to the output stream as object_ids. </p>
+
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00118">118</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
 
 </div>
 </div>
@@ -365,6 +389,8 @@ Public Attributes</h2></td></tr>
 <p>Gives cluster id (index in medoids) for the ith object. </p>
 <p>clusterid[i] == id of cluster of which object i is a member. medoids[clusterid[i]] == representative of that cluster. </p>
 
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00085">85</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a673ab926a3012f7aa057dd85b3bb84f2"></a><!-- doxytag: member="cluster::partition::medoid_ids" ref="a673ab926a3012f7aa057dd85b3bb84f2" args="" -->
@@ -381,11 +407,13 @@ Public Attributes</h2></td></tr>
 <p>Gives the index of the object that is the ith medoid. </p>
 <p>medoids[i] == index in object array for last call to findClusters() </p>
 
+<p>Definition at line <a class="el" href="partition_8h_source.html#l00080">80</a> of file <a class="el" href="partition_8h_source.html">partition.h</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following files:<ul>
 <li>src/<a class="el" href="partition_8h_source.html">partition.h</a></li>
-<li>src/<a class="el" href="partition_8cpp.html">partition.cpp</a></li>
+<li>src/<a class="el" href="partition_8cpp_source.html">partition.cpp</a></li>
 </ul>
 </div>
 <hr class="footer"/>
@@ -396,6 +424,6 @@ Public Attributes</h2></td></tr>
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

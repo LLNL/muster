@@ -28,8 +28,8 @@
 <h1>src/random.h</h1>  </div>
 </div>
 <div class="contents">
-<a href="random_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00002"></a>00002 <span class="comment">// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  </span>
+<a href="random_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//////////////////////////////////////////////////////////////////////////////////////////////////</span>
+<a name="l00002"></a>00002 <span class="comment"></span><span class="comment">// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  </span>
 <a name="l00003"></a>00003 <span class="comment">// Produced at the Lawrence Livermore National Laboratory  </span>
 <a name="l00004"></a>00004 <span class="comment">// Written by Todd Gamblin, tgamblin@llnl.gov.</span>
 <a name="l00005"></a>00005 <span class="comment">// LLNL-CODE-433662</span>
@@ -57,22 +57,34 @@
 <a name="l00027"></a>00027 <span class="comment">// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
 <a name="l00028"></a>00028 <span class="comment">// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
 <a name="l00029"></a>00029 <span class="comment">// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
-<a name="l00030"></a>00030 <span class="comment">// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00030"></a>00030 <span class="comment">// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span><span class="comment"></span>
+<a name="l00031"></a>00031 <span class="comment">//////////////////////////////////////////////////////////////////////////////////////////////////</span>
 <a name="l00032"></a>00032 <span class="comment"></span>
 <a name="l00033"></a>00033 
 <a name="l00034"></a>00034 <span class="preprocessor">#ifndef MUSTER_RANDOM_H</span>
 <a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor">#define MUSTER_RANDOM_H</span>
-<a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 
+<a name="l00036"></a>00036 <span class="preprocessor"></span><span class="comment">///</span>
+<a name="l00037"></a>00037 <span class="comment"></span><span class="comment">/// @file random.h</span>
+<a name="l00038"></a>00038 <span class="comment"></span><span class="comment">/// @brief Helper functions for taking random samples and seeding </span>
+<a name="l00039"></a>00039 <span class="comment"></span><span class="comment">///        RNGs from the system clock.</span>
+<a name="l00040"></a>00040 <span class="comment"></span><span class="comment">///</span>
+<a name="l00041"></a>00041 <span class="comment"></span>
 <a name="l00042"></a>00042 <span class="preprocessor">#include &lt;sys/time.h&gt;</span>
 <a name="l00043"></a>00043 
 <a name="l00044"></a>00044 <span class="keyword">namespace </span>cluster {
-<a name="l00045"></a>00045 
-<a name="l00057"></a>00057   <span class="keyword">template</span> &lt;<span class="keyword">class</span> OutputIterator, <span class="keyword">class</span> Random&gt;
+<a name="l00045"></a>00045 <span class="comment"></span>
+<a name="l00046"></a>00046 <span class="comment">  ///</span>
+<a name="l00047"></a>00047 <span class="comment">  /// This is Knuth&#39;s algorithm R for taking a sample of indices from</span>
+<a name="l00048"></a>00048 <span class="comment">  /// 0 to numElements.  We sample size indices from this (the superset)</span>
+<a name="l00049"></a>00049 <span class="comment">  /// and put them in the subset&#39;s mapping.</span>
+<a name="l00050"></a>00050 <span class="comment">  ///</span>
+<a name="l00051"></a>00051 <span class="comment">  /// @param numElements    total number of elements to select from</span>
+<a name="l00052"></a>00052 <span class="comment">  /// @param sample_size    number of elements to select</span>
+<a name="l00053"></a>00053 <span class="comment">  /// @param out            destination for selected elements </span>
+<a name="l00054"></a>00054 <span class="comment">  /// @param random         model of STL Random Number Generator.</span>
+<a name="l00055"></a>00055 <span class="comment">  ///                       must be callable as random(N), returning a random number in [0,N).</span>
+<a name="l00056"></a>00056 <span class="comment">  ///</span>
+<a name="l00057"></a>00057 <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">class</span> OutputIterator, <span class="keyword">class</span> Random&gt;
 <a name="l00058"></a><a class="code" href="namespacecluster.html#a5a49ac83447a427e107632127220ebc8">00058</a>   <span class="keywordtype">void</span> <a class="code" href="namespacecluster.html#a5a49ac83447a427e107632127220ebc8" title="This is Knuth&amp;#39;s algorithm R for taking a sample of indices from 0 to numElements.">random_subset</a>(<span class="keywordtype">size_t</span> numElements, <span class="keywordtype">size_t</span> sample_size, OutputIterator out, Random&amp; random) {
 <a name="l00059"></a>00059     <span class="keywordtype">size_t</span> first = 0;
 <a name="l00060"></a>00060     <span class="keywordtype">size_t</span> remaining = numElements;
@@ -89,8 +101,12 @@
 <a name="l00071"></a>00071     }
 <a name="l00072"></a>00072   }
 <a name="l00073"></a>00073 
-<a name="l00074"></a>00074 
-<a name="l00079"></a><a class="code" href="namespacecluster.html#a849e4e0e478e64ac1bb00039b251f384">00079</a>   <span class="keyword">inline</span> <span class="keywordtype">long</span> <a class="code" href="namespacecluster.html#a849e4e0e478e64ac1bb00039b251f384" title="Returns a reasonably distributed seed for random number generators.">get_time_seed</a>() {
+<a name="l00074"></a>00074 <span class="comment"></span>
+<a name="l00075"></a>00075 <span class="comment">  ///</span>
+<a name="l00076"></a>00076 <span class="comment">  /// Returns a reasonably distributed seed for random number generators.</span>
+<a name="l00077"></a>00077 <span class="comment">  /// Based on the product of the seconds and usec in gettimeofday().</span>
+<a name="l00078"></a>00078 <span class="comment">  ///</span>
+<a name="l00079"></a><a class="code" href="namespacecluster.html#a849e4e0e478e64ac1bb00039b251f384">00079</a> <span class="comment"></span>  <span class="keyword">inline</span> <span class="keywordtype">long</span> <a class="code" href="namespacecluster.html#a849e4e0e478e64ac1bb00039b251f384" title="Returns a reasonably distributed seed for random number generators.">get_time_seed</a>() {
 <a name="l00080"></a>00080     <span class="keyword">struct </span>timeval time;
 <a name="l00081"></a>00081     gettimeofday(&amp;time, 0);
 <a name="l00082"></a>00082     <span class="keywordflow">return</span> time.tv_sec * time.tv_usec;
@@ -109,6 +125,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

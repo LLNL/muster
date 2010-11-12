@@ -40,15 +40,17 @@
 <a name="l00010"></a>00010 <span class="comment">// This file contains some utility functions for dealing with the STL.</span>
 <a name="l00011"></a>00011 <span class="comment">// ====================================================================================</span>
 <a name="l00012"></a>00012 
-<a name="l00013"></a>00013 
-<a name="l00015"></a><a class="code" href="structget__first.html">00015</a> <span class="keyword">struct </span><a class="code" href="structget__first.html" title="Functor to get the first element of a pair. Use with STL functions like transform().">get_first</a> {
+<a name="l00013"></a>00013 <span class="comment"></span>
+<a name="l00014"></a>00014 <span class="comment">/// Functor to get the first element of a pair.  Use with STL functions like transform().</span>
+<a name="l00015"></a><a class="code" href="structget__first.html">00015</a> <span class="comment"></span><span class="keyword">struct </span><a class="code" href="structget__first.html" title="Functor to get the first element of a pair. Use with STL functions like transform().">get_first</a> {
 <a name="l00016"></a>00016   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> P&gt;
 <a name="l00017"></a><a class="code" href="structget__first.html#a5f53e534b020e1ce4ae5b2d4aca12a72">00017</a>   <span class="keyword">typename</span> P::first_type <a class="code" href="structget__first.html#a5f53e534b020e1ce4ae5b2d4aca12a72">operator()</a>(<span class="keyword">const</span> P&amp; pair) {
 <a name="l00018"></a>00018     <span class="keywordflow">return</span> pair.first;
 <a name="l00019"></a>00019   }
 <a name="l00020"></a>00020 };
-<a name="l00021"></a>00021 
-<a name="l00023"></a><a class="code" href="structget__second.html">00023</a> <span class="keyword">struct </span><a class="code" href="structget__second.html" title="Functor to get the second element of a pair. Use with STL functions like transform().">get_second</a> {
+<a name="l00021"></a>00021 <span class="comment"></span>
+<a name="l00022"></a>00022 <span class="comment">/// Functor to get the second element of a pair.  Use with STL functions like transform().</span>
+<a name="l00023"></a><a class="code" href="structget__second.html">00023</a> <span class="comment"></span><span class="keyword">struct </span><a class="code" href="structget__second.html" title="Functor to get the second element of a pair. Use with STL functions like transform().">get_second</a> {
 <a name="l00024"></a>00024   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> P&gt;
 <a name="l00025"></a><a class="code" href="structget__second.html#aae06a2c6cf0d8cdee56ef657a07662f1">00025</a>   <span class="keyword">typename</span> P::second_type <a class="code" href="structget__second.html#aae06a2c6cf0d8cdee56ef657a07662f1">operator()</a>(<span class="keyword">const</span> P&amp; pair) {
 <a name="l00026"></a>00026     <span class="keywordflow">return</span> pair.second;
@@ -81,8 +83,11 @@
 <a name="l00053"></a>00053   inverse.swap(vec);
 <a name="l00054"></a>00054 }
 <a name="l00055"></a>00055 
-<a name="l00056"></a>00056 
-<a name="l00060"></a><a class="code" href="structsequence.html">00060</a> <span class="keyword">struct </span><a class="code" href="structsequence.html" title="Generator object for a strided sequence of ints.">sequence</a> {
+<a name="l00056"></a>00056 <span class="comment"></span>
+<a name="l00057"></a>00057 <span class="comment">///</span>
+<a name="l00058"></a>00058 <span class="comment">/// Generator object for a strided sequence of ints.</span>
+<a name="l00059"></a>00059 <span class="comment">///</span>
+<a name="l00060"></a><a class="code" href="structsequence.html">00060</a> <span class="comment"></span><span class="keyword">struct </span><a class="code" href="structsequence.html" title="Generator object for a strided sequence of ints.">sequence</a> {
 <a name="l00061"></a><a class="code" href="structsequence.html#ac4f474c82e82cbb89ca7c36dd52be0ed">00061</a>   <span class="keywordtype">int</span> <a class="code" href="structsequence.html#ac4f474c82e82cbb89ca7c36dd52be0ed">value</a>, <a class="code" href="structsequence.html#a08f66a6870d87afcd5dc1b60d1019692">stride</a>;
 <a name="l00062"></a>00062 
 <a name="l00063"></a><a class="code" href="structsequence.html#a3b7854668c28e37b79e8de72d7a2c5a0">00063</a>   <a class="code" href="structsequence.html#a3b7854668c28e37b79e8de72d7a2c5a0">sequence</a>(<span class="keywordtype">int</span> _start=0, <span class="keywordtype">int</span> _stride=1) 
@@ -109,6 +114,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

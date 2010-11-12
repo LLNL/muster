@@ -42,8 +42,9 @@
 <a name="l00012"></a>00012 <span class="preprocessor">#include &lt;stdint.h&gt;</span>
 <a name="l00013"></a>00013 <span class="preprocessor">#include &lt;boost/numeric/ublas/matrix.hpp&gt;</span>
 <a name="l00014"></a>00014 
-<a name="l00015"></a>00015 
-<a name="l00017"></a>00017 <span class="keywordtype">bool</span> <a class="code" href="matrix__utils_8h.html#a58e126b3e3cfae8496085c0855c6737f" title="True if and only if n is divisible by 2 &amp;lt;level&amp;gt; times.">isDivisibleBy2</a>(<span class="keywordtype">size_t</span> n, <span class="keywordtype">int</span> level);
+<a name="l00015"></a>00015 <span class="comment"></span>
+<a name="l00016"></a>00016 <span class="comment">/// True if and only if n is divisible by 2 &lt;level&gt; times.</span>
+<a name="l00017"></a>00017 <span class="comment"></span><span class="keywordtype">bool</span> <a class="code" href="matrix__utils_8h.html#a58e126b3e3cfae8496085c0855c6737f" title="True if and only if n is divisible by 2 &amp;lt;level&amp;gt; times.">isDivisibleBy2</a>(<span class="keywordtype">size_t</span> n, <span class="keywordtype">int</span> level);
 <a name="l00018"></a>00018 
 <a name="l00019"></a>00019 
 <a name="l00020"></a>00020 <span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
@@ -133,8 +134,9 @@
 <a name="l00104"></a>00104   <span class="keywordflow">return</span> sqrt(summary.<a class="code" href="structms__summary.html#a37864735e32de8b2cd6dd019bb5f58b8">sum_squares</a> / (rows * cols));
 <a name="l00105"></a>00105 }
 <a name="l00106"></a>00106 
-<a name="l00107"></a>00107 
-<a name="l00109"></a>00109 <span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
+<a name="l00107"></a>00107 <span class="comment"></span>
+<a name="l00108"></a>00108 <span class="comment">/// Normalized rms error</span>
+<a name="l00109"></a>00109 <span class="comment"></span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
 <a name="l00110"></a><a class="code" href="matrix__utils_8h.html#a480befad93e626eedbb7ef91704d2acc">00110</a> <span class="keywordtype">double</span> <a class="code" href="matrix__utils_8h.html#a480befad93e626eedbb7ef91704d2acc" title="Normalized rms error.">nrmse</a>(<span class="keyword">const</span> Matrix&amp; orig, <span class="keyword">const</span> Matrix&amp; repro,
 <a name="l00111"></a>00111              <span class="keywordtype">size_t</span> row_start = 0, <span class="keywordtype">size_t</span> row_end = std::numeric_limits&lt;size_t&gt;::max(),
 <a name="l00112"></a>00112              <span class="keywordtype">size_t</span> col_start = 0, <span class="keywordtype">size_t</span> col_end = std::numeric_limits&lt;size_t&gt;::max()) {
@@ -151,8 +153,9 @@
 <a name="l00123"></a>00123   <span class="keywordflow">return</span> sqrt(summary.<a class="code" href="structms__summary.html#a37864735e32de8b2cd6dd019bb5f58b8">sum_squares</a> / (rows * cols)) / range;
 <a name="l00124"></a>00124 }
 <a name="l00125"></a>00125 
-<a name="l00126"></a>00126 
-<a name="l00128"></a>00128 <span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
+<a name="l00126"></a>00126 <span class="comment"></span>
+<a name="l00127"></a>00127 <span class="comment">/// Peak Signal to Noise Ratio</span>
+<a name="l00128"></a>00128 <span class="comment"></span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
 <a name="l00129"></a><a class="code" href="matrix__utils_8h.html#ae8813bfd21c8686258499b02518427a5">00129</a> <span class="keywordtype">double</span> <a class="code" href="matrix__utils_8h.html#ae8813bfd21c8686258499b02518427a5" title="Peak Signal to Noise Ratio.">psnr</a>(<span class="keyword">const</span> Matrix&amp; orig, <span class="keyword">const</span> Matrix&amp; repro) {
 <a name="l00130"></a>00130   assert(orig.size1() == repro.size1());
 <a name="l00131"></a>00131   assert(orig.size2() == repro.size2());
@@ -162,8 +165,9 @@
 <a name="l00135"></a>00135   <span class="keywordflow">return</span> 20 * log10(range / sqrt(summary.sum_squares / (orig.size1() * orig.size2())));
 <a name="l00136"></a>00136 }
 <a name="l00137"></a>00137 
-<a name="l00138"></a>00138 
-<a name="l00140"></a>00140 <span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
+<a name="l00138"></a>00138 <span class="comment"></span>
+<a name="l00139"></a>00139 <span class="comment">/// Similarity (NRMSE defined to be symmetric, with max and min taken from both matrices)</span>
+<a name="l00140"></a>00140 <span class="comment"></span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
 <a name="l00141"></a><a class="code" href="matrix__utils_8h.html#ac9a9e462a8d769d6b316567f2dd52887">00141</a> <span class="keywordtype">double</span> <a class="code" href="matrix__utils_8h.html#ac9a9e462a8d769d6b316567f2dd52887" title="Similarity (NRMSE defined to be symmetric, with max and min taken from both matrices).">similarity</a>(<span class="keyword">const</span> Matrix&amp; orig, <span class="keyword">const</span> Matrix&amp; repro) {
 <a name="l00142"></a>00142   assert(orig.size1() == repro.size1());
 <a name="l00143"></a>00143   assert(orig.size2() == repro.size2());
@@ -195,8 +199,9 @@
 <a name="l00169"></a>00169   }
 <a name="l00170"></a>00170 }
 <a name="l00171"></a>00171 
-<a name="l00172"></a>00172 
-<a name="l00174"></a>00174 <span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;
+<a name="l00172"></a>00172 <span class="comment"></span>
+<a name="l00173"></a>00173 <span class="comment">/// Template class for generic, type-inferred absolute value </span>
+<a name="l00174"></a>00174 <span class="comment"></span><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;
 <a name="l00175"></a><a class="code" href="struct_abs.html">00175</a> <span class="keyword">struct </span><a class="code" href="struct_abs.html" title="Template class for generic, type-inferred absolute value.">Abs</a> {
 <a name="l00176"></a><a class="code" href="struct_abs.html#a4fc7f59e3113e19697159919a5aad095">00176</a>   T <a class="code" href="struct_abs.html#a4fc7f59e3113e19697159919a5aad095">value</a>;
 <a name="l00177"></a><a class="code" href="struct_abs.html#aabd939893e63668ff0ce5b1b74d2df30">00177</a>   <a class="code" href="struct_abs.html#aabd939893e63668ff0ce5b1b74d2df30">Abs</a>(<span class="keywordtype">double</span> num)        : <a class="code" href="struct_abs.html#a4fc7f59e3113e19697159919a5aad095">value</a>(::fabs(num)) { }
@@ -207,8 +212,10 @@
 <a name="l00182"></a><a class="code" href="struct_abs.html#ae566556d7cbb7f57ea90043bd91a7161">00182</a>   <a class="code" href="struct_abs.html#ae566556d7cbb7f57ea90043bd91a7161">Abs</a>(<span class="keywordtype">int</span> num)           : <a class="code" href="struct_abs.html#a4fc7f59e3113e19697159919a5aad095">value</a>(::abs(num)) { }
 <a name="l00183"></a>00183 };
 <a name="l00184"></a>00184 
-<a name="l00185"></a>00185 
-<a name="l00188"></a><a class="code" href="matrix__utils_8h.html#aaa75b5836938e25e005d885cba4d7aac">00188</a> <span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; T <a class="code" href="matrix__utils_8h.html#aaa75b5836938e25e005d885cba4d7aac" title="Generic, type-inferred absolute value function.">abs_val</a>(T num) {
+<a name="l00185"></a>00185 <span class="comment"></span>
+<a name="l00186"></a>00186 <span class="comment">/// Generic, type-inferred absolute value function.</span>
+<a name="l00187"></a>00187 <span class="comment">/// Applies fabs to doubles, labs to longs, etc.</span>
+<a name="l00188"></a><a class="code" href="matrix__utils_8h.html#aaa75b5836938e25e005d885cba4d7aac">00188</a> <span class="comment"></span><span class="keyword">template</span>&lt;<span class="keyword">typename</span> T&gt; T <a class="code" href="matrix__utils_8h.html#aaa75b5836938e25e005d885cba4d7aac" title="Generic, type-inferred absolute value function.">abs_val</a>(T num) {
 <a name="l00189"></a>00189   <span class="keywordflow">return</span> <a class="code" href="struct_abs.html" title="Template class for generic, type-inferred absolute value.">Abs&lt;T&gt;</a>(num).value;
 <a name="l00190"></a>00190 }
 <a name="l00191"></a>00191 
@@ -346,8 +353,11 @@
 <a name="l00323"></a>00323   <span class="keywordflow">return</span> sqrt(sum);
 <a name="l00324"></a>00324 }
 <a name="l00325"></a>00325 
-<a name="l00326"></a>00326 
-<a name="l00330"></a>00330 <span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
+<a name="l00326"></a>00326 <span class="comment"></span>
+<a name="l00327"></a>00327 <span class="comment">/// Interpolates a value for point (x,y) based on values in the Matrix.</span>
+<a name="l00328"></a>00328 <span class="comment">/// Finds the nearest values by taking floor and ceil of x and y, then</span>
+<a name="l00329"></a>00329 <span class="comment">/// uses bilinear interpolation to estimate the value at (x,y).</span>
+<a name="l00330"></a>00330 <span class="comment"></span><span class="keyword">template</span> &lt;<span class="keyword">class</span> Matrix&gt;
 <a name="l00331"></a><a class="code" href="matrix__utils_8h.html#aa78f228d0a45f909b9d8bb25b8bce429">00331</a> <span class="keywordtype">double</span> <a class="code" href="matrix__utils_8h.html#aa78f228d0a45f909b9d8bb25b8bce429" title="Interpolates a value for point (x,y) based on values in the Matrix.">interp_bilinear</a>(<span class="keyword">const</span> Matrix&amp; mat, <span class="keywordtype">double</span> x, <span class="keywordtype">double</span> y) {
 <a name="l00332"></a>00332   <span class="keywordflow">if</span> (x &lt; 0) {
 <a name="l00333"></a>00333     x = 0;
@@ -404,6 +414,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

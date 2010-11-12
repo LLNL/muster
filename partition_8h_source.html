@@ -28,8 +28,8 @@
 <h1>src/partition.h</h1>  </div>
 </div>
 <div class="contents">
-<a href="partition_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00002"></a>00002 <span class="comment">// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  </span>
+<a href="partition_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//////////////////////////////////////////////////////////////////////////////////////////////////</span>
+<a name="l00002"></a>00002 <span class="comment"></span><span class="comment">// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  </span>
 <a name="l00003"></a>00003 <span class="comment">// Produced at the Lawrence Livermore National Laboratory  </span>
 <a name="l00004"></a>00004 <span class="comment">// Written by Todd Gamblin, tgamblin@llnl.gov.</span>
 <a name="l00005"></a>00005 <span class="comment">// LLNL-CODE-433662</span>
@@ -57,54 +57,94 @@
 <a name="l00027"></a>00027 <span class="comment">// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
 <a name="l00028"></a>00028 <span class="comment">// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
 <a name="l00029"></a>00029 <span class="comment">// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
-<a name="l00030"></a>00030 <span class="comment">// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00030"></a>00030 <span class="comment">// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span><span class="comment"></span>
+<a name="l00031"></a>00031 <span class="comment">//////////////////////////////////////////////////////////////////////////////////////////////////</span>
 <a name="l00032"></a>00032 <span class="comment"></span>
 <a name="l00033"></a>00033 
 <a name="l00034"></a>00034 <span class="preprocessor">#ifndef PARTITION_H</span>
 <a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor">#define PARTITION_H</span>
-<a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 
-<a name="l00040"></a>00040 
+<a name="l00036"></a>00036 <span class="preprocessor"></span><span class="comment">///</span>
+<a name="l00037"></a>00037 <span class="comment"></span><span class="comment">/// @file partition.h</span>
+<a name="l00038"></a>00038 <span class="comment"></span><span class="comment">/// @brief Class to represent a partitioning of a data set.</span>
+<a name="l00039"></a>00039 <span class="comment"></span><span class="comment">///</span>
+<a name="l00040"></a>00040 <span class="comment"></span>
 <a name="l00041"></a>00041 <span class="preprocessor">#include &lt;cstddef&gt;</span>
 <a name="l00042"></a>00042 <span class="preprocessor">#include &lt;vector&gt;</span>
 <a name="l00043"></a>00043 <span class="preprocessor">#include &lt;set&gt;</span>
 <a name="l00044"></a>00044 <span class="preprocessor">#include &lt;ostream&gt;</span>
 <a name="l00045"></a>00045 <span class="preprocessor">#include &lt;stdint.h&gt;</span>
-<a name="l00046"></a>00046 
-<a name="l00050"></a>00050 <span class="keyword">namespace </span>cluster {
+<a name="l00046"></a>00046 <span class="comment"></span>
+<a name="l00047"></a>00047 <span class="comment">///</span>
+<a name="l00048"></a>00048 <span class="comment">/// Namespace for everything in the cluster library.</span>
+<a name="l00049"></a>00049 <span class="comment">///</span>
+<a name="l00050"></a>00050 <span class="comment"></span><span class="keyword">namespace </span>cluster {
 <a name="l00051"></a>00051 
-<a name="l00052"></a><a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092">00052</a>   <span class="keyword">typedef</span> <span class="keywordtype">size_t</span> medoid_id;       
-<a name="l00053"></a><a class="code" href="namespacecluster.html#abe52518c0b3d1e6319b0b994ed58a315">00053</a>   <span class="keyword">typedef</span> <span class="keywordtype">size_t</span> object_id;       
-<a name="l00054"></a>00054 
-<a name="l00061"></a><a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9">00061</a>   <span class="keyword">typedef</span> std::vector&lt; std::set&lt;object_id&gt; &gt; cluster_list;
-<a name="l00062"></a>00062   
-<a name="l00077"></a><a class="code" href="structcluster_1_1partition.html">00077</a>   <span class="keyword">struct </span><a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a> {
-<a name="l00080"></a><a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2">00080</a>     std::vector&lt;object_id&gt; <a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2" title="Gives the index of the object that is the ith medoid.">medoid_ids</a>;
-<a name="l00081"></a>00081 
-<a name="l00085"></a><a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb">00085</a>     std::vector&lt;medoid_id&gt; <a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>;
-<a name="l00086"></a>00086     
-<a name="l00089"></a>00089     <a class="code" href="structcluster_1_1partition.html#a0f33d833142c442e1e1eb2f0c05192a9" title="Constructor.">partition</a>(<span class="keywordtype">size_t</span> num_objects = 0);
+<a name="l00052"></a><a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092">00052</a>   <span class="keyword">typedef</span> <span class="keywordtype">size_t</span> medoid_id;       <span class="comment">///&lt; More descriptive type for medoid index</span>
+<a name="l00053"></a><a class="code" href="namespacecluster.html#abe52518c0b3d1e6319b0b994ed58a315">00053</a> <span class="comment"></span>  <span class="keyword">typedef</span> <span class="keywordtype">size_t</span> object_id;       <span class="comment">///&lt; More descriptive type for object index</span>
+<a name="l00054"></a>00054 <span class="comment"></span><span class="comment"></span>
+<a name="l00055"></a>00055 <span class="comment">  /// </span>
+<a name="l00056"></a>00056 <span class="comment">  /// Explicit representation of a clustering.  Instead of a vecto of representative</span>
+<a name="l00057"></a>00057 <span class="comment">  /// ids, this has &lt;i&gt;k&lt;/i&gt; sets of object_ids indicating which objects are in a </span>
+<a name="l00058"></a>00058 <span class="comment">  /// particular cluster.  You can convert a partition to a cluster_list with </span>
+<a name="l00059"></a>00059 <span class="comment">  /// to_cluster_list().</span>
+<a name="l00060"></a>00060 <span class="comment">  /// </span>
+<a name="l00061"></a><a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9">00061</a> <span class="comment"></span>  <span class="keyword">typedef</span> std::vector&lt; std::set&lt;object_id&gt; &gt; cluster_list;
+<a name="l00062"></a>00062   <span class="comment"></span>
+<a name="l00063"></a>00063 <span class="comment">  ///</span>
+<a name="l00064"></a>00064 <span class="comment">  /// This represents a partitioning of a data set.  The data set consists of </span>
+<a name="l00065"></a>00065 <span class="comment">  /// &lt;i&gt;objects&lt;/i&gt;, each of which has an associated non-negative object_id.  </span>
+<a name="l00066"></a>00066 <span class="comment">  /// </span>
+<a name="l00067"></a>00067 <span class="comment">  /// A partitioning divides a data set into groups, or &lt;i&gt;clusters&lt;/i&gt;, and the</span>
+<a name="l00068"></a>00068 <span class="comment">  /// partition object stores information about these clusters internally.  In </span>
+<a name="l00069"></a>00069 <span class="comment">  /// particular, it contains a vector of object_ids that indicate the </span>
+<a name="l00070"></a>00070 <span class="comment">  /// &lt;i&gt;representative&lt;/i&gt; object, or &lt;i&gt;medoid&lt;/i&gt; of each cluster.  It also</span>
+<a name="l00071"></a>00071 <span class="comment">  /// contains a vector of medoid_ids indicating which cluster each object</span>
+<a name="l00072"></a>00072 <span class="comment">  /// in the data set belongs to.</span>
+<a name="l00073"></a>00073 <span class="comment">  /// </span>
+<a name="l00074"></a>00074 <span class="comment">  /// Partition objects can be converted to a cluster_list, which is a more</span>
+<a name="l00075"></a>00075 <span class="comment">  /// explicit representation of the partitioning.</span>
+<a name="l00076"></a>00076 <span class="comment">  /// </span>
+<a name="l00077"></a><a class="code" href="structcluster_1_1partition.html">00077</a> <span class="comment"></span>  <span class="keyword">struct </span><a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a> {<span class="comment"></span>
+<a name="l00078"></a>00078 <span class="comment">    /// Gives the index of the object that is the ith medoid.</span>
+<a name="l00079"></a>00079 <span class="comment">    /// medoids[i] == index in object array for last call to findClusters()</span>
+<a name="l00080"></a><a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2">00080</a> <span class="comment"></span>    std::vector&lt;object_id&gt; <a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2" title="Gives the index of the object that is the ith medoid.">medoid_ids</a>;
+<a name="l00081"></a>00081 <span class="comment"></span>
+<a name="l00082"></a>00082 <span class="comment">    /// Gives cluster id (index in medoids) for the ith object.</span>
+<a name="l00083"></a>00083 <span class="comment">    /// clusterid[i]          == id of cluster of which object i is a member.</span>
+<a name="l00084"></a>00084 <span class="comment">    /// medoids[clusterid[i]] == representative of that cluster.</span>
+<a name="l00085"></a><a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb">00085</a> <span class="comment"></span>    std::vector&lt;medoid_id&gt; <a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>;
+<a name="l00086"></a>00086     <span class="comment"></span>
+<a name="l00087"></a>00087 <span class="comment">    /// Constructor.  Can optionall supply the number of objects to be partitioned</span>
+<a name="l00088"></a>00088 <span class="comment">    /// and this will start out with one cluster containing all of them.</span>
+<a name="l00089"></a>00089 <span class="comment"></span>    <a class="code" href="structcluster_1_1partition.html#a0f33d833142c442e1e1eb2f0c05192a9" title="Constructor.">partition</a>(<span class="keywordtype">size_t</span> num_objects = 0);
 <a name="l00090"></a>00090     <span class="keyword">virtual</span> <a class="code" href="structcluster_1_1partition.html#a8ce4b68a08ebf7e0b267836e585140ec">~partition</a>();
-<a name="l00091"></a>00091 
-<a name="l00093"></a><a class="code" href="structcluster_1_1partition.html#a8e59a8d91992b1cc4e34ff1e01a7ac14">00093</a>     <span class="keywordtype">bool</span> <a class="code" href="structcluster_1_1partition.html#a8e59a8d91992b1cc4e34ff1e01a7ac14" title="True if and only if object i is a medoid.">is_medoid</a>(<a class="code" href="namespacecluster.html#abe52518c0b3d1e6319b0b994ed58a315" title="More descriptive type for object index.">object_id</a> oi)<span class="keyword"> const </span>{
+<a name="l00091"></a>00091 <span class="comment"></span>
+<a name="l00092"></a>00092 <span class="comment">    /// True if and only if object i is a medoid.</span>
+<a name="l00093"></a><a class="code" href="structcluster_1_1partition.html#a8e59a8d91992b1cc4e34ff1e01a7ac14">00093</a> <span class="comment"></span>    <span class="keywordtype">bool</span> <a class="code" href="structcluster_1_1partition.html#a8e59a8d91992b1cc4e34ff1e01a7ac14" title="True if and only if object i is a medoid.">is_medoid</a>(<a class="code" href="namespacecluster.html#abe52518c0b3d1e6319b0b994ed58a315" title="More descriptive type for object index.">object_id</a> oi)<span class="keyword"> const </span>{
 <a name="l00094"></a>00094       <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2" title="Gives the index of the object that is the ith medoid.">medoid_ids</a>[<a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>[oi]] == oi;
 <a name="l00095"></a>00095     }
-<a name="l00096"></a>00096 
-<a name="l00099"></a>00099     <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#a0663ee221a9688f3b0baf7e026a7799e" title="Creates a list of std::sets from the partition info in medoids and cluster_ids.">to_cluster_list</a>(<a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; list) <span class="keyword">const</span>;
-<a name="l00100"></a>00100 
-<a name="l00102"></a>00102     <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#afcaed035222c4bc5deafc8355883396d" title="Fast swap with other patrition objects.">swap</a>(<a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; other);
-<a name="l00103"></a>00103     
-<a name="l00105"></a>00105     <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#a47fdc9eea42b6975cdc835bb2e08810e" title="puts medoids in order by their object id, and adjusts cluster_ids accordingly.">sort</a>();
-<a name="l00106"></a>00106     
-<a name="l00108"></a><a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac">00108</a>     <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac" title="Total number of objects in the partition.">size</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); }
-<a name="l00109"></a>00109 
-<a name="l00111"></a><a class="code" href="structcluster_1_1partition.html#a1ed0d7487b54586d5a24eb39afed2c78">00111</a>     <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1partition.html#a1ed0d7487b54586d5a24eb39afed2c78" title="Total number of clusters in the partition.">num_clusters</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2" title="Gives the index of the object that is the ith medoid.">medoid_ids</a>.size(); }
-<a name="l00112"></a>00112     
-<a name="l00114"></a>00114     <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac" title="Total number of objects in the partition.">size</a>(<span class="keywordtype">size_t</span> i) <span class="keyword">const</span>;
-<a name="l00115"></a>00115     
-<a name="l00117"></a>00117     <span class="keyword">template</span> &lt;<span class="keyword">class</span> OutputIterator&gt;
+<a name="l00096"></a>00096 <span class="comment"></span>
+<a name="l00097"></a>00097 <span class="comment">    /// Creates a list of std::sets from the partition info in </span>
+<a name="l00098"></a>00098 <span class="comment">    /// medoids and cluster_ids.</span>
+<a name="l00099"></a>00099 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#a0663ee221a9688f3b0baf7e026a7799e" title="Creates a list of std::sets from the partition info in medoids and cluster_ids.">to_cluster_list</a>(<a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; list) <span class="keyword">const</span>;
+<a name="l00100"></a>00100 <span class="comment"></span>
+<a name="l00101"></a>00101 <span class="comment">    /// Fast swap with other patrition objects</span>
+<a name="l00102"></a>00102 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#afcaed035222c4bc5deafc8355883396d" title="Fast swap with other patrition objects.">swap</a>(<a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; other);
+<a name="l00103"></a>00103     <span class="comment"></span>
+<a name="l00104"></a>00104 <span class="comment">    /// puts medoids in order by their object id, and adjusts cluster_ids accordingly.</span>
+<a name="l00105"></a>00105 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#a47fdc9eea42b6975cdc835bb2e08810e" title="puts medoids in order by their object id, and adjusts cluster_ids accordingly.">sort</a>();
+<a name="l00106"></a>00106     <span class="comment"></span>
+<a name="l00107"></a>00107 <span class="comment">    /// Total number of objects in the partition</span>
+<a name="l00108"></a><a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac">00108</a> <span class="comment"></span>    <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac" title="Total number of objects in the partition.">size</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); }
+<a name="l00109"></a>00109 <span class="comment"></span>
+<a name="l00110"></a>00110 <span class="comment">    /// Total number of clusters in the partition</span>
+<a name="l00111"></a><a class="code" href="structcluster_1_1partition.html#a1ed0d7487b54586d5a24eb39afed2c78">00111</a> <span class="comment"></span>    <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1partition.html#a1ed0d7487b54586d5a24eb39afed2c78" title="Total number of clusters in the partition.">num_clusters</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> <a class="code" href="structcluster_1_1partition.html#a673ab926a3012f7aa057dd85b3bb84f2" title="Gives the index of the object that is the ith medoid.">medoid_ids</a>.size(); }
+<a name="l00112"></a>00112     <span class="comment"></span>
+<a name="l00113"></a>00113 <span class="comment">    /// Number of objects in cluster i</span>
+<a name="l00114"></a>00114 <span class="comment"></span>    <span class="keywordtype">size_t</span> <a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac" title="Total number of objects in the partition.">size</a>(<span class="keywordtype">size_t</span> i) <span class="keyword">const</span>;
+<a name="l00115"></a>00115     <span class="comment"></span>
+<a name="l00116"></a>00116 <span class="comment">    /// Write the members of cluster m out to the output stream as object_ids</span>
+<a name="l00117"></a>00117 <span class="comment"></span>    <span class="keyword">template</span> &lt;<span class="keyword">class</span> OutputIterator&gt;
 <a name="l00118"></a><a class="code" href="structcluster_1_1partition.html#ab272088ec15768d320f353d8696f3178">00118</a>     <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#ab272088ec15768d320f353d8696f3178" title="Write the members of cluster m out to the output stream as object_ids.">write_members</a>(<a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> m, OutputIterator out) {
 <a name="l00119"></a>00119       <span class="keywordflow">for</span> (<a class="code" href="namespacecluster.html#abe52518c0b3d1e6319b0b994ed58a315" title="More descriptive type for object index.">object_id</a> o=0; o &lt; <a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); o++) {
 <a name="l00120"></a>00120         <span class="keywordflow">if</span> (<a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>[o] == m) {
@@ -112,10 +152,13 @@
 <a name="l00122"></a>00122         }
 <a name="l00123"></a>00123       }
 <a name="l00124"></a>00124     }
-<a name="l00125"></a>00125 
-<a name="l00128"></a>00128     <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#a6d99b2ee7ce1448b11910da4f15b02f4" title="Write the members of cluster m out to the output stream formatted nicely with hyphenated runs of cons...">write_members_with_runs</a>(<a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> m, std::ostream&amp; out);
-<a name="l00129"></a>00129 
-<a name="l00131"></a><a class="code" href="structcluster_1_1partition_1_1member__writer.html">00131</a>     <span class="keyword">struct </span><a class="code" href="structcluster_1_1partition_1_1member__writer.html" title="writable structure returned by members() function.">member_writer</a> {    
+<a name="l00125"></a>00125 <span class="comment"></span>
+<a name="l00126"></a>00126 <span class="comment">    /// Write the members of cluster m out to the output stream formatted nicely with</span>
+<a name="l00127"></a>00127 <span class="comment">    /// hyphenated runs of consecutive numbers</span>
+<a name="l00128"></a>00128 <span class="comment"></span>    <span class="keywordtype">void</span> <a class="code" href="structcluster_1_1partition.html#a6d99b2ee7ce1448b11910da4f15b02f4" title="Write the members of cluster m out to the output stream formatted nicely with hyphenated runs of cons...">write_members_with_runs</a>(<a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> m, std::ostream&amp; out);
+<a name="l00129"></a>00129 <span class="comment"></span>
+<a name="l00130"></a>00130 <span class="comment">    /// writable structure returned by members() function.</span>
+<a name="l00131"></a><a class="code" href="structcluster_1_1partition_1_1member__writer.html">00131</a> <span class="comment"></span>    <span class="keyword">struct </span><a class="code" href="structcluster_1_1partition_1_1member__writer.html" title="writable structure returned by members() function.">member_writer</a> {    
 <a name="l00132"></a><a class="code" href="structcluster_1_1partition_1_1member__writer.html#ae55b068bd61431cf0f95671a926def81">00132</a>       <a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>* <a class="code" href="structcluster_1_1partition_1_1member__writer.html#ae55b068bd61431cf0f95671a926def81">p</a>;
 <a name="l00133"></a><a class="code" href="structcluster_1_1partition_1_1member__writer.html#a6a8659577af39566f37b0d694221d12e">00133</a>       <a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> <a class="code" href="structcluster_1_1partition_1_1member__writer.html#a6a8659577af39566f37b0d694221d12e">m</a>;
 <a name="l00134"></a><a class="code" href="structcluster_1_1partition_1_1member__writer.html#aa4e1339e9f2f66c65374ad1d040cc190">00134</a>       <a class="code" href="structcluster_1_1partition_1_1member__writer.html#aa4e1339e9f2f66c65374ad1d040cc190">member_writer</a>(<a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a> *_p, <a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> _m) : <a class="code" href="structcluster_1_1partition_1_1member__writer.html#ae55b068bd61431cf0f95671a926def81">p</a>(_p), <a class="code" href="structcluster_1_1partition_1_1member__writer.html#a6a8659577af39566f37b0d694221d12e">m</a>(_m) { }
@@ -128,18 +171,31 @@
 <a name="l00141"></a>00141     mw.<a class="code" href="structcluster_1_1partition_1_1member__writer.html#ae55b068bd61431cf0f95671a926def81">p</a>-&gt;<a class="code" href="structcluster_1_1partition.html#a6d99b2ee7ce1448b11910da4f15b02f4" title="Write the members of cluster m out to the output stream formatted nicely with hyphenated runs of cons...">write_members_with_runs</a>(mw.<a class="code" href="structcluster_1_1partition_1_1member__writer.html#a6a8659577af39566f37b0d694221d12e">m</a>, out);
 <a name="l00142"></a>00142     <span class="keywordflow">return</span> out;
 <a name="l00143"></a>00143   }
-<a name="l00144"></a>00144   
-<a name="l00146"></a>00146   std::ostream&amp; <a class="code" href="namespacecluster.html#a48cb342d6385d2bd99366247e0269c53" title="Print out an id_pair as a tuple of its element and its source rank.">operator&lt;&lt;</a>(std::ostream&amp; out, <span class="keyword">const</span> <a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; list);
-<a name="l00147"></a>00147 
-<a name="l00149"></a>00149   std::ostream&amp; <a class="code" href="namespacecluster.html#a48cb342d6385d2bd99366247e0269c53" title="Print out an id_pair as a tuple of its element and its source rank.">operator&lt;&lt;</a>(std::ostream&amp; out, <span class="keyword">const</span> partition&amp; km);  
-<a name="l00150"></a>00150 
-<a name="l00152"></a>00152   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#ac6317ef2a7029b335c084d6501d3a8ad" title="Mirkin distance bt/w two clusterings.">mirkin_distance</a>(<span class="keyword">const</span> <a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; c1, <span class="keyword">const</span> <a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; c2);
-<a name="l00153"></a>00153 
-<a name="l00155"></a>00155   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#ac6317ef2a7029b335c084d6501d3a8ad" title="Mirkin distance bt/w two clusterings.">mirkin_distance</a>(<span class="keyword">const</span> partition&amp; c1, <span class="keyword">const</span> partition&amp; c2);
-<a name="l00156"></a>00156 
-<a name="l00163"></a>00163   <span class="keywordtype">void</span> <a class="code" href="namespacecluster.html#ae9b520de376d157f863f2c6a71d9db89" title="Expand a cluster_list by l levels.">expand</a>(<a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; list, <span class="keywordtype">size_t</span> level = 1);
-<a name="l00164"></a>00164 
-<a name="l00168"></a>00168   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
+<a name="l00144"></a>00144   <span class="comment"></span>
+<a name="l00145"></a>00145 <span class="comment">  /// Prints out nicely formatted clustering</span>
+<a name="l00146"></a>00146 <span class="comment"></span>  std::ostream&amp; <a class="code" href="namespacecluster.html#a48cb342d6385d2bd99366247e0269c53" title="Print out an id_pair as a tuple of its element and its source rank.">operator&lt;&lt;</a>(std::ostream&amp; out, <span class="keyword">const</span> <a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; list);
+<a name="l00147"></a>00147 <span class="comment"></span>
+<a name="l00148"></a>00148 <span class="comment">  /// For convenience</span>
+<a name="l00149"></a>00149 <span class="comment"></span>  std::ostream&amp; <a class="code" href="namespacecluster.html#a48cb342d6385d2bd99366247e0269c53" title="Print out an id_pair as a tuple of its element and its source rank.">operator&lt;&lt;</a>(std::ostream&amp; out, <span class="keyword">const</span> partition&amp; km);  
+<a name="l00150"></a>00150 <span class="comment"></span>
+<a name="l00151"></a>00151 <span class="comment">  /// Mirkin distance bt/w two clusterings.</span>
+<a name="l00152"></a>00152 <span class="comment"></span>  <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#ac6317ef2a7029b335c084d6501d3a8ad" title="Mirkin distance bt/w two clusterings.">mirkin_distance</a>(<span class="keyword">const</span> <a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; c1, <span class="keyword">const</span> <a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; c2);
+<a name="l00153"></a>00153 <span class="comment"></span>
+<a name="l00154"></a>00154 <span class="comment">  /// Convenience overload for comparing partition objects directly</span>
+<a name="l00155"></a>00155 <span class="comment"></span>  <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#ac6317ef2a7029b335c084d6501d3a8ad" title="Mirkin distance bt/w two clusterings.">mirkin_distance</a>(<span class="keyword">const</span> partition&amp; c1, <span class="keyword">const</span> partition&amp; c2);
+<a name="l00156"></a>00156 <span class="comment"></span>
+<a name="l00157"></a>00157 <span class="comment">  /// </span>
+<a name="l00158"></a>00158 <span class="comment">  /// Expand a cluster_list by l levels.  That is, replace each index i</span>
+<a name="l00159"></a>00159 <span class="comment">  /// in the cluster_list with indices in [2^l * i ... 2^l * (i+1) - 1]</span>
+<a name="l00160"></a>00160 <span class="comment">  /// </span>
+<a name="l00161"></a>00161 <span class="comment">  /// @todo deprecate and delete this.</span>
+<a name="l00162"></a>00162 <span class="comment">  /// </span>
+<a name="l00163"></a>00163 <span class="comment"></span>  <span class="keywordtype">void</span> <a class="code" href="namespacecluster.html#ae9b520de376d157f863f2c6a71d9db89" title="Expand a cluster_list by l levels.">expand</a>(<a class="code" href="namespacecluster.html#ab8aaff667d0c1d5dd7aa94e0c1a237d9" title="Explicit representation of a clustering.">cluster_list</a>&amp; list, <span class="keywordtype">size_t</span> level = 1);
+<a name="l00164"></a>00164 <span class="comment"></span>
+<a name="l00165"></a>00165 <span class="comment">  ///</span>
+<a name="l00166"></a>00166 <span class="comment">  /// Compute the total dissimilarity between all objects and their medoids.</span>
+<a name="l00167"></a>00167 <span class="comment">  ///</span>
+<a name="l00168"></a>00168 <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
 <a name="l00169"></a><a class="code" href="namespacecluster.html#a4a078c24f11b876a18e1ea7780f58a4e">00169</a>   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#a4a078c24f11b876a18e1ea7780f58a4e" title="Compute the total dissimilarity between all objects and their medoids.">total_dissimilarity</a>(<span class="keyword">const</span> <a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; p, D dist) {
 <a name="l00170"></a>00170     <span class="keywordtype">double</span> dissim = 0.0;
 <a name="l00171"></a>00171     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0; i &lt; p.<a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); i++) {
@@ -147,8 +203,11 @@
 <a name="l00173"></a>00173     }
 <a name="l00174"></a>00174     <span class="keywordflow">return</span> dissim;
 <a name="l00175"></a>00175   }
-<a name="l00176"></a>00176 
-<a name="l00180"></a>00180   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
+<a name="l00176"></a>00176 <span class="comment"></span>
+<a name="l00177"></a>00177 <span class="comment">  ///</span>
+<a name="l00178"></a>00178 <span class="comment">  /// Compute the total dissimilarity between all objects in a particular cluster and its medoid.</span>
+<a name="l00179"></a>00179 <span class="comment">  ///</span>
+<a name="l00180"></a>00180 <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
 <a name="l00181"></a><a class="code" href="namespacecluster.html#ac1dc9b626241e4bb0bbfc8ec6c2c5dd4">00181</a>   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#a4a078c24f11b876a18e1ea7780f58a4e" title="Compute the total dissimilarity between all objects and their medoids.">total_dissimilarity</a>(<span class="keyword">const</span> <a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; p, D dist, <a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> m) {
 <a name="l00182"></a>00182     <span class="keywordtype">double</span> dissim = 0.0;
 <a name="l00183"></a>00183     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0; i &lt; p.<a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); i++) {
@@ -158,8 +217,11 @@
 <a name="l00187"></a>00187     }
 <a name="l00188"></a>00188     <span class="keywordflow">return</span> dissim;
 <a name="l00189"></a>00189   }
-<a name="l00190"></a>00190   
-<a name="l00194"></a>00194   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
+<a name="l00190"></a>00190   <span class="comment"></span>
+<a name="l00191"></a>00191 <span class="comment">  ///</span>
+<a name="l00192"></a>00192 <span class="comment">  /// Compute the total squared dissimilarity between all objects and their medoids.</span>
+<a name="l00193"></a>00193 <span class="comment">  ///</span>
+<a name="l00194"></a>00194 <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
 <a name="l00195"></a><a class="code" href="namespacecluster.html#add265e8aae9c95c0cf9b5498772494d9">00195</a>   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#add265e8aae9c95c0cf9b5498772494d9" title="Compute the total squared dissimilarity between all objects and their medoids.">total_squared_dissimilarity</a>(<span class="keyword">const</span> <a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; p, D dist) {
 <a name="l00196"></a>00196     <span class="keywordtype">double</span> dissim2 = 0.0;
 <a name="l00197"></a>00197     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0; i &lt; p.<a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); i++) {
@@ -168,8 +230,12 @@
 <a name="l00200"></a>00200     }
 <a name="l00201"></a>00201     <span class="keywordflow">return</span> dissim2;
 <a name="l00202"></a>00202   }
-<a name="l00203"></a>00203 
-<a name="l00208"></a>00208   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
+<a name="l00203"></a>00203 <span class="comment"></span>
+<a name="l00204"></a>00204 <span class="comment">  ///</span>
+<a name="l00205"></a>00205 <span class="comment">  /// Compute the total squared dissimilarity between all objects in a particular </span>
+<a name="l00206"></a>00206 <span class="comment">  /// cluster and its medoid.</span>
+<a name="l00207"></a>00207 <span class="comment">  ///</span>
+<a name="l00208"></a>00208 <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
 <a name="l00209"></a><a class="code" href="namespacecluster.html#a1790e80a7a567f5d4198e89a74fd5d68">00209</a>   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#add265e8aae9c95c0cf9b5498772494d9" title="Compute the total squared dissimilarity between all objects and their medoids.">total_squared_dissimilarity</a>(<span class="keyword">const</span> <a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; p, D dist, <a class="code" href="namespacecluster.html#aea622505d1fa9f4641796167e37f1092" title="More descriptive type for medoid index.">medoid_id</a> m) {
 <a name="l00210"></a>00210     <span class="keywordtype">double</span> dissim2 = 0.0;
 <a name="l00211"></a>00211     <span class="keywordflow">for</span> (<span class="keywordtype">size_t</span> i=0; i &lt; p.<a class="code" href="structcluster_1_1partition.html#a07825294eae9a31b13f046890accecdb" title="Gives cluster id (index in medoids) for the ith object.">cluster_ids</a>.size(); i++) {
@@ -195,6 +261,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

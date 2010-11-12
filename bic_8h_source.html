@@ -28,8 +28,8 @@
 <h1>src/bic.h</h1>  </div>
 </div>
 <div class="contents">
-<a href="bic_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 
-<a name="l00002"></a>00002 <span class="comment">// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  </span>
+<a href="bic_8h.html">Go to the documentation of this file.</a><div class="fragment"><pre class="fragment"><a name="l00001"></a>00001 <span class="comment">//////////////////////////////////////////////////////////////////////////////////////////////////</span>
+<a name="l00002"></a>00002 <span class="comment"></span><span class="comment">// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  </span>
 <a name="l00003"></a>00003 <span class="comment">// Produced at the Lawrence Livermore National Laboratory  </span>
 <a name="l00004"></a>00004 <span class="comment">// Written by Todd Gamblin, tgamblin@llnl.gov.</span>
 <a name="l00005"></a>00005 <span class="comment">// LLNL-CODE-433662</span>
@@ -57,32 +57,33 @@
 <a name="l00027"></a>00027 <span class="comment">// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</span>
 <a name="l00028"></a>00028 <span class="comment">// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,</span>
 <a name="l00029"></a>00029 <span class="comment">// WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN</span>
-<a name="l00030"></a>00030 <span class="comment">// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span>
+<a name="l00030"></a>00030 <span class="comment">// ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</span><span class="comment"></span>
+<a name="l00031"></a>00031 <span class="comment">//////////////////////////////////////////////////////////////////////////////////////////////////</span>
 <a name="l00032"></a>00032 <span class="comment"></span>
 <a name="l00033"></a>00033 
 <a name="l00034"></a>00034 <span class="preprocessor">#ifndef BAYESIAN_INFORMATION_CRITERION_H</span>
 <a name="l00035"></a>00035 <span class="preprocessor"></span><span class="preprocessor">#define BAYESIAN_INFORMATION_CRITERION_H</span>
-<a name="l00036"></a>00036 <span class="preprocessor"></span>
-<a name="l00037"></a>00037 
-<a name="l00038"></a>00038 
-<a name="l00039"></a>00039 
-<a name="l00040"></a>00040 
-<a name="l00041"></a>00041 
-<a name="l00042"></a>00042 
-<a name="l00043"></a>00043 
-<a name="l00044"></a>00044 
-<a name="l00045"></a>00045 
-<a name="l00046"></a>00046 
-<a name="l00047"></a>00047 
-<a name="l00048"></a>00048 
-<a name="l00049"></a>00049 
-<a name="l00050"></a>00050 
-<a name="l00051"></a>00051 
-<a name="l00052"></a>00052 
-<a name="l00053"></a>00053 
-<a name="l00054"></a>00054 
-<a name="l00055"></a>00055 
-<a name="l00056"></a>00056 
+<a name="l00036"></a>00036 <span class="preprocessor"></span><span class="comment">///</span>
+<a name="l00037"></a>00037 <span class="comment"></span><span class="comment">/// @file bic.h</span>
+<a name="l00038"></a>00038 <span class="comment"></span><span class="comment">/// @brief Template function implementations of the Bayesian Information Criterion.</span>
+<a name="l00039"></a>00039 <span class="comment"></span><span class="comment">///</span>
+<a name="l00040"></a>00040 <span class="comment"></span><span class="comment">/// The Bayesian Information Criterion (BIC) is a criterion for model selection</span>
+<a name="l00041"></a>00041 <span class="comment"></span><span class="comment">/// that balances a maximum likelihood estimator and a parameter count.  This</span>
+<a name="l00042"></a>00042 <span class="comment"></span><span class="comment">/// implementation is designed for clustering algorithms, in particular K-means and</span>
+<a name="l00043"></a>00043 <span class="comment"></span><span class="comment">/// K-medoids clustering algorithms where we expect clusters with  spherical gaussian</span>
+<a name="l00044"></a>00044 <span class="comment"></span><span class="comment">/// distributions.  </span>
+<a name="l00045"></a>00045 <span class="comment"></span><span class="comment">///</span>
+<a name="l00046"></a>00046 <span class="comment"></span><span class="comment">/// Here, we want to test whether a clustering&#39;s centroids or medoids are good predictors</span>
+<a name="l00047"></a>00047 <span class="comment"></span><span class="comment">/// of the points in a data set, so these are our parameters, and we try to find the best</span>
+<a name="l00048"></a>00048 <span class="comment"></span><span class="comment">/// clustering without too many clusters.  For more on this technique and the approach</span>
+<a name="l00049"></a>00049 <span class="comment"></span><span class="comment">/// we&#39;ve based this implementation on, see this paper:</span>
+<a name="l00050"></a>00050 <span class="comment"></span><span class="comment">/// @par</span>
+<a name="l00051"></a>00051 <span class="comment"></span><span class="comment">/// Dan Pelleg and Andrew Moore.  &lt;a href=&quot;http://www.cs.cmu.edu/~dpelleg/download/xmeans.pdf&quot;&gt;</span>
+<a name="l00052"></a>00052 <span class="comment"></span><span class="comment">/// &lt;b&gt;X-Means: Extending K-Means with Efficient Estimation of the Number of Clusters&lt;/b&gt;&lt;/a&gt;.</span>
+<a name="l00053"></a>00053 <span class="comment"></span><span class="comment">/// &lt;i&gt;Proceedings of the Seventeenth International Conference on Machine Learning&lt;/i&gt;, </span>
+<a name="l00054"></a>00054 <span class="comment"></span><span class="comment">/// San Francisco, CA. June 29-July 2, 2000.  pp 727-734.</span>
+<a name="l00055"></a>00055 <span class="comment"></span><span class="comment">/// </span>
+<a name="l00056"></a>00056 <span class="comment"></span>
 <a name="l00057"></a>00057 <span class="preprocessor">#include &lt;stdint.h&gt;</span>
 <a name="l00058"></a>00058 <span class="preprocessor">#include &lt;numeric&gt;</span>
 <a name="l00059"></a>00059 <span class="preprocessor">#include &lt;iostream&gt;</span>
@@ -92,8 +93,18 @@
 <a name="l00063"></a>00063 <span class="preprocessor">#include &quot;<a class="code" href="partition_8h.html" title="Class to represent a partitioning of a data set.">partition.h</a>&quot;</span>
 <a name="l00064"></a>00064 
 <a name="l00065"></a><a class="code" href="namespacecluster.html">00065</a> <span class="keyword">namespace </span>cluster {
-<a name="l00066"></a>00066   
-<a name="l00077"></a><a class="code" href="namespacecluster.html#af654c630dfe169d9f005f16956ed293f">00077</a>   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
+<a name="l00066"></a>00066   <span class="comment"></span>
+<a name="l00067"></a>00067 <span class="comment">  ///</span>
+<a name="l00068"></a>00068 <span class="comment">  /// Directly computes the BIC from a partition object based on the cluster centroids</span>
+<a name="l00069"></a>00069 <span class="comment">  /// and the number of clusters.</span>
+<a name="l00070"></a>00070 <span class="comment">  /// </span>
+<a name="l00071"></a>00071 <span class="comment">  /// @param[in] p         A partition object describing the clustering to be evaluated.</span>
+<a name="l00072"></a>00072 <span class="comment">  /// @param[in] distance  A distance function callable on two \em indices from the partition p.</span>
+<a name="l00073"></a>00073 <span class="comment">  /// @param[in] M         Dimensionality parameter -- degrees of freedom in the input dataset.</span>
+<a name="l00074"></a>00074 <span class="comment">  ///</span>
+<a name="l00075"></a>00075 <span class="comment">  /// @return A valid BIC score based on the input parameters.  Higher numbers indicate better fit.</span>
+<a name="l00076"></a>00076 <span class="comment">  /// </span>
+<a name="l00077"></a><a class="code" href="namespacecluster.html#af654c630dfe169d9f005f16956ed293f">00077</a> <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> D&gt;
 <a name="l00078"></a>00078   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#af654c630dfe169d9f005f16956ed293f" title="Directly computes the BIC from a partition object based on the cluster centroids and the number of cl...">bic</a>(<span class="keyword">const</span> <a class="code" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>&amp; p, D distance, <span class="keywordtype">size_t</span> M) {
 <a name="l00079"></a>00079     <span class="keywordtype">double</span> R = p.<a class="code" href="structcluster_1_1partition.html#aac782da1f912bceb5d8ad00c8dc892ac" title="Total number of objects in the partition.">size</a>();
 <a name="l00080"></a>00080     <span class="keywordtype">size_t</span> k = p.<a class="code" href="structcluster_1_1partition.html#a1ed0d7487b54586d5a24eb39afed2c78" title="Total number of clusters in the partition.">num_clusters</a>();
@@ -125,8 +136,22 @@
 <a name="l00106"></a>00106     <span class="keywordflow">return</span> lD - pj/2 * log((<span class="keywordtype">double</span>)R);
 <a name="l00107"></a>00107   }
 <a name="l00108"></a>00108 
-<a name="l00109"></a>00109 
-<a name="l00124"></a><a class="code" href="namespacecluster.html#a327e81307cb0a7cf71231c807cd0ac98">00124</a>   <span class="keyword">template</span> &lt;<span class="keyword">typename</span> SizeIterator, <span class="keyword">typename</span> DissimIterator&gt;
+<a name="l00109"></a>00109 <span class="comment"></span>
+<a name="l00110"></a>00110 <span class="comment">  ///</span>
+<a name="l00111"></a>00111 <span class="comment">  /// This version of the BIC assumes some precomputed information.  This is useful for</span>
+<a name="l00112"></a>00112 <span class="comment">  /// parallel implementations, where it is more efficient to compute some global sums as a </span>
+<a name="l00113"></a>00113 <span class="comment">  /// reduction rather than aggregating a full partition to one process.  Here,</span>
+<a name="l00114"></a>00114 <span class="comment">  /// we assume that the sizes of the distributed clusters as well as the total squared intra-cluster</span>
+<a name="l00115"></a>00115 <span class="comment">  /// dissimilarity (between each object and its medoid) is known.</span>
+<a name="l00116"></a>00116 <span class="comment">  /// </span>
+<a name="l00117"></a>00117 <span class="comment">  ///    @param[in] k               Number of clusters in the clustering.  Same as k from k-means or k-medoids.</span>
+<a name="l00118"></a>00118 <span class="comment">  ///    @param[in] cluster_sizes   Start of range of k sizes.  </span>
+<a name="l00119"></a>00119 <span class="comment">  ///                               &lt;code&gt;*cluster_sizes .. *(cluster_sizes + k)&lt;/code&gt; should be the</span>
+<a name="l00120"></a>00120 <span class="comment">  ///                               sizes of clusters 1 to k</span>
+<a name="l00121"></a>00121 <span class="comment">  ///    @param[in] sum2_dissim     Sum of squared dissimilarities of each object w.r.t. its nearest medoid.</span>
+<a name="l00122"></a>00122 <span class="comment">  ///    @param[in] dimensionality  Dimensionality of clustered data.  e.g., 2 for 2-dimensional points.</span>
+<a name="l00123"></a>00123 <span class="comment">  ///</span>
+<a name="l00124"></a><a class="code" href="namespacecluster.html#a327e81307cb0a7cf71231c807cd0ac98">00124</a> <span class="comment"></span>  <span class="keyword">template</span> &lt;<span class="keyword">typename</span> SizeIterator, <span class="keyword">typename</span> DissimIterator&gt;
 <a name="l00125"></a>00125   <span class="keywordtype">double</span> <a class="code" href="namespacecluster.html#af654c630dfe169d9f005f16956ed293f" title="Directly computes the BIC from a partition object based on the cluster centroids and the number of cl...">bic</a>(<span class="keywordtype">size_t</span> k, SizeIterator cluster_sizes, DissimIterator sum2_dissim, <span class="keywordtype">size_t</span> dimensionality) {
 <a name="l00126"></a>00126     <span class="comment">// figure out total size of data set and put it in R.</span>
 <a name="l00127"></a>00127     <span class="keyword">const</span> <span class="keywordtype">double</span> R      = std::accumulate(cluster_sizes, cluster_sizes + k, 0);
@@ -165,6 +190,6 @@
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 

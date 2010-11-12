@@ -80,6 +80,8 @@ Public Attributes</h2></td></tr>
 <p>While cluster_ids will vary, the "same" <a class="el" href="structcluster_1_1par__partition.html" title="par_partition represents a partitioning of a distributed data set.">par_partition</a> object on the same communicator will have the same medoid_ids. If this is not true, then the medoid_ids won't make any sense between processes. Partitioning algorithms that use a <a class="el" href="structcluster_1_1par__partition.html" title="par_partition represents a partitioning of a distributed data set.">par_partition</a> for output should preserve this property.</p>
 <p>You can convert a <a class="el" href="structcluster_1_1par__partition.html" title="par_partition represents a partitioning of a distributed data set.">par_partition</a> to a partition on a single process using the <a class="el" href="structcluster_1_1par__partition.html#a02d94b5ae788fc7ac1a397875e8d4533" title="Collective operation.">gather()</a> method. This is a collective operation. It is not scalable, in that it will aggregate ids from <em>every</em> process in the communicator to <em>one</em> process. However, it's useful for small systems and debugging.</p>
 <dl class="see"><dt><b>See also:</b></dt><dd><a class="el" href="structcluster_1_1partition.html" title="This represents a partitioning of a data set.">partition</a>, the non-distributed equivalent of this class. </dd></dl>
+
+<p>Definition at line <a class="el" href="par__partition_8h_source.html#l00071">71</a> of file <a class="el" href="par__partition_8h_source.html">par_partition.h</a>.</p>
 <hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a28989f2fe859071f24e3ae3616bb6b45"></a><!-- doxytag: member="cluster::par_partition::par_partition" ref="a28989f2fe859071f24e3ae3616bb6b45" args="(MPI_Comm comm=MPI_COMM_WORLD)" -->
 <div class="memitem">
@@ -99,6 +101,8 @@ Public Attributes</h2></td></tr>
 
 <p>Construct a parallel partition for the communicator supplied Partition starts off with everyone in one cluster with medoid 0. </p>
 
+<p>Definition at line <a class="el" href="par__partition_8cpp_source.html#l00048">48</a> of file <a class="el" href="par__partition_8cpp_source.html">par_partition.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="a87b0675a97e27f24bfe728de074513f5"></a><!-- doxytag: member="cluster::par_partition::~par_partition" ref="a87b0675a97e27f24bfe728de074513f5" args="()" -->
@@ -117,6 +121,8 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Virtual destructor for inheritance. </p>
+
+<p>Definition at line <a class="el" href="par__partition_8cpp_source.html#l00050">50</a> of file <a class="el" href="par__partition_8cpp_source.html">par_partition.cpp</a>.</p>
 
 </div>
 </div>
@@ -149,6 +155,8 @@ Public Attributes</h2></td></tr>
 <p>Collective operation. </p>
 <p>Gathers my_id from all processes into a local partition object. If size of system is large, then this method will not scale. </p>
 
+<p>Definition at line <a class="el" href="par__partition_8cpp_source.html#l00053">53</a> of file <a class="el" href="par__partition_8cpp_source.html">par_partition.cpp</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="ad5b6c88a0fb602562c75447f0f8ae9f3"></a><!-- doxytag: member="cluster::par_partition::get_sizes" ref="ad5b6c88a0fb602562c75447f0f8ae9f3" args="(std::vector&lt; size_t &gt; &amp;sizes)" -->
@@ -170,6 +178,8 @@ Public Attributes</h2></td></tr>
 <p>Scalably get the sizes of all the clusters in this partition. </p>
 <p>POST: sizes is valid on all processes </p>
 
+<p>Definition at line <a class="el" href="par__partition_8cpp_source.html#l00096">96</a> of file <a class="el" href="par__partition_8cpp_source.html">par_partition.cpp</a>.</p>
+
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
@@ -187,6 +197,8 @@ Public Attributes</h2></td></tr>
 <p>Global cluster ids for local objects. </p>
 <p>These are indices into medoid_ids. The object id of the medoid of the ith local object is medoid_ids[cluster_ids[i]]. </p>
 
+<p>Definition at line <a class="el" href="par__partition_8h_source.html#l00077">77</a> of file <a class="el" href="par__partition_8h_source.html">par_partition.h</a>.</p>
+
 </div>
 </div>
 <a class="anchor" id="ab048c6f9fcbcfaa57ce68b00263dbebe"></a><!-- doxytag: member="cluster::par_partition::comm" ref="ab048c6f9fcbcfaa57ce68b00263dbebe" args="" -->
@@ -201,6 +213,8 @@ Public Attributes</h2></td></tr>
 <div class="memdoc">
 
 <p>Communicator, the processes of which this partition divides. </p>
+
+<p>Definition at line <a class="el" href="par__partition_8h_source.html#l00080">80</a> of file <a class="el" href="par__partition_8h_source.html">par_partition.h</a>.</p>
 
 </div>
 </div>
@@ -217,11 +231,13 @@ Public Attributes</h2></td></tr>
 
 <p>Gives the object id for the ith medoid. This object may not be local. </p>
 
+<p>Definition at line <a class="el" href="par__partition_8h_source.html#l00073">73</a> of file <a class="el" href="par__partition_8h_source.html">par_partition.h</a>.</p>
+
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following files:<ul>
 <li>src/<a class="el" href="par__partition_8h_source.html">par_partition.h</a></li>
-<li>src/<a class="el" href="par__partition_8cpp.html">par_partition.cpp</a></li>
+<li>src/<a class="el" href="par__partition_8cpp_source.html">par_partition.cpp</a></li>
 </ul>
 </div>
 <hr class="footer"/>
@@ -232,6 +248,6 @@ Public Attributes</h2></td></tr>
 <b>Muster</b>.
 Copyright &copy; 2010, <a href="http://www.llnl.gov">Lawrence Livermore National Laboratory</a>,  LLNL-CODE-433662.<br>
 Distribution of Muster and its documentation is subject to terms of the Muster <a href="http://github.com/tgamblin/muster/blob/master/LICENSE">LICENSE</a>.<br>
-Generated on Fri Oct 29 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
+Generated on Fri Nov 12 2010 using <a href="http://www.doxygen.org/">Doxygen 1.7.1</a>
 </small>
 
