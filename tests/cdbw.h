@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Juan Gonzalez, juan.gonzalez@bsc.es
-
+// LLNL-CODE-433662
 // All rights reserved.  
 //
 // This file is part of Muster. For details, see http://github.com/tgamblin/muster. 
@@ -30,11 +29,9 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-#ifndef CDBW_H
-#define CDBW_H
-
 ///
 /// @file cdbw.h
+/// @author Juan Gonzalez
 /// @brief Implementation of the CDbw criterion
 ///
 /// CDbw criterion is a validity approach for density-based clustering algorithms.
@@ -47,6 +44,8 @@
 /// <b>A Density-based Cluster Validity Approach using Multi-representatives</b></a>.
 /// <i> Pattern Recognition Letters, 2008</i>, 
 /// 
+#ifndef CDBW_H
+#define CDBW_H
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <vector>

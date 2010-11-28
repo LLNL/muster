@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,13 +29,13 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef TRIAL_H
-#define TRIAL_H
 ///
 /// @file trial.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Data structure representing a trial run of a partitioned clustering algorithm.
 ///
+#ifndef TRIAL_H
+#define TRIAL_H
 
 #include <cstdlib>
 

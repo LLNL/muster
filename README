@@ -1,7 +1,10 @@
 ==============================================================================
  Muster: Massively Scalable Clustering
- by Todd Gamblin
- tgamblin@llnl.gov
+ Created by Todd Gamblin tgamblin@llnl.gov
+ 
+ Contributors:
+   Todd Gamblin     tgamblin@llnl.gov
+   Juan Gonzalez    juan.gonzalez@bsc.es
 ==============================================================================
 
 The Muster library provides implementations of serial and parallel K-Medoids 

@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,11 +29,9 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef MUSTER_MPI_BINDINGS_H
-#define MUSTER_MPI_BINDINGS_H
 ///
 /// @file mpi_bindings.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief <code>\#defines</code> for switching between MPI and PMPI bindings.
 /// 
 /// User of the API can <code>\#define</code> <code>MUSTER_USE_PMPI</code> to use the 
@@ -44,6 +41,8 @@
 /// This file should contain <code>\#defines</code> for all MPI calls used in 
 /// the cluster library, and needs to be kept current.
 ///
+#ifndef MUSTER_MPI_BINDINGS_H
+#define MUSTER_MPI_BINDINGS_H
 
 #include "muster-config.h"
 

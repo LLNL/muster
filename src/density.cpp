@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Juan Gonzalez, juan.gonzalez@bsc.es
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,6 +29,11 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+///
+/// @file density.cpp
+/// @author Juan Gonzalez juan.gonzalez@bsc.es
+/// @author Todd Gamblin tgamblin@llnl.gov
+///
 #include "density.h"
 
 #include <vector>

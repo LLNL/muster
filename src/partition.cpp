@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,8 +29,12 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+///
+/// @file partition.cpp
+/// @author Todd Gamblin tgamblin@llnl.gov
+///
 #include "partition.h"
+
 #include <iostream>
 #include <iterator>
 #include <map>

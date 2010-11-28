@@ -1,8 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Juan Gonzalez, juan.gonzalez@bsc.es
-
+// LLNL-CODE-433662
 // All rights reserved.  
 //
 // This file is part of Muster. For details, see http://github.com/tgamblin/muster. 
@@ -30,6 +29,10 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
+///
+/// @file par_cluster_test.cpp
+/// @author Juan Gonzalez juan.gonzalez@bsc.es
+/// 
 #include <iostream>
 #include <fstream>
 #include <string.h>

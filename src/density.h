@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Juan Gonzalez, juan.gonzalez@bsc.es
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,13 +29,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef MUSTER_DENSITY_H_
-#define MUSTER_DENSITY_H_
 ///
 /// @file density.h
+/// @author Juan Gonzalez juan.gonzalez@bsc.es
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Implementations of regular and sampled density clustering.
 ///
+#ifndef MUSTER_DENSITY_H_
+#define MUSTER_DENSITY_H_
 
 #include <vector>
 #include <set>
