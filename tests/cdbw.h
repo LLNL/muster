@@ -31,7 +31,7 @@
 
 ///
 /// @file cdbw.h
-/// @author Juan Gonzalez
+/// @author Juan Gonzalez juan.gonzalez@bsc.es
 /// @brief Implementation of the CDbw criterion
 ///
 /// CDbw criterion is a validity approach for density-based clustering algorithms.

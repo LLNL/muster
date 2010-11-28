@@ -31,7 +31,7 @@
 
 ///
 /// @file cdbw.cpp
-/// @author Juan Gonzalez
+/// @author Juan Gonzalez juan.gonzalez@bsc.es
 /// 
 #include "cdbw.h"
 
