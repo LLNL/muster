@@ -15,12 +15,11 @@ set(LIBANN_SOURCES
 	perf.cpp)
 
 add_library(ANN ${LIBANN_SOURCES})
+install(TARGETS ANN DESTINATION lib)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/libANN
   ${PROJECT_SOURCE_DIR}/external
   ${Boost_INCLUDE_DIR}
   ${PROJECT_BINARY_DIR})
-
-
 

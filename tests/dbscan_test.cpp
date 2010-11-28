@@ -2,7 +2,7 @@
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
 // Written by Juan Gonzalez, juan.gonzalez@bsc.es
-// LLNL-CODE-433662
+
 // All rights reserved.  
 //
 // This file is part of Muster. For details, see http://github.com/tgamblin/muster. 
@@ -30,17 +30,19 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 #include <iostream>
 #include <fstream>
-#include <cstring>
+#include <string.h>
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include "density_based.h"
+#include "density.h"
 #include "Timer.h"
 #include "point.h"
+#include "point_set.h"
 #include "spherical_clustering_generator.h"
+
+#include "cdbw.h"
 
 using namespace std;
 using namespace cluster;
@@ -48,10 +50,11 @@ using namespace cluster;
 typedef boost::minstd_rand base_generator_type;
 
 void usage() {
-  cerr << "Usage: dbscan-test [-htdn] [-r number_of_points] [-e epsilon] [-m min_points] [-i <data_file> ] [-o output_file]" << endl;
+  cerr << "Usage: dbscan-test [-htdnc] [-r <number_of_points>] [-i <data_file>] [-o output_file] -e <epsilon> -m <min_points>" << endl;
   cerr << "  DBSCAN test case for clustering points" << endl;
   cerr << "Options:" << endl;
   cerr << "  -h         Show this message." << endl;
+  cerr << "  -c         Use CDBW to evaluate the clustering." << endl;
   cerr << "  -t         Output timing info to file." << endl;
   cerr << "  -d         Verbose debug output." << endl;
   cerr << "  -n         Normalize values of the dimensions" << endl;
@@ -80,15 +83,16 @@ double epsilon;
 
 bool   min_points_set = false;
 size_t min_points;
+bool cdbw = false;
 
 char* input_file  = NULL;
 char* output_file = NULL;
 
-vector<point> points;
+point_set points;
+
 
 /// Uses getopt to read in arguments.
-void get_args(int *argc, char ***argv)
-{
+void get_args(int *argc, char ***argv) {
   int c;
   char *err;
 
@@ -108,7 +112,7 @@ void get_args(int *argc, char ***argv)
     output_file = strdup("dbscan_random_execution.csv");
   }
   
-  while ((c = getopt(*argc, *argv, "htdnr:e:m:i:o:")) != -1) {
+  while ((c = getopt(*argc, *argv, "htdncr:e:m:i:o:")) != -1) {
     switch (c) {
       case 'h':
         usage();
@@ -116,6 +120,9 @@ void get_args(int *argc, char ***argv)
         break;
       case 't':
         timing = true;
+        break;
+      case 'c':
+        cdbw = true;
         break;
       case 'd':
         debug = true;
@@ -157,41 +164,18 @@ void get_args(int *argc, char ***argv)
   *argv += optind;
 
   
-  if (random_run && input_file != NULL)
-  {
+  if (random_run && input_file != NULL) {
     random_run = false;
   }
 
-  if (!epsilon_set || !min_points)
-  {
-    cerr << "You must set 'epsilon' (-e) and 'min_points' (-m)" << endl;
+  if (!epsilon_set || !min_points) {
+    cerr << "You must provide -e and -m for epsilon and min_points." << endl;
     exit (EXIT_FAILURE);
   }
 }
 
-void load_file()
-{
-  char line[200];
-  
-  ifstream input_stream (input_file, ifstream::in);
 
-  if (!input_stream)
-  {
-    cerr << "Unable to open input file" << endl;
-    exit (EXIT_FAILURE);
-  }
-
-  while (input_stream.good())
-  {
-    input_stream.getline(line, 200);
-    parse_point_csv (line, points);
-  }
-
-  input_stream.close();
-}
-
-void random_generator()
-{
+void generate_random_points() {
   base_generator_type generator(42u);
   boost::uniform_real<> uni_dist(0,1);
   boost::variate_generator<base_generator_type&, boost::uniform_real<> > uni(generator, uni_dist);
@@ -200,87 +184,41 @@ void random_generator()
 
   /* Always 10 spherical clusters are generated */
   cgen.set_default_stddev(uni());
-  for (size_t i = 0; i < 10; i++)
-  {
+  for (size_t i = 0; i < 10; i++) {
     cgen.add_cluster(point(uni(),uni()*4));
   }
 
-  for (size_t i = 0; i < num_points; i++)
-  {
+  for (size_t i = 0; i < num_points; i++) {
     point p;
 
     do {
       p = cgen.next_point();
     } while (p.x < 0 || p.y < 0);
 
-    points.push_back(p);
-  }
-
-  /*
-  for (size_t i = 0; i < num_points; i++)
-  {
-    points.push_back(point(uni(), uni()));
-  }
-  */
-
-}
-
-void normalize()
-{
-  for (size_t i = 0; i < points.size(); i++)
-  {
-    points[i].normalize();
-  }
-}
-
-void flush_points(density_based& clustering_results)
-{
-  ofstream output_stream (output_file, ios_base::trunc);
-
-  if (!output_stream)
-  {
-    cerr << "Error opening output file!" << endl;
-    exit (EXIT_FAILURE);
-  }
-  
-  cout.setf(std::ios::fixed);
-  for (size_t i = 0; i < points.size(); i++)
-  {
-    output_stream.setf(std::ios::fixed);
-
-    output_stream << points[i].x << ", " << points[i].y << ", " << clustering_results.get_cluster(i) << endl;
-    // output_stream << clustering_results;
+    points.add_point(p);
   }
 }
 
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   Timer timer;
-  
-  density_based clustering = density_based();
-  
+  density clustering;
   get_args(&argc, &argv);
 
-  if (random_run)
-  {
+  timer.record("Initialization");
+
+  if (random_run) {
     cout << "Generating " << num_points << " random points...";
-    
-    timer.record("Generation of random points starts");
-    random_generator();
-    timer.record("Genaration of random points ends");
-
+    generate_random_points();
+    timer.record("Genarate Random Points");
     cout << " READY" << endl;
-  }
-  else
-  {
-    cout << "Loading input file...";
-    
-    timer.record("File load starts");
-    load_file();
-    timer.record("File load ends");
 
+  } else {
+    cout << "Loading input file...";
+    ifstream csv_file(input_file, ifstream::in);
+    points.load_csv_file(csv_file);
+    timer.record("Load Input File");
     cout << " READY" << endl;
   }
 
@@ -288,22 +226,32 @@ int main(int argc, char **argv)
   
   cout << "Clustering Points...";
   
-  timer.record("Clustering starts");
-  clustering.dbscan(points, point_distance(), epsilon, min_points);
-  timer.record("Clustering ends");
+  clustering.dbscan(points.points(), point_distance(), epsilon, min_points);
+  timer.record("Clustering");
 
   cout << " READY (Clusters found = " << clustering.num_clusters() << ")" << endl;
 
-  if (output_file != NULL)
-  {
-    timer.record("Output file write starts");
-    flush_points(clustering);
-    timer.record("Output file write ends");
+  if (output_file != NULL) {
+    ofstream csv_file(output_file, ios_base::trunc);
+    if (!csv_file) {
+      cerr << "Error opening output file!" << endl;
+      exit (EXIT_FAILURE);
+    }
+    points.write_csv_file(csv_file, &clustering);
+    timer.record("Write Output File");
   }
+  
+  if (cdbw) {
+    // Checking the CDbw
+    CDbw validation = CDbw(clustering, points.points());
+    double current_cdbw = validation.compute(10); // 10 representatives per cluster
+    timer.record("CDBW");
 
+    cout << "CDbw = " << current_cdbw << endl;
+  }
+  
   // Write timing
-  if (timing)
-  {
+  if (timing) {
     cout << endl;
     cout << "**** EXECUTION TIMING ****" << endl;
     timer.write(cout);
@@ -311,4 +259,3 @@ int main(int argc, char **argv)
   
   exit (EXIT_SUCCESS);
 }
-

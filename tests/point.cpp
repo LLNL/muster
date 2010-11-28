@@ -43,50 +43,17 @@
 #include <iomanip>
 #include <cstdlib>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/algorithm/string.hpp>
 
 using boost::numeric::ublas::matrix;
-using namespace boost;
 using namespace std;
 
 namespace cluster {
-
-  double point::max_x = std::numeric_limits<double>::min();
-  double point::max_y = std::numeric_limits<double>::min();
-  double point::min_x = std::numeric_limits<double>::max();
-  double point::min_y = std::numeric_limits<double>::max();
   
-  point::point(double _x, double _y) : 
-    x(_x),
-    y(_y),
-    normalized(false)
-  {
-    if (_x > point::max_x)
-      point::max_x = _x;
+  point::point(double _x, double _y) : x(_x), y(_y) { }
 
-    if (_x < point::min_x)
-      point::min_x = _x;
-    
-    if (_y > point::max_y)
-      point::max_y = _y;
+  point::point() : x(0), y(0) { }
 
-    if (_y < point::min_y)
-      point::min_y = _y;
-  }
-
-  point::point() : 
-    x(0),
-    y(0),
-    normalized(false)
-  { }
-
-  point::point(const point& other) : 
-    x(other.x),
-    y(other.y),
-    normalized(other.normalized),
-    norm_x(other.norm_x),
-    norm_y(other.norm_y)
-  { }
+  point::point(const point& other) : x(other.x), y(other.y) { }
 
 
 #ifdef MUSTER_HAVE_MPI
@@ -108,6 +75,16 @@ namespace cluster {
     PMPI_Unpack(buf, bufsize, position, &p.y, 1, MPI_DOUBLE,  comm);
     return p;
   }
+  
+  MPI_Datatype point::mpi_datatype() {
+    static MPI_Datatype type = MPI_DATATYPE_NULL;
+    if (type == MPI_DATATYPE_NULL) {
+      MPI_Type_contiguous(2, MPI_DOUBLE, &type);
+      MPI_Type_commit(&type); 
+    }
+    return type;
+  }
+
 #endif // MUSTER_HAVE_MPI
 
 
@@ -115,51 +92,6 @@ namespace cluster {
     return out << "(" << setw(2) << p.x << "," << setw(2) << p.y << ")";
   }
 
-
-  void parse_points(const string& str, vector<point>& points) {
-    string trimmed = trim_copy_if(str, is_any_of("() "));
-
-    vector<string> parts;
-    split(parts, trimmed, is_any_of("(,"));
-
-    vector<double> values(parts.size());
-    for (size_t i=0; i < parts.size(); i++) {
-      parts[i]  = trim_copy_if(parts[i], is_any_of("() ,"));
-      values[i] = strtod(parts[i].c_str(), NULL);
-    }
-
-    for (size_t i=1; i < values.size(); i += 2) {
-      points.push_back(point(values[i-1], values[i]));
-    }
-  }
-
-  void parse_point_csv(const std::string& str, std::vector<point>& points)
-  {
-    double X, Y;
-
-    char  *err;
-    
-    string trimmed = trim_copy_if(str, is_any_of(","));
-
-    vector<string> parts;
-    split(parts, str, is_any_of(","));
-
-    if (parts.size() < 2)
-      return;
-
-    X = strtod(parts[0].c_str(), &err);
-
-    if (*err)
-      return;
-    
-    Y = strtod(parts[1].c_str(), &err);
-
-    if (*err)
-      return;
-
-    points.push_back(point(X,Y));
-  }
-  
 
   void draw(string label, vector<point>& points, const partition& parts, ostream& out) {
     static const char *colors[] = {

@@ -37,6 +37,7 @@
 #include "kmedoids.h"
 #include "matrix_utils.h"
 #include "point.h"
+#include "point_set.h"
 #include "Timer.h"
 
 using namespace cluster;
@@ -75,13 +76,13 @@ int main(int argc, char **argv) {
   const size_t num_tests = sizeof(tests) / sizeof(test);
 
   for (size_t i=0; i < num_tests; i++) {
-    vector<point> points;
-    parse_points(tests[i].points, points);
+    point_set points;
+    points.parse_points(tests[i].points);
     const size_t k = tests[i].k;
 
     kmedoids cluster;
     dissimilarity_matrix distance;
-    build_dissimilarity_matrix(points, point_distance(), distance);
+    build_dissimilarity_matrix(points.points(), point_distance(), distance);
     
     cerr << "Starting Test " << i << " with k=" << k <<endl;
     cluster.pam(distance, k);
@@ -89,6 +90,6 @@ int main(int argc, char **argv) {
 
     ostringstream label;
     label << "Trial " << i;
-    draw(label.str(), points, cluster);
+    draw(label.str(), points.points(), cluster);
   }
 }

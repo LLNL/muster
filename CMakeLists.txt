@@ -22,13 +22,13 @@ option(BUILD_SHARED_LIBS "Build shared libraries?" DEFAULT_SHARED)
 option(MUSTER_USE_PMPI "Build with PMPI bindings?" FALSE)
 
 # Tests are off by default.  Set this to ON to build tests.
-option(BUILD_TESTS "Do you want to build the test programs?" FALSE)
+option(INSTALL_TESTS "Do you want to build the test programs?" FALSE)
 
 # Muster requires boost for matrices and random number generators.
 find_package(Boost REQUIRED)
 
 # Find the MPI library and set some definitions
-find_package(MPI QUIET)
+find_package(MPI)
 if (MPI_FOUND)
   set(MUSTER_HAVE_MPI TRUE)
 endif()
@@ -47,11 +47,10 @@ check_function_exists(gettimeofday MUSTER_HAVE_GETTIMEOFDAY)
 configure_file(
   ${PROJECT_SOURCE_DIR}/muster-config.h.in
   ${PROJECT_BINARY_DIR}/muster-config.h)
+install(FILES ${PROJECT_BINARY_DIR}/muster-config.h DESTINATION include)
 
 # Configure subdirectories here, after everything else, so that they 
 # inherit variables set in the global scope.
 add_subdirectory(src)
 add_subdirectory(libANN)
-if (BUILD_TESTS)
-  add_subdirectory(tests)
-endif()
+add_subdirectory(tests)

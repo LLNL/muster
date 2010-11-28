@@ -1,5 +1,6 @@
 noinst_HEADERS = \
 	point.h \
+	pont_set.h \
 	gaussian.h \
 	color.h \
 	spherical_clustering_generator.h
@@ -10,7 +11,9 @@ noinst_LTLIBRARIES = \
 	libtestsupport.la
 
 libtestsupport_la_SOURCES = \
-	point.cpp
+	point.cpp \
+	point_set.cpp \
+	cdbw.cpp
 
 #test program for matrix
 bin_PROGRAMS = \
@@ -22,15 +25,9 @@ bin_PROGRAMS = \
 	write-members-test \
 	bic-test \
 	reuse-test \
-	dbscan-test \
-	cdbw-test
+	dbscan-test 
 
-cdbw_test_SOURCES = \
-	cdbw_test.cpp\
-	cdbw.cpp
-
-dbscan_test_SOURCES = \
-	dbscan_test.cpp
+dbscan_test_SOURCES = dbscan_test.cpp 
 
 if HAVE_MPI
 bin_PROGRAMS += \

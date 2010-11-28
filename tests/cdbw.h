@@ -55,7 +55,7 @@ using boost::numeric::ublas::matrix;
 #include <ANN/ANN.h>
 
 #include "point.h"
-#include "density_based.h"
+#include "density.h"
 
 
 namespace cluster
@@ -133,6 +133,8 @@ namespace cluster
     double compute(size_t r);
 
   private:
+
+    medoid_id get_cluster(object_id i);
 
     void create_clusters(void);
 

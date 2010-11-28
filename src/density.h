@@ -31,12 +31,11 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-#ifndef K_MEDOIDS_H
-#define K_MEDOIDS_H
+#ifndef MUSTER_DENSITY_H_
+#define MUSTER_DENSITY_H_
 ///
-/// @file density_based.h
-/// @brief Implementations of the classic clustering algorithms PAM and CLARA, from 
-/// <i>Finding Groups in Data</i>, by Kaufman and Rousseeuw.
+/// @file density.h
+/// @brief Implementations of regular and sampled density clustering.
 ///
 
 #include <vector>
@@ -58,14 +57,21 @@ namespace cluster {
   /// 
   /// Implementation of the classic clustering algorithm DBSCAN.
   /// 
-  class density_based : public partition {
+  class density : public partition {
   public:
+    enum {
+      UNCLASSIFIED  = 0,  ///< special id for unclassified points
+      NOISE         = 1,  ///< special id for noise
+      FIRST_CLUSTER = 2   ///< id of first real cluster
+    };
+
     ///
     /// Constructor.  
     /// 
-    /// 
-    density_based(size_t num_objects = 0);
-    ~density_based();
+    density(size_t num_objects = 0);
+
+    /// Destructor does nothing for now.
+    virtual ~density();
 
     /// 
     /// DBSCAN clustering, described by Ester et. al. in the paper "A Density-Based 
@@ -80,46 +86,47 @@ namespace cluster {
     ///
     /// 
     template <class T, class D>
-    void dbscan(const std::vector<T>& objects, D dmetric, double _epsilon, size_t _min_points ) {
-      epsilon    = _epsilon;
-      min_points = _min_points;
+    void dbscan(const std::vector<T>& objects, D dmetric, double epsilon, size_t min_points) {
+      epsilon_    = epsilon;
+      min_points_ = min_points;
 
       for (size_t i = 0; i < objects.size(); i++) {
-        cluster_ids.push_back(cluster::unclassified);
+        cluster_ids.push_back(UNCLASSIFIED);
       }
 
       for (size_t i = 0; i < objects.size(); i++) {
-        if (cluster_ids[i] == cluster::unclassified) {
+        if (cluster_ids[i] == UNCLASSIFIED) {
           if (expand_cluster(objects, dmetric, i)) {
             medoid_ids.push_back(i);
-            current_cluster_id++;
-            total_clusters++;
+            current_cluster_id_++;
+            total_clusters_++;
           }
         }
       }
     }
 
-    protected:
+  protected:
     typedef boost::mt19937 random_type;                /// Type for RNG used in this algorithm
-    random_type random;                                /// Randomness source for this algorithm
+    random_type random_;                               /// Randomness source for this algorithm
     
     /// Adaptor for STL algorithms.
     typedef boost::random_number_generator<random_type, unsigned long> rng_type;
-    rng_type rng;
+    rng_type rng_;
 
-    double epsilon;                          /// maximum distance to perform the distance searches
-    size_t min_points;                       /// minimun number of points to consider a region as a cluster
+    double epsilon_;              ///< maximum distance to perform the distance searches
+    size_t min_points_;           ///< minimun number of points to consider a region as a cluster
 
-    size_t current_cluster_id;
-    size_t total_clusters;
+    size_t current_cluster_id_;   ///< Next cluster id to assign
+    size_t total_clusters_;       ///< total number of non-noise, non-unclassified clusters
+
 
     template <class T, class D>
     bool expand_cluster(const std::vector<T>& objects, D dmetric, size_t current_object) {
       std::list<size_t> seed_list = epsilon_range_query(objects, dmetric, current_object);
       std::list<size_t>::iterator seed_list_iterator;
 
-      if (seed_list.size() < min_points) {
-        cluster_ids[current_object] = cluster::noise;
+      if (seed_list.size() < min_points_) {
+        cluster_ids[current_object] = NOISE;
         return false;
       }
 
@@ -127,7 +134,7 @@ namespace cluster {
       seed_list_iterator = seed_list.begin();
       while (seed_list_iterator != seed_list.end()) {
         size_t current_seed = (*seed_list_iterator);
-        cluster_ids[current_seed] = current_cluster_id;
+        cluster_ids[current_seed] = current_cluster_id_;
 
         if (current_seed == current_object) {
           seed_list_iterator = seed_list.erase(seed_list_iterator);
@@ -140,31 +147,32 @@ namespace cluster {
       for (seed_list_iterator  = seed_list.begin();
            seed_list_iterator != seed_list.end();
            ++seed_list_iterator)
-      {
-        std::list<size_t>           neighbour_seed_list;
-        std::list<size_t>::iterator neighbour_seed_list_iterator;
+        {
+          std::list<size_t>           neighbour_seed_list;
+          std::list<size_t>::iterator neighbour_seed_list_iterator;
         
-        size_t current_neighbour = (*seed_list_iterator);
+          size_t current_neighbour = (*seed_list_iterator);
 
-        neighbour_seed_list = epsilon_range_query(objects, dmetric, current_neighbour);
+          neighbour_seed_list = epsilon_range_query(objects, dmetric, current_neighbour);
 
-        if (neighbour_seed_list.size() >= min_points) {
-          for (neighbour_seed_list_iterator  = neighbour_seed_list.begin();
-               neighbour_seed_list_iterator != neighbour_seed_list.end();
-               neighbour_seed_list_iterator++) {
-            size_t current_neighbour_neighbour = (*neighbour_seed_list_iterator);
+          if (neighbour_seed_list.size() >= min_points_) {
+            for (neighbour_seed_list_iterator  = neighbour_seed_list.begin();
+                 neighbour_seed_list_iterator != neighbour_seed_list.end();
+                 neighbour_seed_list_iterator++) {
+              size_t current_neighbour_neighbour = (*neighbour_seed_list_iterator);
+            
 
-            if (cluster_ids[current_neighbour_neighbour] == cluster::unclassified ||
-                cluster_ids[current_neighbour_neighbour] == cluster::noise) {
-              if (cluster_ids[current_neighbour_neighbour] == cluster::unclassified) {
-                seed_list.push_back(current_neighbour_neighbour);
+              if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED ||
+                  cluster_ids[current_neighbour_neighbour] == NOISE) {
+                if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED) {
+                  seed_list.push_back(current_neighbour_neighbour);
+                }
+                cluster_ids[current_neighbour_neighbour] = current_cluster_id_;
               }
-              cluster_ids[current_neighbour_neighbour] = current_cluster_id;
             }
           }
+          neighbour_seed_list.clear();
         }
-        neighbour_seed_list.clear();
-      }
 
       return true;
     }
@@ -180,15 +188,15 @@ namespace cluster {
         }
 
         /* Check the distance between current_object and i-th object */
-        if (dmetric(objects[current_object], objects[i]) < epsilon) {
+        if (dmetric(objects[current_object], objects[i]) < epsilon_) {
           result.push_back(i);
         }
       }
 
       return result;
     }
-  }; // class density_based
+  }; // class density
 
 } // namespace cluster
 
-#endif //K_MEDOIDS_H
+#endif //MUSTER_DENSITY_H_

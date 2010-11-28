@@ -30,7 +30,7 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "density_based.h"
+#include "density.h"
 
 #include <vector>
 #include <sstream>
@@ -46,16 +46,16 @@ using namespace std;
 
 
 namespace cluster {
-  
-  density_based::density_based(size_t num_objects) 
+
+  density::density(size_t num_objects) 
     : partition(num_objects), 
-      random(get_time_seed()),
-      rng(random),
-      current_cluster_id(cluster::first_cluster),
-      total_clusters(0)
+      random_(get_time_seed()),
+      rng_(random_),
+      current_cluster_id_(FIRST_CLUSTER),
+      total_clusters_(0)
   { }
 
 
-  density_based::~density_based() {  }
+  density::~density() {  }
 
 } // namespace cluster  
