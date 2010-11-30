@@ -101,17 +101,16 @@ namespace cluster {
   
   class CDbw {
   private:
-    partition& p;
-    std::vector<point>& points;
-    std::vector<dbscan_cluster> clusters;
-    size_t r; /// representatives
+    partition& p_;
+    std::vector<point>& points_;
+    std::vector<dbscan_cluster> clusters_;
+    size_t r_;                              ///< Representatives
       
-    boost::numeric::ublas::matrix<std::vector<std::pair<size_t, size_t> > > RCRs;
+    boost::numeric::ublas::matrix<std::vector<std::pair<size_t, size_t> > > RCRs_;
 
-    ANNpointArray       ann_data_points;
-    ANNkd_tree*         kd_tree;
-
-    double              intra_cluster_density_change;
+    ANNpointArray       ann_data_points_;
+    ANNkd_tree*         kd_tree_;
+    double              intra_cluster_density_change_;
       
   public:
       

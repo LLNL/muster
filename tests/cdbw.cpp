@@ -186,7 +186,7 @@ namespace cluster {
    ****************************************************************************/
 
 
-  CDbw::CDbw(partition& p, std::vector<point>& points) : p(p), points(points) {
+  CDbw::CDbw(partition& p, std::vector<point>& points) : p_(p), points_(points) {
     create_clusters();
   }
 
@@ -200,7 +200,7 @@ namespace cluster {
     double sep, coh, compact, sc;
 
     // omit the noise cluster from the cluster count.
-    size_t num_clusters = p.num_clusters() - 1;
+    size_t num_clusters = p_.num_clusters() - 1;
 
     // Criterion is not defined when number of clusters is 1
     if (num_clusters == 1) {
@@ -215,13 +215,11 @@ namespace cluster {
       }
     }
     
-    this->r = r;
+    r_ = r;
+    RCRs_ = matrix< vector< pair<size_t, size_t> > >(num_clusters, num_clusters);
 
-    this->RCRs = matrix<vector<pair<size_t, size_t> > >(num_clusters, num_clusters);
-
-  
     for (size_t i = 0; i < num_clusters; i++) {
-      clusters[i].choose_representatives(r);
+      clusters_[i].choose_representatives(r_);
     }
 
     compute_rcrs();
@@ -247,47 +245,45 @@ namespace cluster {
   /// Create the 'dbscan_cluster' objects using, so as to manipulate the cluster data easily
   ///
   void CDbw::create_clusters() {
-    size_t num_clusters = p.num_clusters() - 1;
+    size_t num_clusters = p_.num_clusters() - 1;
     for (size_t i=0; i < num_clusters; i++) {
-      clusters.push_back(dbscan_cluster(i, points));
+      clusters_.push_back(dbscan_cluster(i, points_));
     }
 
-    ann_data_points = annAllocPts(p.size(), 2);
+    ann_data_points_ = annAllocPts(p_.size(), 2);
   
-    for (size_t i=density::FIRST_CLUSTER; i < p.size(); i++) {
-      if (p.cluster_ids[i] != density::NOISE) {
+    for (size_t i=density::FIRST_CLUSTER; i < p_.size(); i++) {
+      if (p_.cluster_ids[i] != density::NOISE) {
         // -1 -> first cluster value == 1
-        clusters[p.cluster_ids[i]-1].add_point(i);
+        clusters_[p_.cluster_ids[i]-1].add_point(i);
       }
       
       ANNpoint current_point = annAllocPt(2);
       
-      current_point[0] = points[i].x;
-      current_point[1] = points[i].y;
+      current_point[0] = points_[i].x;
+      current_point[1] = points_[i].y;
       
-      ann_data_points[i] = current_point;
+      ann_data_points_[i] = current_point;
     }
     
-    for (size_t i=0; i < clusters.size(); i++) {
-      clusters[i].compute_data();
-      
-      /*
-        cout << "cl_" << i << " - Size = " << clusters[i].size();
-        cout << " Centroid = " << clusters[i].centroid();
-        cout << " stdev = " << clusters[i].stdev() << endl; */
+    for (size_t i=0; i < clusters_.size(); i++) {
+      clusters_[i].compute_data();
+      // cout << "cl_" << i << " - Size = " << clusters_[i].size();
+      // cout << " Centroid = " << clusters_[i].centroid();
+      // cout << " stdev = " << clusters_[i].stdev() << endl;
     }
   
-    kd_tree = new ANNkd_tree(ann_data_points, p.size(), 2);
+    kd_tree_ = new ANNkd_tree(ann_data_points_, p_.size(), 2);
   }
 
   ///
   /// Compute RCRs for each pair of clusters
   ///
   void CDbw::compute_rcrs() {
-    for (size_t i = 0; i < clusters.size(); ++i) {
-      for (size_t j = 0; j < clusters.size(); ++j) {
+    for (size_t i = 0; i < clusters_.size(); ++i) {
+      for (size_t j = 0; j < clusters_.size(); ++j) {
         if (i != j)
-          RCRs(i,j) = compute_rcrs_i_j (i,j);
+          RCRs_(i,j) = compute_rcrs_i_j(i,j);
       }
     }
   }
@@ -298,20 +294,20 @@ namespace cluster {
   vector<pair<size_t, size_t> > CDbw::compute_rcrs_i_j(medoid_id c_i, medoid_id c_j) {
     vector<pair<size_t, size_t> > result;
 
-    vector<size_t>& reps_i = clusters[c_i].representatives();
-    vector<size_t>& reps_j = clusters[c_j].representatives();
+    vector<size_t>& reps_i = clusters_[c_i].representatives();
+    vector<size_t>& reps_j = clusters_[c_j].representatives();
 
     vector<pair<size_t, size_t> > rcs_i_j;
     vector<pair<size_t, size_t> > rcs_j_i;
 
     for (size_t v = 0; v < reps_i.size(); ++v) {
       rcs_i_j.push_back(make_pair(reps_i[v],
-                                  clusters[c_j].closest_representative(points[reps_i[v]])));
+                                  clusters_[c_j].closest_representative(points_[reps_i[v]])));
     }
 
     for (size_t v = 0; v < reps_j.size(); ++v) {
       rcs_j_i.push_back(make_pair(reps_j[v],
-                                  clusters[c_i].closest_representative(points[reps_j[v]])));
+                                  clusters_[c_i].closest_representative(points_[reps_j[v]])));
     }
 
     // Now we have the rc's for both clusters, next, we have to compute the rcr's
@@ -341,10 +337,10 @@ namespace cluster {
     double sum_min_distance_btw_clusters = 0.0;
     double inter_cluster_density_val = inter_cluster_density();
 
-    for (medoid_id i = 0; i < clusters.size(); ++i) {
+    for (medoid_id i = 0; i < clusters_.size(); ++i) {
       min_distance_btw_clusters_i_j = std::numeric_limits<double>::max();
     
-      for (medoid_id j = 0; j < clusters.size(); ++j) {
+      for (medoid_id j = 0; j < clusters_.size(); ++j) {
         if (i != j) {
           double distance_btw_clusters = distance_between_clusters(i, j);
         
@@ -363,7 +359,7 @@ namespace cluster {
       cout << "Inter cluster density = " << inter_cluster_density_val << endl;
     */
   
-    result = (sum_min_distance_btw_clusters/clusters.size())/(1 + inter_cluster_density_val);
+    result = (sum_min_distance_btw_clusters / clusters_.size())/(1 + inter_cluster_density_val);
   
     return result;
   }
@@ -375,10 +371,10 @@ namespace cluster {
     double max_density_btw_clusters_i_j;
     double sum_max_density_btw_clusters = 0.0;
 
-    for (medoid_id i = 0; i < clusters.size(); ++i) {
+    for (medoid_id i = 0; i < clusters_.size(); ++i) {
       max_density_btw_clusters_i_j = std::numeric_limits<double>::min();
       
-      for (medoid_id j = 0; j < clusters.size(); ++j) {
+      for (medoid_id j = 0; j < clusters_.size(); ++j) {
         if (i != j) {
           double density_btw_clusters = density_between_clusters(i,j);
 
@@ -396,25 +392,28 @@ namespace cluster {
       cout << "Max. Density btw Clusters = " << sum_max_density_btw_clusters << endl;
     */
   
-    return (sum_max_density_btw_clusters/clusters.size());
+    return (sum_max_density_btw_clusters / clusters_.size());
   }
 
   ///
   /// Compute the density between a pair of clusters c_i and c_j
   ///
   double CDbw::density_between_clusters(medoid_id c_i, medoid_id c_j) {
-    vector<pair<size_t, size_t> >& RCR_i_j = RCRs ((size_t) c_i, (size_t) c_j);
+    vector<pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
 
     double sum_densities = 0.0;
-    double avg_stdev     = sqrt((pow(clusters[c_i].stdev(),2.0) + pow(clusters[c_j].stdev(),2.0))/2);
+
+    double c_i_stdev = clusters_[c_i].stdev();
+    double c_j_stdev = clusters_[c_j].stdev();
+    double avg_stdev = sqrt((c_i_stdev * c_i_stdev + c_j_stdev * c_j_stdev) / 2);
 
     for (size_t p = 0; p < RCR_i_j.size(); ++p) {
       point  u;
-      double distance_vi_vj = points[RCR_i_j[p].first].distance(points[RCR_i_j[p].second]);
+      double distance_vi_vj = points_[RCR_i_j[p].first].distance(points_[RCR_i_j[p].second]);
       double cardinality_u;
     
-      u  = points[RCR_i_j[p].first];
-      u += points[RCR_i_j[p].second];
+      u  = points_[RCR_i_j[p].first];
+      u += points_[RCR_i_j[p].second];
       u /= 2.0;
 
 
@@ -445,13 +444,13 @@ namespace cluster {
   
     // Count just those points that belong to clusters c_i and c_j
     for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
-      size_t cid = p.cluster_ids[neighbourhood_u[x]]-1;
+      size_t cid = p_.cluster_ids[neighbourhood_u[x]]-1;
       if (cid == c_i || cid == c_j) {
         ++number_of_points;
       }
     }
 
-    return (number_of_points/(clusters[c_i].size() + clusters[c_j].size()));
+    return (number_of_points / (clusters_[c_i].size() + clusters_[c_j].size()));
   }
 
   ///
@@ -459,10 +458,10 @@ namespace cluster {
   ///
   double CDbw::distance_between_clusters(medoid_id c_i, medoid_id c_j) {
     double sum_distances = 0.0;
-    vector<pair<size_t, size_t> >& RCR_i_j = RCRs (c_i, c_j);
+    vector<pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
 
-    for (size_t p = 0; p < RCR_i_j.size(); ++p) {
-      sum_distances += points[RCR_i_j[p].first].distance(points[RCR_i_j[p].second]);
+    for (size_t p=0; p < RCR_i_j.size(); ++p) {
+      sum_distances += points_[RCR_i_j[p].first].distance(points_[RCR_i_j[p].second]);
     }
 
     /*
@@ -489,13 +488,11 @@ namespace cluster {
       intra_densities_values.push_back(current_intra_density);
     }
 
-    intra_cluster_density_change = 0.0;
-  
+    intra_cluster_density_change_ = 0.0;
     for (size_t i = 1; i < intra_densities_values.size(); ++i) {
-      intra_cluster_density_change += fabs(intra_densities_values[i] - intra_densities_values[i-1]);
+      intra_cluster_density_change_ += fabs(intra_densities_values[i] - intra_densities_values[i-1]);
     }
-
-    intra_cluster_density_change = intra_cluster_density_change/7;
+    intra_cluster_density_change_ /= 7;
 
     // cout << "intra_cluster_density_change = " << intra_cluster_density_change << endl;
   
@@ -506,13 +503,13 @@ namespace cluster {
     double avg_stdev = 0.0;
     double result;
 
-    for (size_t i = 0; i < clusters.size(); ++i) {
-      avg_stdev += pow (clusters[i].stdev(), 2.0);
+    for (size_t i = 0; i < clusters_.size(); ++i) {
+      avg_stdev += clusters_[i].stdev() * clusters_[i].stdev();
     }
 
-    avg_stdev = sqrt(avg_stdev/clusters.size());
+    avg_stdev = sqrt(avg_stdev/clusters_.size());
 
-    result = density(s)/(clusters.size()*avg_stdev);
+    result = density(s)/(clusters_.size()*avg_stdev);
   
     return result;
   }
@@ -521,17 +518,17 @@ namespace cluster {
     double result;
     double sum_cardinalities = 0.0;
 
-    for (size_t i = 0; i < clusters.size(); ++i) {
-      vector<point> shrunk_rep = clusters[i].shrunk_representatives(s);
+    for (size_t i = 0; i < clusters_.size(); ++i) {
+      vector<point> shrunk_rep = clusters_[i].shrunk_representatives(s);
 
       for (size_t j = 0; j < shrunk_rep.size(); ++j) {
-        sum_cardinalities += cardinality(shrunk_rep[j], clusters[i].stdev(), i);
+        sum_cardinalities += cardinality(shrunk_rep[j], clusters_[i].stdev(), i);
       }
     }
 
     // cout << "sum_cardinalities = " << sum_cardinalities << endl;
   
-    result = sum_cardinalities/r;
+    result = sum_cardinalities / r_;
 
     /* DEBUG */
     // cout << "Density s_" << s << " = " << result << endl;
@@ -549,7 +546,7 @@ namespace cluster {
   
     // Count just those points that belong to cluster c_i
     for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
-      size_t cid = p.cluster_ids[neighbourhood_u[x]]-1;
+      size_t cid = p_.cluster_ids[neighbourhood_u[x]]-1;
       if (cid == c_i) {
         ++number_of_points;
       }
@@ -557,7 +554,7 @@ namespace cluster {
 
     // cout << "number of points = " << number_of_points << endl;
 
-    result = number_of_points*1.0/clusters[c_i].size();
+    result = number_of_points * 1.0/clusters_[c_i].size();
 
     // cout << "cardinality = " << result << endl;
 
@@ -566,9 +563,7 @@ namespace cluster {
 
   /* Cohesion */
   double CDbw::cohesion(double compact) {
-    double result = compact/(1+intra_cluster_density_change);
-
-    return result;
+    return compact / (1 + intra_cluster_density_change_);
   }
 
   ///
@@ -583,14 +578,11 @@ namespace cluster {
     ann_query_point[0] = u.x;
     ann_query_point[1] = u.y;
 
-    results_size = kd_tree->annkFRSearch(ann_query_point, pow(radix, 2.0), 0);
+    double radix2 = radix * radix;
+    results_size = kd_tree_->annkFRSearch(ann_query_point, radix2, 0);
   
     ann_results = new ANNidx[results_size];
-
-    kd_tree->annkFRSearch(ann_query_point,
-                          pow(radix, 2.0),
-                          results_size,
-                          ann_results);
+    kd_tree_->annkFRSearch(ann_query_point, radix2, results_size, ann_results);
 
     for (size_t i = 0; i < results_size; ++i) {
       result.push_back(ann_results[i]);
