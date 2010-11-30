@@ -86,6 +86,8 @@ namespace cluster {
     /// Constructor.  Can optionall supply the number of objects to be partitioned
     /// and this will start out with one cluster containing all of them.
     partition(size_t num_objects = 0);
+
+    /// Virtual destructor; currently does nothing.
     virtual ~partition();
 
     /// True if and only if object i is a medoid.
@@ -111,7 +113,7 @@ namespace cluster {
     
     /// Number of objects in cluster i
     size_t size(size_t i) const;
-    
+
     /// Write the members of cluster m out to the output stream as object_ids
     template <class OutputIterator>
     void write_members(medoid_id m, OutputIterator out) {

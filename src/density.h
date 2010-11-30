@@ -45,9 +45,6 @@
 #include <stdexcept>
 #include <cfloat>
 
-#include <boost/random.hpp>
-
-#include "random.h"
 #include "dissimilarity.h"
 #include "partition.h"
 #include "bic.h"
@@ -59,10 +56,10 @@ namespace cluster {
   /// 
   class density : public partition {
   public:
+    // Ids of special clusters in partitions created by dbscan.
     enum {
-      UNCLASSIFIED  = 0,  ///< special id for unclassified points
-      NOISE         = 1,  ///< special id for noise
-      FIRST_CLUSTER = 2   ///< id of first real cluster
+      NOISE         = 0,    ///< special id for noise cluster
+      FIRST_CLUSTER = 1     ///< id of first real cluster
     };
 
     ///
@@ -90,34 +87,54 @@ namespace cluster {
       epsilon_    = epsilon;
       min_points_ = min_points;
 
-      for (size_t i = 0; i < objects.size(); i++) {
-        cluster_ids.push_back(UNCLASSIFIED);
-      }
+      // put an arbitrary representative in for the noise cluster
+      medoid_ids.resize(1, 0);
 
+      // init cluster ids to UNCLASSIFIED_ before we do the density clustering
+      cluster_ids.clear();
+      cluster_ids.resize(objects.size(), UNCLASSIFIED_);
+
+      // go through the data set and expand each point that's not yet classified.
+      current_cluster_id_ = FIRST_CLUSTER_;
       for (size_t i = 0; i < objects.size(); i++) {
-        if (cluster_ids[i] == UNCLASSIFIED) {
+        if (cluster_ids[i] == UNCLASSIFIED_) {
           if (expand_cluster(objects, dmetric, i)) {
             medoid_ids.push_back(i);
             current_cluster_id_++;
-            total_clusters_++;
           }
         }
+      }
+
+      // Get rid of the UNCLASSIFIED_ cluster in the output by shifting all ids down one.
+      // This makes the output sane.  users of this class will use the public cluster ids
+      // instead of the private ones (e.g. NOISE instead of NOISE_)
+      for (size_t i=0; i < objects.size(); i++) {
+        cluster_ids[i]--;
+      }
+
+      // put a real noise object in as the representative for the noise cluster.
+      size_t i=0;
+      while (i < objects.size() && cluster_ids[i] != NOISE) i++;
+      if (i < objects.size()) {
+        medoid_ids[NOISE] = i;
+      } else {
+        // TODO: what to do if there is no noise?
       }
     }
 
   protected:
-    typedef boost::mt19937 random_type;                /// Type for RNG used in this algorithm
-    random_type random_;                               /// Randomness source for this algorithm
-    
-    /// Adaptor for STL algorithms.
-    typedef boost::random_number_generator<random_type, unsigned long> rng_type;
-    rng_type rng_;
+    // These cluster ids are use DURING the dbscan algorithm, while there are 
+    // still unclassified points.  We shift to the public ids once the algorithm is done.
+    enum {
+      UNCLASSIFIED_  = 0,  ///< special id for unclassified points
+      NOISE_         = 1,  ///< special id for noise
+      FIRST_CLUSTER_ = 2   ///< id of first real cluster
+    };
 
     double epsilon_;              ///< maximum distance to perform the distance searches
     size_t min_points_;           ///< minimun number of points to consider a region as a cluster
 
     size_t current_cluster_id_;   ///< Next cluster id to assign
-    size_t total_clusters_;       ///< total number of non-noise, non-unclassified clusters
 
 
     template <class T, class D>
@@ -126,7 +143,7 @@ namespace cluster {
       std::list<size_t>::iterator seed_list_iterator;
 
       if (seed_list.size() < min_points_) {
-        cluster_ids[current_object] = NOISE;
+        cluster_ids[current_object] = NOISE_;
         return false;
       }
 
@@ -146,8 +163,7 @@ namespace cluster {
       /* Expand the search to every seed */
       for (seed_list_iterator  = seed_list.begin();
            seed_list_iterator != seed_list.end();
-           ++seed_list_iterator)
-        {
+           ++seed_list_iterator) {
           std::list<size_t>           neighbour_seed_list;
           std::list<size_t>::iterator neighbour_seed_list_iterator;
         
@@ -162,9 +178,9 @@ namespace cluster {
               size_t current_neighbour_neighbour = (*neighbour_seed_list_iterator);
             
 
-              if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED ||
-                  cluster_ids[current_neighbour_neighbour] == NOISE) {
-                if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED) {
+              if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED_ ||
+                  cluster_ids[current_neighbour_neighbour] == NOISE_) {
+                if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED_) {
                   seed_list.push_back(current_neighbour_neighbour);
                 }
                 cluster_ids[current_neighbour_neighbour] = current_cluster_id_;

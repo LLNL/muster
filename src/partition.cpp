@@ -54,12 +54,12 @@ namespace cluster {
 
 
   partition::~partition() { }
-  
+
 
   void partition::to_cluster_list(cluster_list& clusters) const {
     clusters.clear();
-    clusters.resize(medoid_ids.size(), set<object_id>());
-    for (unsigned object=0; object < cluster_ids.size(); object++) {
+    clusters.resize(medoid_ids.size());
+    for (size_t object=0; object < cluster_ids.size(); object++) {
       clusters[cluster_ids[object]].insert(object);
     }
   }

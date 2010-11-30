@@ -57,50 +57,42 @@ using boost::numeric::ublas::matrix;
 #include "density.h"
 
 
-namespace cluster
-{
+namespace cluster {
 
   class dbscan_cluster {
   private:
-    std::vector<point>&  points;
-    medoid_id            cluster_id;
-    std::vector<size_t>  cluster_points;
-    point                centroid;
-    std::vector<size_t>  representatives;
-    double               stdev;
+    std::vector<point>&  points_;
+    medoid_id            cluster_id_;
+    std::vector<size_t>  cluster_points_;
+    point                centroid_;
+    std::vector<size_t>  representatives_;
+    double               stdev_;
 
   public:
 
-    dbscan_cluster(size_t& cluster_id, std::vector<point>& points):
-      cluster_id(cluster_id),points(points) { };
-    
-    void add_point(size_t point_id) {
-      cluster_points.push_back(point_id);
-    }
+    dbscan_cluster(size_t& cluster_id, std::vector<point>& points);
 
-    void compute_data(void);
+    dbscan_cluster(const dbscan_cluster& other);
+
+    ~dbscan_cluster();
+    
+    void add_point(size_t point_id);
+
+    void compute_data();
 
     void choose_representatives(size_t r);
 
-    std::vector<size_t>& get_representatives(void) { return representatives; };
-
     size_t closest_representative(point& p);
 
-    std::vector<point>   shrunk_representatives(double s);
+    std::vector<point> shrunk_representatives(double s);
 
-    size_t size(void) { return cluster_points.size(); };
-      
-    double get_stdev(void)    { return stdev; };
-    point& get_centroid(void) { return centroid; };
+    size_t size() { return cluster_points_.size(); }
 
-    void operator=(const dbscan_cluster& other) {
-      points = other.points;
-      cluster_id = other.cluster_id;
-      cluster_points = other.cluster_points;
-      centroid = other.centroid;
-      representatives = other.representatives;
-      stdev = other.stdev;
-    }
+    std::vector<size_t>& representatives()   { return representatives_; }
+    double stdev()                           { return stdev_; }
+    point& centroid()                        { return centroid_; }
+
+    void operator=(const dbscan_cluster& other);
   };
 
   ///
@@ -111,9 +103,7 @@ namespace cluster
   private:
     partition& p;
     std::vector<point>& points;
-    
     std::vector<dbscan_cluster> clusters;
-
     size_t r; /// representatives
       
     boost::numeric::ublas::matrix<std::vector<std::pair<size_t, size_t> > > RCRs;
@@ -125,27 +115,25 @@ namespace cluster
       
   public:
       
-    CDbw(partition& p, std::vector<point>& points): p(p), points(points) {
-      create_clusters();
-    };
+    CDbw(partition& p, std::vector<point>& points);
+
+    ~CDbw();
 
     double compute(size_t r);
 
   private:
 
-    medoid_id get_cluster(object_id i);
-
-    void create_clusters(void);
+    void create_clusters();
 
     /* RCRs computation */
-    void compute_rcrs(void);
+    void compute_rcrs();
 
     std::vector< std::pair<size_t, size_t> > compute_rcrs_i_j(medoid_id i, medoid_id j);
 
     /* Separation */
-    double separation(void);
+    double separation();
 
-    double inter_cluster_density(void);
+    double inter_cluster_density();
 
     double density_between_clusters(medoid_id i, medoid_id j);
 
@@ -154,7 +142,7 @@ namespace cluster
     double distance_between_clusters(medoid_id i, medoid_id j);
 
     /* Compactness */
-    double compactness_and_intra_density_changes(void);
+    double compactness_and_intra_density_changes();
 
     double intra_cluster_density(double s);
 
@@ -169,6 +157,6 @@ namespace cluster
     std::vector<size_t> range_query(point u, double radix);
   };
 
-};
+} // namespace cluster
 
 #endif // CDBW_H

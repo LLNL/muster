@@ -45,33 +45,44 @@ namespace cluster {
    * dbscan_clusters
    ****************************************************************************/
 
+  dbscan_cluster::dbscan_cluster(size_t& cluster_id, std::vector<point>& points)
+    : points_(points), cluster_id_(cluster_id) { }
+
+  dbscan_cluster::~dbscan_cluster() { }
+
+  void dbscan_cluster::add_point(size_t point_id) {
+    cluster_points_.push_back(point_id);
+  }
+
   ///
   /// Compute the centroid and the standard deviation for each cluster data
   ///
-  void dbscan_cluster::compute_data(void) {
-    if (cluster_points.size() == 0)
+  void dbscan_cluster::compute_data() {
+    if (cluster_points_.size() == 0) {
       return;
-    
-    /* Compute centroid */
-    centroid = points[cluster_points[0]];
+    }
 
-    if (cluster_points.size() > 1) {
-      for (size_t i = 1; i < cluster_points.size(); i++) {
-        centroid += points[cluster_points[i]];
+    /* Compute centroid */
+    centroid_ = points_[cluster_points_[0]];
+
+    if (cluster_points_.size() > 1) {
+      for (size_t i = 1; i < cluster_points_.size(); i++) {
+        centroid_ += points_[cluster_points_[i]];
       }
 
-      centroid /= cluster_points.size();
+      centroid_ /= cluster_points_.size();
     }
 
     /* Stdev */
     double sum_squares = 0.0;
-    for (size_t i = 0; i < cluster_points.size(); i++) {
-      sum_squares += pow(centroid.distance(points[cluster_points[i]]), 2);
+    for (size_t i = 0; i < cluster_points_.size(); i++) {
+      double val = centroid_.distance(points_[cluster_points_[i]]);
+      sum_squares += val * val;
     }
 
     // cout << "cl_" << cluster_id << " sum_squares = " << sum_squares << endl;
     
-    stdev = sqrt(sum_squares/(cluster_points.size()-1));
+    stdev_ = sqrt(sum_squares/(cluster_points_.size()-1));
   }
 
   ///
@@ -79,58 +90,56 @@ namespace cluster {
   ///
   void dbscan_cluster::choose_representatives(size_t r) {
     double max_distance = std::numeric_limits<double>::min();
-    size_t representative_id;
-    size_t representative_position;
 
-    deque<bool> point_used (cluster_points.size(), false);
+    deque<bool> point_used (cluster_points_.size(), false);
 
-    if (r >= cluster_points.size()) {
-      representatives = cluster_points;
+    if (r >= cluster_points_.size()) {
+      representatives_ = cluster_points_;
       return;
     }
     
-    point& last_representative = centroid;
+    point& last_representative = centroid_;
     
-    representatives = vector<size_t>(r, 0);
+    representatives_ = vector<size_t>(r, 0);
   
+    size_t representative_id = 0;
+    size_t representative_position = 0;
     for (size_t i = 0; i < r; ++i) {
       max_distance = std::numeric_limits<double>::min();
       representative_id = 0;
       
-      for (size_t j = 0; j < cluster_points.size(); ++j) {
+      for (size_t j = 0; j < cluster_points_.size(); ++j) {
         // cout << "checking point " << cluster_points[j] << "( " << point_used[j] << ")" << endl;
         if (!point_used[j]) {
-          double current_distance = last_representative.distance(points[cluster_points[j]]);
+          double current_distance = last_representative.distance(points_[cluster_points_[j]]);
           
           if (current_distance > max_distance) {
             max_distance            = current_distance;
-            representative_id       = cluster_points[j];
+            representative_id       = cluster_points_[j];
             representative_position = j;
           }
         }
       }
 
-      representatives[i]                  = representative_id;
+      representatives_[i]                 = representative_id;
       point_used[representative_position] = true;
-      last_representative                 = points[representative_id];
+      last_representative                 = points_[representative_id];
     }
-    
-    return;
   }
   
   ///
   /// Returns the closest representative of the given point
   ///
   size_t dbscan_cluster::closest_representative(point& p) {
-    double min_distance = p.distance(points[representatives[0]]);
-    size_t result       = representatives[0];
+    double min_distance = p.distance(points_[representatives_[0]]);
+    size_t result       = representatives_[0];
     
-    for (size_t i = 1; i < representatives.size(); i++) {
-      double current_distance = p.distance(points[representatives[i]]);
+    for (size_t i = 1; i < representatives_.size(); i++) {
+      double current_distance = p.distance(points_[representatives_[i]]);
       
       if (current_distance < min_distance) {
         min_distance = current_distance;
-        result       = representatives[i];
+        result       = representatives_[i];
       }
     }
 
@@ -143,31 +152,58 @@ namespace cluster {
   vector<point> dbscan_cluster::shrunk_representatives(double s) {
     vector<point> result;
     
-    for (size_t i = 0; i < representatives.size(); ++i) {
-      point shrunken_point = points[representatives[i]];
+    for (size_t i = 0; i < representatives_.size(); ++i) {
+      point shrunken_point = points_[representatives_[i]];
 
-      shrunken_point.x = shrunken_point.x + s*(centroid.x - shrunken_point.x);
-      shrunken_point.y = shrunken_point.y + s*(centroid.y - shrunken_point.y);
+      shrunken_point.x = shrunken_point.x + s*(centroid_.x - shrunken_point.x);
+      shrunken_point.y = shrunken_point.y + s*(centroid_.y - shrunken_point.y);
 
       result.push_back(shrunken_point);
     }
     return result;
   }
 
+  dbscan_cluster::dbscan_cluster(const dbscan_cluster& other) 
+    : points_(other.points_),
+      cluster_id_(other.cluster_id_),
+      cluster_points_(other.cluster_points_),
+      centroid_(other.centroid_),
+      representatives_(other.representatives_),
+      stdev_(other.stdev_)
+  { }
+
+  void dbscan_cluster::operator=(const dbscan_cluster& other) {
+    points_          = other.points_;
+    cluster_id_      = other.cluster_id_;
+    cluster_points_  = other.cluster_points_;
+    centroid_        = other.centroid_;
+    representatives_ = other.representatives_;
+    stdev_           = other.stdev_;
+  }
+
   /*****************************************************************************
    * CDbw
    ****************************************************************************/
+
+
+  CDbw::CDbw(partition& p, std::vector<point>& points) : p(p), points(points) {
+    create_clusters();
+  }
+
+  CDbw::~CDbw() { }
 
   ///
   /// Compute the CDbw criterion
   ///
   double CDbw::compute(size_t r) {
     double result;
-
     double sep, coh, compact, sc;
 
+    // omit the noise cluster from the cluster count.
+    size_t num_clusters = p.num_clusters() - 1;
+
     // Criterion is not defined when number of clusters is 1
-    if (p.num_clusters() == 1) {
+    if (num_clusters == 1) {
       if (std::numeric_limits<double>::has_quiet_NaN) {
         return std::numeric_limits<double>::quiet_NaN();
 
@@ -181,10 +217,10 @@ namespace cluster {
     
     this->r = r;
 
-    this->RCRs = matrix<vector<pair<size_t, size_t> > >(p.num_clusters(), p.num_clusters());
+    this->RCRs = matrix<vector<pair<size_t, size_t> > >(num_clusters, num_clusters);
 
   
-    for (size_t i = 0; i < p.num_clusters(); i++) {
+    for (size_t i = 0; i < num_clusters; i++) {
       clusters[i].choose_representatives(r);
     }
 
@@ -210,18 +246,18 @@ namespace cluster {
   ///
   /// Create the 'dbscan_cluster' objects using, so as to manipulate the cluster data easily
   ///
-  void CDbw::create_clusters(void) {
-    for (size_t i = 0; i < p.num_clusters(); i++) {
+  void CDbw::create_clusters() {
+    size_t num_clusters = p.num_clusters() - 1;
+    for (size_t i=0; i < num_clusters; i++) {
       clusters.push_back(dbscan_cluster(i, points));
     }
 
     ann_data_points = annAllocPts(p.size(), 2);
   
-    for (size_t i = 0; i < p.size(); i++) {
-      if (get_cluster(i) != density::UNCLASSIFIED &&
-          get_cluster(i) != density::NOISE) {
-        // -2 -> first cluster value == 2
-        clusters[(size_t) (get_cluster(i)-2)].add_point(i);
+    for (size_t i=density::FIRST_CLUSTER; i < p.size(); i++) {
+      if (p.cluster_ids[i] != density::NOISE) {
+        // -1 -> first cluster value == 1
+        clusters[p.cluster_ids[i]-1].add_point(i);
       }
       
       ANNpoint current_point = annAllocPt(2);
@@ -232,13 +268,13 @@ namespace cluster {
       ann_data_points[i] = current_point;
     }
     
-    for (size_t i = 0; i < clusters.size(); i++) {
+    for (size_t i=0; i < clusters.size(); i++) {
       clusters[i].compute_data();
       
       /*
         cout << "cl_" << i << " - Size = " << clusters[i].size();
-        cout << " Centroid = " << clusters[i].get_centroid();
-        cout << " stdev = " << clusters[i].get_stdev() << endl; */
+        cout << " Centroid = " << clusters[i].centroid();
+        cout << " stdev = " << clusters[i].stdev() << endl; */
     }
   
     kd_tree = new ANNkd_tree(ann_data_points, p.size(), 2);
@@ -247,7 +283,7 @@ namespace cluster {
   ///
   /// Compute RCRs for each pair of clusters
   ///
-  void CDbw::compute_rcrs(void) {
+  void CDbw::compute_rcrs() {
     for (size_t i = 0; i < clusters.size(); ++i) {
       for (size_t j = 0; j < clusters.size(); ++j) {
         if (i != j)
@@ -262,8 +298,8 @@ namespace cluster {
   vector<pair<size_t, size_t> > CDbw::compute_rcrs_i_j(medoid_id c_i, medoid_id c_j) {
     vector<pair<size_t, size_t> > result;
 
-    vector<size_t>& reps_i = clusters[c_i].get_representatives();
-    vector<size_t>& reps_j = clusters[c_j].get_representatives();
+    vector<size_t>& reps_i = clusters[c_i].representatives();
+    vector<size_t>& reps_j = clusters[c_j].representatives();
 
     vector<pair<size_t, size_t> > rcs_i_j;
     vector<pair<size_t, size_t> > rcs_j_i;
@@ -299,7 +335,7 @@ namespace cluster {
   ///
   /// Compute the separation of the current partition C
   ///
-  double CDbw::separation(void) {
+  double CDbw::separation() {
     double result;
     double min_distance_btw_clusters_i_j;
     double sum_min_distance_btw_clusters = 0.0;
@@ -335,7 +371,7 @@ namespace cluster {
   ///
   /// Compute the inter-cluster density of the current partition C
   ///
-  double CDbw::inter_cluster_density(void) {
+  double CDbw::inter_cluster_density() {
     double max_density_btw_clusters_i_j;
     double sum_max_density_btw_clusters = 0.0;
 
@@ -370,7 +406,7 @@ namespace cluster {
     vector<pair<size_t, size_t> >& RCR_i_j = RCRs ((size_t) c_i, (size_t) c_j);
 
     double sum_densities = 0.0;
-    double avg_stdev     = sqrt((pow(clusters[c_i].get_stdev(),2.0) + pow(clusters[c_j].get_stdev(),2.0))/2);
+    double avg_stdev     = sqrt((pow(clusters[c_i].stdev(),2.0) + pow(clusters[c_j].stdev(),2.0))/2);
 
     for (size_t p = 0; p < RCR_i_j.size(); ++p) {
       point  u;
@@ -409,13 +445,13 @@ namespace cluster {
   
     // Count just those points that belong to clusters c_i and c_j
     for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
-      if ((get_cluster(neighbourhood_u[x])-2) == c_i ||
-          (get_cluster(neighbourhood_u[x])-2) == c_j) {
+      size_t cid = p.cluster_ids[neighbourhood_u[x]]-1;
+      if (cid == c_i || cid == c_j) {
         ++number_of_points;
       }
     }
 
-    return (number_of_points/(clusters[c_i].size()+clusters[c_j].size()));
+    return (number_of_points/(clusters[c_i].size() + clusters[c_j].size()));
   }
 
   ///
@@ -442,7 +478,7 @@ namespace cluster {
   /// Computes the compactness of the partition and also the intra-cluster density changes, so
   /// as to save intra-cluster density computations
   ///
-  double CDbw::compactness_and_intra_density_changes(void) {
+  double CDbw::compactness_and_intra_density_changes() {
     double         sum_intra_densities = 0.0;
     vector<double> intra_densities_values;
   
@@ -471,7 +507,7 @@ namespace cluster {
     double result;
 
     for (size_t i = 0; i < clusters.size(); ++i) {
-      avg_stdev += pow (clusters[i].get_stdev(), 2.0);
+      avg_stdev += pow (clusters[i].stdev(), 2.0);
     }
 
     avg_stdev = sqrt(avg_stdev/clusters.size());
@@ -489,7 +525,7 @@ namespace cluster {
       vector<point> shrunk_rep = clusters[i].shrunk_representatives(s);
 
       for (size_t j = 0; j < shrunk_rep.size(); ++j) {
-        sum_cardinalities += cardinality(shrunk_rep[j], clusters[i].get_stdev(), i);
+        sum_cardinalities += cardinality(shrunk_rep[j], clusters[i].stdev(), i);
       }
     }
 
@@ -513,7 +549,8 @@ namespace cluster {
   
     // Count just those points that belong to cluster c_i
     for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
-      if ((get_cluster(neighbourhood_u[x])-2) == c_i) {
+      size_t cid = p.cluster_ids[neighbourhood_u[x]]-1;
+      if (cid == c_i) {
         ++number_of_points;
       }
     }
@@ -560,14 +597,6 @@ namespace cluster {
     }
 
     return result;
-  }
-
-  medoid_id CDbw::get_cluster(object_id i) {
-    if (i < p.size()) {
-      return p.cluster_ids[i];
-    } else {
-      return density::UNCLASSIFIED;
-    }
   }
 
 } // namespace cluster

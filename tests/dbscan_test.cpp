@@ -46,6 +46,7 @@
 #include "spherical_clustering_generator.h"
 
 #include "cdbw.h"
+#include "density.h"
 
 using namespace std;
 using namespace cluster;
@@ -53,14 +54,16 @@ using namespace cluster;
 typedef boost::minstd_rand base_generator_type;
 
 void usage() {
-  cerr << "Usage: dbscan-test [-htdnc] [-r <number_of_points>] [-i <data_file>] [-o output_file] -e <epsilon> -m <min_points>" << endl;
+  cerr << "Usage: dbscan-test [-htvc] "
+       << "[-r <number_of_points>] [-i <data_file>] [-o output_file] "
+       << "-e <epsilon> -m <min_points>" 
+       << endl;
   cerr << "  DBSCAN test case for clustering points" << endl;
   cerr << "Options:" << endl;
   cerr << "  -h         Show this message." << endl;
   cerr << "  -c         Use CDBW to evaluate the clustering." << endl;
   cerr << "  -t         Output timing info to file." << endl;
-  cerr << "  -d         Verbose debug output." << endl;
-  cerr << "  -n         Normalize values of the dimensions" << endl;
+  cerr << "  -v         Verbose output." << endl;
   cerr << "  -r         Run using random points" << endl;
   cerr << "  -e         Epsilon parameter of DBSCAN algorithm" << endl;
   cerr << "  -m         MinPoints parameter of DBSCAN algorithm" << endl;
@@ -70,28 +73,24 @@ void usage() {
   exit(1);
 }
 
-bool debug = false;
-bool timing = false;
-bool validate = false;
+static bool   verbose = false;
+static bool   timing = false;
+static bool   random_run = false;
+static size_t num_points = 0;
+static bool   normalize_points = false;
 
-bool   random_run = false;
-size_t num_points = 0;
+static bool   epsilon_set = false;
+static double epsilon;
 
-bool normalize_points = false;
+static bool   min_points_set = false;
+static size_t min_points;
 
-const size_t dimensions = 2;
+static bool   cdbw = false;
 
-bool   epsilon_set = false;
-double epsilon;
+static char*  input_file  = NULL;
+static char*  output_file = NULL;
 
-bool   min_points_set = false;
-size_t min_points;
-bool cdbw = false;
-
-char* input_file  = NULL;
-char* output_file = NULL;
-
-point_set points;
+static point_set points;
 
 
 /// Uses getopt to read in arguments.
@@ -127,8 +126,8 @@ void get_args(int *argc, char ***argv) {
       case 'c':
         cdbw = true;
         break;
-      case 'd':
-        debug = true;
+      case 'v':
+        verbose = true;
         break;
       case 'n':
         normalize_points = true;
@@ -173,7 +172,8 @@ void get_args(int *argc, char ***argv) {
 
   if (!epsilon_set || !min_points) {
     cerr << "You must provide -e and -m for epsilon and min_points." << endl;
-    exit (EXIT_FAILURE);
+    usage();
+    exit(EXIT_FAILURE);
   }
 }
 
@@ -243,10 +243,11 @@ int main(int argc, char **argv) {
     points.write_csv_file(csv_file, &clustering);
     timer.record("Write Output File");
   }
-  
+
   if (cdbw) {
     // Checking the CDbw
-    CDbw validation = CDbw(clustering, points.points());
+    CDbw validation(clustering, points.points());
+
     double current_cdbw = validation.compute(10); // 10 representatives per cluster
     timer.record("CDBW");
 
@@ -259,6 +260,6 @@ int main(int argc, char **argv) {
     cout << "**** EXECUTION TIMING ****" << endl;
     timer.write(cout);
   }
-  
-  exit (EXIT_SUCCESS);
+
+  exit(EXIT_SUCCESS);
 }

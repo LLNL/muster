@@ -52,11 +52,7 @@ using namespace std;
 namespace cluster {
 
   density::density(size_t num_objects) 
-    : partition(num_objects), 
-      random_(get_time_seed()),
-      rng_(random_),
-      current_cluster_id_(FIRST_CLUSTER),
-      total_clusters_(0)
+    : partition(num_objects)
   { }
 
 
