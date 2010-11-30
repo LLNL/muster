@@ -43,6 +43,7 @@
 #include <boost/random/variate_generator.hpp>
 
 #include "point.h"
+#include "random.h"
 
 namespace cluster {
   ///
