@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,13 +29,13 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef PAR_KMEDOIDS_H
-#define PAR_KMEDOIDS_H
 ///
 /// @file par_kmedoids.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief CAPEK and XCAPEK scalable parallel clustering algorithms.
 /// 
+#ifndef PAR_KMEDOIDS_H
+#define PAR_KMEDOIDS_H
 
 #include <mpi.h>
 #include <ostream>
@@ -167,6 +166,9 @@ namespace cluster {
       int size, rank;
       CMPI_Comm_size(comm, &size);
       CMPI_Comm_rank(comm, &rank);
+
+      // array for packed medoid arrays from trials -- we'll broadcast from/to here.
+      std::vector< std::vector<char> > bcast_buffers(all_medoids.size());
       
       for (size_t i=0; trials.has_next(); i++) {
         int my_k = -1;                        // trial id for local run of kmedoids
@@ -215,8 +217,8 @@ namespace cluster {
         gather.finish();
         timer.record("FinishGather");
 
-        // if we're a worker process (we were assigned a k and a trial number) then run PAM on the sample.
-        if (my_k >= 0) {
+        // if we're a worker process (we were assigned a trial number) then run PAM on the sample.
+        if (my_trial >= 0) {
           kmedoids cluster;
           cluster.set_epsilon(epsilon);
 
@@ -224,21 +226,41 @@ namespace cluster {
           build_dissimilarity_matrix(my_objects, dmetric, mat);
           cluster.pam(mat, my_k);
 
-          // put this trial's medoids into its spot in the global medoids array.
+          // put this trial's medoids into their spot in the global medoids array.
+          // and pack them up so that we can bcast them to other processes.
           for (size_t m=0; m < cluster.medoid_ids.size(); m++) {
             all_medoids[my_trial].push_back(
               make_id_pair(my_objects[cluster.medoid_ids[m]], my_ids[cluster.medoid_ids[m]]));
           }
+          pack_vector(comm, all_medoids[my_trial], bcast_buffers[my_trial]);
+          timer.record("PackForBroadcast");
         }
-        timer.record("LocalCluster");
 
         // once workers are done clustering, broadcast the medoids from each clustering 
         // so that all processes have the full all_medoids array.
         for (size_t trial_id = i * size; trial_id < trials.count(); trial_id++) {
-          bcast_vector(comm, all_medoids[trial_id], trial_id % size);
-        }
+          int root = trial_id % size;
 
+          // broadcast size and allocate receive buffer where needed
+          size_t packed_size = bcast_buffers[trial_id].size();
+          CMPI_Bcast(&packed_size, 1, MPI_SIZE_T, root, comm);
+          bcast_buffers[trial_id].resize(packed_size);
+
+          // broadcast packed data
+          CMPI_Bcast(&bcast_buffers[trial_id][0], packed_size, MPI_PACKED, root, comm);
+        }
         timer.record("Broadcast");
+
+        // now once we're done with the broadcasts, unpack all the data
+        for (size_t trial_id = i * size; trial_id < trials.count(); trial_id++) {
+          if ((size_t)my_trial != trial_id) {
+            unpack_vector(comm, bcast_buffers[trial_id], all_medoids[trial_id]);
+          }
+
+          // save some space: no longer need packed data here.
+          bcast_buffers[trial_id].clear();
+        }
+        timer.record("UnpackFromBroadcast");
       }
     }
 
@@ -522,58 +544,47 @@ namespace cluster {
     void seed_random_uniform(MPI_Comm comm);
 
     ///
-    /// This function broadcasts a vector of packable objects on one process 
-    /// to all processes.  To be packable, a type must support these operations:
-    ///                  T must also support the following operations:
-    ///                    - int packed_size(MPI_Comm comm) const
-    ///                    - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-    ///                    - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
+    /// This packs a vector of packable objects on one process.
+    /// To be packable, T must support these operations:
+    ///    - int packed_size(MPI_Comm comm) const
+    ///    - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
+    ///    - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
+    /// Each T in the input vector is packed and put on the back of 
     ///
     template <class T>
-    void bcast_vector(MPI_Comm comm, std::vector<T>& medoids, int root) {
-      int rank;
-      CMPI_Comm_rank(comm, &rank);
-
+    void pack_vector(MPI_Comm comm, const std::vector<T>& packables, std::vector<char>& buffer) {
       // figure out size of packed buffer
-      int packed_size=0;
-      if (rank == root) {
-        packed_size += cmpi_packed_size(1, MPI_SIZE_T, comm);   // num medoids for trial.
-        for (size_t i=0; i < medoids.size(); i++) {         // size of medoids.
-          packed_size += medoids[i].packed_size(comm);
-        }
+      int packed_size = 0;
+      packed_size += cmpi_packed_size(1, MPI_SIZE_T, comm);  // num packables for trial.
+      for (size_t i=0; i < packables.size(); i++) {          // size of packables.
+        packed_size += packables[i].packed_size(comm);
       }
-
-      // broadcast size and allocate receive buffer.
-      CMPI_Bcast(&packed_size, 1, MPI_INT, root, comm);
-      char packed_buffer[packed_size];
+      buffer.resize(packed_size);
 
       // pack buffer with medoid objects
-      if (rank == root) {
-        int pos = 0;
-
-        size_t num_medoids = medoids.size();
-        CMPI_Pack(&num_medoids, 1, MPI_SIZE_T, packed_buffer, packed_size, &pos, comm);
-
-        for (size_t i=0; i < num_medoids; i++) {
-          medoids[i].pack(packed_buffer, packed_size, &pos, comm);
-        }
-      }
-
-      CMPI_Bcast(&packed_buffer, packed_size, MPI_PACKED, root, comm);
-
-      // unpack broadcast medoids.
-      if (rank != root) {
-        int pos = 0;
-
-        size_t num_medoids;
-        CMPI_Unpack(packed_buffer, packed_size, &pos, &num_medoids, 1, MPI_SIZE_T, comm);
-        medoids.resize(num_medoids);
-
-        for (size_t i=0; i < medoids.size(); i++) {
-          medoids[i] = T::unpack(packed_buffer, packed_size, &pos, comm);
-        }
+      int pos = 0;
+      size_t num_packables = packables.size();
+      CMPI_Pack(&num_packables, 1, MPI_SIZE_T, &buffer[0], packed_size, &pos, comm);
+      for (size_t i=0; i < num_packables; i++) {
+        packables[i].pack(&buffer[0], packed_size, &pos, comm);
       }
     }
+
+    ///
+    /// This unpacks a vector of packable objects packed by pack_vector().
+    ///
+    template <class T>
+    void unpack_vector(MPI_Comm comm, const std::vector<char>& buffer, std::vector<T>& packables) {
+      int pos = 0;      
+      size_t num_packables;
+      CMPI_Unpack((void*)&buffer[0], buffer.size(), &pos, &num_packables, 1, MPI_SIZE_T, comm);
+
+      packables.resize(num_packables);
+      for (size_t i=0; i < packables.size(); i++) {
+        packables[i] = T::unpack((void*)&buffer[0], buffer.size(), &pos, comm);
+      }
+    }
+
 
     ///
     /// Find the closest object in the medoids vector to the object passed in.
