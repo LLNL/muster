@@ -225,6 +225,7 @@ namespace cluster {
           dissimilarity_matrix mat;
           build_dissimilarity_matrix(my_objects, dmetric, mat);
           cluster.pam(mat, my_k);
+          timer.record("LocalCluster");
 
           // put this trial's medoids into their spot in the global medoids array.
           // and pack them up so that we can bcast them to other processes.
