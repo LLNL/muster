@@ -16,7 +16,7 @@ set(MUSTER_VERSION "${MUSTER_MAJOR_VERSION}.${MUSTER_MINOR_VERSION}.${MUSTER_PAT
 
 # Build shared libraries by default.
 get_property(DEFAULT_SHARED GLOBAL PROPERTY TARGET_SUPPORTS_SHARED_LIBS)
-option(BUILD_SHARED_LIBS "Build shared libraries?" DEFAULT_SHARED)
+option(BUILD_SHARED_LIBS "Build shared libraries?" ${DEFAULT_SHARED})
 
 # Whether to build for regular MPI apps or with PMPI bindings (for tools).
 option(MUSTER_USE_PMPI "Build with PMPI bindings?" FALSE)
