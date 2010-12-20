@@ -1,54 +1,62 @@
 ==============================================================================
  Building and Installing
 ==============================================================================
+Muster uses CMake for building and installing, which is available on many 
+platforms.  If CMake is not already installed on your system, you can get
+the most current version here:
 
-Muster is designed to be simple to build and install.  In the most basic
-case, you can simply do this:
+    http://www.cmake.org/cmake/resources/software.html
+
+Once this is done, you can build and install Muster like this:
 
     $ tar xzf muster.tar.gz
     $ cd muster
-    $ ./configure --prefix=/path/to/install/location
+    $ mkdir linux-x86_64 && cd linux-x86_64
+    $ cmake -D CMAKE_INSTALL_PREFIX=/path/to/install/location
     $ make
     $ make install
 
-Currently the Muster build uses autoconf, but we are slowly transitioning to
-CMake.  Thus, you may notice CMake build files in the source tree.  The CMake
-build is currently undocumented, but these instructions will be updated when
-the transition is complete.
+Note that using CMake, you can have a build directory for every platform
+you use.  Above, we call the build directory 'linux-x86_64', but you could just 
+as easily have one called, e.g., "bgp" or "cray-XT5".  This is useful when the 
+source directory is shared among many different platforms.
 
 ------------------------------------------------------------------------------
  MPI Support
 ------------------------------------------------------------------------------
-For MPI support, you should configure Muster with your MPI C++ compiler, 
-like this:
+MPI support is autodetected by the Muster build, based on the presence of
+MPI compilers.  If you have MPI on your system, Muster should detect it
+and build the parallel clustering algorithms using it.
 
-    $ ./configure CXX=mpicxx --prefix=/path/to/install/location
+If you need to further customize the MPI libraries used in the build, you 
+can do this with the ccmake interactive tool:
 
-Building and installing are the same as for a sequential build:
+    $ cd muster/<build-directory>
+    $ ccmake ..
 
-    $ make
-    $ make install
-
+Hit 't' to toggle advanced options, and you will be able to edit the 
+particular variables used to guide the MPI build.
 
 ------------------------------------------------------------------------------
  External Dependencies
 ------------------------------------------------------------------------------
-Muster requires a header-only installation of the Boost C++ libraries.  Since
-it does not depend on the compiled boost libraries, this means that you can
-build Muster with either a fully installed Boost, or with just the headers.
+Muster requires a header-only installation of the Boost C++ libraries.  If 
+Boost is installed on your system, it should be detected automatically.
 
-If your system does not have boost headers in a standard location (e.g.,
-/usr/include, /usr/local/include, etc.), then you can download boost and
-point Muster at your boost installation like this:
+If boost is not installed on your system, you don't need to build it.  You 
+can download the latest boost here:
 
-    $ ./configure \
-          CXX=mpicxx \
-          --prefix=/path/to/install/location \
-          --with-boost=/path/to/boost
+    http://www.boost.org/users/download/
 
-The Muster build is able to handle paths to full boost installations or 
-header-only installations.
+Simply unarchive the headers, and run cmake like this:
 
+     $cmake \
+        -D CMAKE_INSTALL_PREFIX=/path/to/install/location \
+        -D Boost_INCLUDE_DIR=/path/to/boost/include/boost-<version> \
+        ..
+
+Look in the 'build' directory of the source tree for sample cmake 
+configuration scripts.
 
 ------------------------------------------------------------------------------
  Building Muster for Parallel Performance Tools
@@ -58,66 +66,43 @@ The PMPI interface is a common method of instrumenting MPI applications, but
 PMPI tools cannot themselves contain direct calls to MPI.  They must instead
 use calls to the name-shifted PMPI_* equivalents of the standard MPI calls.
 
-If you are using Muster in a performance tool, you should build with this 
-option:
+If you are using Muster in a performance tool, you should build with
+MUSTER_USE_PMPI set to true:
 
-    $ ./configure \
-          CXX=mpicxx \
-          --prefix=/path/to/install/location \
-          --with-boost=/path/to/boost \
-          --with-pmpi-bindings
+     $cmake \
+        -D CMAKE_INSTALL_PREFIX=/path/to/install/location \
+        -D MUSTER_USE_PMPI=TRUE \
+        ..
 
 This will #define all of the MPI calls in Muster to their PMPI equivalents,
 making the library safe for use in tools.
 
-
 ------------------------------------------------------------------------------
  Muster Test Programs
 ------------------------------------------------------------------------------
-By default, the Muster build does not include the various test programs that
-we used to debug the library.  However, many of these are of interest as 
-examples for users learning the library.  You can build the test programs
-by configuring with the --with-tests option, e.g.:
-
-    $ ./configure \
-          CXX=mpicxx \
-          --prefix=/path/to/install/location \
-          --with-boost=/path/to/boost \
-          --with-tests
-
-Tests will be installed in the /bin directory under the Muster prefix. Or,
-you can simply run the tests from the 'tests' directory in the Muster 
-source tree.
-
+By default, Muster tests are built but not installed.  If you want to install
+the tests with muster,  configure cmake with INSTALL_TESTS=TRUE.
 
 ------------------------------------------------------------------------------
  Muster on Blue Gene/P and other platforms
 ------------------------------------------------------------------------------
-The Muster build is designed to support many platforms.  To support this, the
-build can be run in a separate directory outside of the source tree, like so:
+The Muster build is designed to support many platforms.  As mentioned, the 
+build can be run in a directory per platform.  You can find sample configuration
+scripts for using Muster on BG/P and other platforms in the 'build' directory.
 
-    $ tar xzf muster.tar.gz
-    $ cd muster
-    $ mkdir linux-x86_64
-    $ cd linux-x86_64
-    $ ../configure CXX=mpicxx --prefix=/path/to/install/location
-    $ make
-    $ make install
+To build on BG/P, look at build/do_cmake_bgp.  This script contains a sample 
+CMake invocation for BlueGene/P machines.  To use it, simply copy it to your
+own build directory, run it, and build the project:
 
-To simplify this process, there are a number of sample configure scripts in the
-build directory of the source tree.  For example, there are currently scripts
-for configuring on Blue Gene architectures.  You could build for the BlueGene/P 
-compute node kernel like this:
-
-    $ tar xzf muster.tar.gz
-    $ cd muster
-    $ mkdir bgp-cnk
-    $ cp build/do_configure_bgp bgp-cnk/
-    $ cd bgp-cnk
-    $ <edit script to adjust prefixes and compiler flags>
-    $ ./do_configure_bgp
-    $ make
-    $ make install
+     $ tar xzf muster.tar.gz
+     $ cd muster
+     $ mkdir bgp-build
+     $ cp build/do_cmake_bgp bgp-build/
+     $ cd bgp-build
+     $ <edit do_cmake_bgp for your setup>
+     $ ./do_cmake_bgp
+     $ make
+     $ make install
 
 For help building on other platforms, please contact the Muster author,
 Todd Gamblin, tgamblin@llnl.gov.

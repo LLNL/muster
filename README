@@ -23,12 +23,17 @@ The parallel algorithms in Muster are implemented using the Message Passing
 Interface (MPI), making them suitable for use on many of the world's largest 
 supercomputers.  They should, however, also run efficiently on your laptop.
   
-
 ------------------------------------------------------------------------------
  Documentation 
 ------------------------------------------------------------------------------
 More extensive documentation for Muster is available through the Doxygen
-documentation system.  Doxygen is available for download from:
+documentation system.  You can find the most recent auto-generated 
+Muster documentation online at:
+    
+    http://tgamblin.github.com/muster
+
+Alternately, you can build the documentation yourself.  Doxygen is available 
+for download from:
 
     http://www.doxygen.org
 
@@ -52,7 +57,18 @@ See the LICENSE file for license and distribution information.
 ------------------------------------------------------------------------------
  Building and Installing
 ------------------------------------------------------------------------------
-More extensive information on building and installing Muster can be found
-in the INSTALL file.
+Information on building and installing Muster can be found in the INSTALL file.
 
+
+------------------------------------------------------------------------------
+ Contributors
+------------------------------------------------------------------------------
+Thanks to these people and organizations for their contributions (code and 
+otherwise) to Muster:
+
+  Martin Schulz         Lawrence Livermore National Laboratory
+  Bronis de Supinski    Lawrence Livermore National Laboratory
+  Juan Gonzalez         Barcelona Supercomputing Center
+  Rob Fowler            Renaissance Computing Institute
+  Daniel A. Reed        Microsoft Research
 
