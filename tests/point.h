@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,7 +29,10 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+///
+/// @file point.h
+/// @author Todd Gamblin tgamblin@llnl.gov
+///
 #ifndef MUSTER_TEST_POINT_H
 #define MUSTER_TEST_POINT_H
 
@@ -124,18 +126,14 @@ namespace cluster {
 
     /// Unpacks a point from an MPI packed buffer
     static point unpack(void *buf, int bufsize, int *position, MPI_Comm comm);
+    
+    /// Get an MPI datatype for a point.
+    static MPI_Datatype mpi_datatype();
 #endif // MUSTER_HAVE_MPI
   };
 
   std::ostream& operator<<(std::ostream& out, const point& p);
-
-  ///
-  /// Parses a string containing points in parentheses, like this:
-  ///  "(1, 1)  (2, 2) (3, 3)"
-  /// Appends parsed points to points vector.
-  ///
-  void parse_points(const std::string& str, std::vector<point>& points);
-
+    
   ///
   /// Draws a set of points in ascii with console colors.  Colors are assigned based on
   /// the partition provided.  Indices in points vector should correspond to ids in the 

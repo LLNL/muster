@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,14 +29,13 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef ID_PAIR_H
-#define ID_PAIR_H
 ///
 /// @file id_pair.h
 /// @brief MPI-packable, templated struct for shipping around an MPI-packable
 ///        object plus the id of the process it came from.
 ///
+#ifndef ID_PAIR_H
+#define ID_PAIR_H
 
 #include <mpi.h>
 #include "mpi_bindings.h"

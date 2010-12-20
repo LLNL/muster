@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,14 +29,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef MULTI_GATHER_H
-#define MULTI_GATHER_H
 ///
 /// @file multi_gather.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Asynchronous, some-to-some gather operation used by parallel clustering algorithms
 /// to simultaneously send members of sample sets to a set of distributed worker processes.
 ///
+#ifndef MULTI_GATHER_H
+#define MULTI_GATHER_H
 
 #include <mpi.h>
 #include <vector>

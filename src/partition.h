@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,13 +29,13 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef PARTITION_H
-#define PARTITION_H
 ///
 /// @file partition.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Class to represent a partitioning of a data set.
 ///
+#ifndef PARTITION_H
+#define PARTITION_H
 
 #include <cstddef>
 #include <vector>
@@ -87,6 +86,8 @@ namespace cluster {
     /// Constructor.  Can optionall supply the number of objects to be partitioned
     /// and this will start out with one cluster containing all of them.
     partition(size_t num_objects = 0);
+
+    /// Virtual destructor; currently does nothing.
     virtual ~partition();
 
     /// True if and only if object i is a medoid.
@@ -112,7 +113,7 @@ namespace cluster {
     
     /// Number of objects in cluster i
     size_t size(size_t i) const;
-    
+
     /// Write the members of cluster m out to the output stream as object_ids
     template <class OutputIterator>
     void write_members(medoid_id m, OutputIterator out) {

@@ -30,75 +30,92 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///
-/// @file spherical_clustering_generator.cpp
+/// @file point_set.h
 /// @author Todd Gamblin tgamblin@llnl.gov
 ///
-#ifndef SPHERICAL_CLUSTERING_GENERATOR_H
-#define SPHERICAL_CLUSTERING_GENERATOR_H
+#ifndef POINT_SET_H
+#define POINT_SET_H
+
+#ifdef HAVE_CONFIG_H
+#include "muster-config.h"
+#endif // HAVE_CONFIG_H
 
 #include <vector>
+#include <string>
+#include <iostream>
 #include "point.h"
-#include "gaussian.h"
-#include "random.h"
-#include <climits>
-
 
 namespace cluster {
-  
-  class spherical_clustering_generator {
-    std::vector<gaussian_generator_2d> generators;
-    double default_stddev;
-    double xscale;
-    double yscale;
-    size_t cur_generator;
 
+  class point_set {
   public:
-    spherical_clustering_generator() 
-      : default_stddev(1.0), xscale(1.0), yscale(1.0), cur_generator(0) { }
-
-    void add_cluster(point center, double stddev = -1) {
-      if (stddev < 0) stddev = default_stddev;
-      generators.push_back(gaussian_generator_2d(center.x, center.y, stddev, xscale, yscale));
-    }
+    point_set();
+    ~point_set();
     
-    /// Get the next point from the next cluster in round-robin order.
-    point next_point() {
-      if (!generators.size()) {
-        return point(0,0);
-      }      
-      point next = generators[cur_generator].next_point();
-      cur_generator = (cur_generator + 1) % generators.size();
-      return next;
-    }
+    void add_point(point p);
+    void add_point(double x, double y) { add_point(point(x,y)); }
 
-    /// Get the next point for a specific cluster
-    point next_point(size_t i) {
-      return generators[i].next_point();
-    }
+    ///
+    /// Range normalization
+    ///
+    void normalize();
+
+    ///
+    /// Parses a string containing points in parentheses, like this:
+    ///  "(1, 1)  (2, 2) (3, 3)"
+    /// Appends parsed points to points vector.
+    ///
+    void parse_points(const std::string& str);
+
+    ///
+    /// Parses a line containing a point with dimensions separated by a commas:
+    ///  "x, y"
+    /// Appends parsed point to points vector.
+    ///
+    void parse_point_csv(const std::string& str);
+    
+    ///
+    /// Loads a csv file.
+    ///
+    void load_csv_file(std::istream& input);
+
+
+    ///
+    /// Write a csv file out, optionally including information about
+    /// a clustering of the points in the file.
+    ///
+    void write_csv_file(std::ostream& out, partition *clustering=NULL);
+
+    /// Get a reference to the actual points vector here.
+    std::vector<point>& points() { return points_; }
+
+    /// Allow indexing.
+    point& operator[](size_t i) { return points_[i]; }
+
+    /// Number of points in this point set.
+    size_t size()  { return points_.size(); }
+
+    double min_x() { return min_x_; }
+    double max_x() { return max_x_; }
+    double min_y() { return min_y_; }
+    double max_y() { return max_y_; }
+    
+  private:
+    std::vector<point> points_;
+
+    double min_x_, max_x_;
+    double min_y_, max_y_;
+
+#ifdef MUSTER_HAVE_MPI
+    friend void scatter(point_set& points, int root, MPI_Comm comm);
+#endif
+  }; // point_set
   
-    void set_default_stddev(double dsd) {
-      default_stddev = dsd;
-    }
-    
-    void set_scale(double scale) {
-      xscale = yscale = scale;
-    }
-    
-    void set_xscale(double scale) {
-      xscale = scale;
-    }
 
-    void set_yscale(double scale) {
-      yscale = scale;
-    }
-
-    size_t size() const {
-      return generators.size();
-    }
-    
-  };
+#ifdef MUSTER_HAVE_MPI
+  void scatter(point_set& points, int root, MPI_Comm comm);
+#endif
 
 } // namespace cluster
 
-
-#endif // SPHERICAL_CLUSTERING_GENERATOR_H
+#endif // POINT_SET_H

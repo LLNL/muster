@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,14 +29,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef COUNTER_ITERATOR_H
-#define COUNTER_ITERATOR_H
 /// 
 /// @file counter.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Dummy output iterator that counts how many times it was assigned to.
 ///        without actually storing anything.
 ///
+#ifndef COUNTER_ITERATOR_H
+#define COUNTER_ITERATOR_H
 
 #include <cstdlib>
 #include <iterator>

@@ -1,26 +1,24 @@
 # Support files for tests that don't need to be in the main muster library.
-add_library(testsupport point.cpp)
-if (MUSTER_HAVE_MPI)
-  target_link_libraries(testsupport ${MPI_LIBRARIES})
-endif()
-
-# This lists all the libraries tests should need to compile.
-set(TEST_LIBS testsupport muster)
+set(EXTRA_TEST_SOURCES
+  point.cpp
+  point_set.cpp)
 
 # Simple function to add an executable and link it to the test libraries.
 function(add_test test_name src_name)
-  add_executable(${test_name} ${src_name})
-  target_link_libraries(${test_name} ${TEST_LIBS})
+  add_executable(${test_name} ${src_name} ${EXTRA_TEST_SOURCES})
+  target_link_libraries(${test_name} muster)
+  if (INSTALL_TESTS)
+    install(TARGETS ${test_name} DESTINATION bin)
+  endif()
 endfunction()
 
 # Function to add MPI tests, but only if MPI is enabled.
 function(add_mpi_test test_name src_name)
   if (MUSTER_HAVE_MPI)
-    add_executable(${test_name} ${src_name})
-    target_link_libraries(${test_name} ${TEST_LIBS} ${MPI_LIBRARIES})
+    add_test(${test_name} ${src_name})
+    target_link_libraries(${test_name} ${MPI_LIBRARIES})
   endif()
 endfunction()
-
 
 add_test(point-cluster-test point_cluster_test.cpp)
 add_test(mirkin-test mirkin_test.cpp)
@@ -37,7 +35,7 @@ add_mpi_test(par-bic-test par_bic_test.cpp)
 add_mpi_test(multi-gather-test multi_gather_test.cpp)
 
 include_directories(
-	${PROJECT_SOURCE_DIR}/external
+  ${PROJECT_SOURCE_DIR}/external
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}

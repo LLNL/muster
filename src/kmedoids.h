@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,14 +29,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef K_MEDOIDS_H
-#define K_MEDOIDS_H
 ///
 /// @file kmedoids.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Implementations of the classic clustering algorithms PAM and CLARA, from 
 /// <i>Finding Groups in Data</i>, by Kaufman and Rousseeuw.
 ///
+#ifndef K_MEDOIDS_H
+#define K_MEDOIDS_H
 
 #include <vector>
 #include <set>

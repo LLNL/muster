@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,14 +29,14 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef MUSTER_RANDOM_H
-#define MUSTER_RANDOM_H
 ///
 /// @file random.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Helper functions for taking random samples and seeding 
 ///        RNGs from the system clock.
 ///
+#ifndef MUSTER_RANDOM_H
+#define MUSTER_RANDOM_H
 
 #include <sys/time.h>
 

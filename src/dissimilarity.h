@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,13 +29,13 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef DISSIMILARITY_MATRIX_H
-#define DISSIMILARITY_MATRIX_H
 ///
 /// @file dissimilarity.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Data types and functions for dealing with dissimilarity matrices.
 ///
+#ifndef DISSIMILARITY_MATRIX_H
+#define DISSIMILARITY_MATRIX_H
 
 #include <vector>
 #include <boost/numeric/ublas/symmetric.hpp>

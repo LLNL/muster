@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,7 +29,10 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+///
+/// @file point.cpp
+/// @author Todd Gamblin tgamblin@llnl.gov
+///
 #include "point.h"
 #include "muster-config.h"
 
@@ -39,17 +41,16 @@
 #endif // MUSTER_HAVE_MPI
 #include "color.h"
 
+#include <limits>
 #include <iomanip>
 #include <cstdlib>
 #include <boost/numeric/ublas/matrix.hpp>
-#include <boost/algorithm/string.hpp>
 
 using boost::numeric::ublas::matrix;
-using namespace boost;
 using namespace std;
 
 namespace cluster {
-
+  
   point::point(double _x, double _y) : x(_x), y(_y) { }
 
   point::point() : x(0), y(0) { }
@@ -76,29 +77,21 @@ namespace cluster {
     PMPI_Unpack(buf, bufsize, position, &p.y, 1, MPI_DOUBLE,  comm);
     return p;
   }
+  
+  MPI_Datatype point::mpi_datatype() {
+    static MPI_Datatype type = MPI_DATATYPE_NULL;
+    if (type == MPI_DATATYPE_NULL) {
+      MPI_Type_contiguous(2, MPI_DOUBLE, &type);
+      MPI_Type_commit(&type); 
+    }
+    return type;
+  }
+
 #endif // MUSTER_HAVE_MPI
 
 
   ostream& operator<<(ostream& out, const point& p) {
     return out << "(" << setw(2) << p.x << "," << setw(2) << p.y << ")";
-  }
-
-
-  void parse_points(const string& str, vector<point>& points) {
-    string trimmed = trim_copy_if(str, is_any_of("() "));
-
-    vector<string> parts;
-    split(parts, trimmed, is_any_of("(,"));
-
-    vector<double> values(parts.size());
-    for (size_t i=0; i < parts.size(); i++) {
-      parts[i]  = trim_copy_if(parts[i], is_any_of("() ,"));
-      values[i] = strtod(parts[i].c_str(), NULL);
-    }
-
-    for (size_t i=1; i < values.size(); i += 2) {
-      points.push_back(point(values[i-1], values[i]));
-    }
   }
 
 

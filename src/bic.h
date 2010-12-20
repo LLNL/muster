@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 // Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
 // Produced at the Lawrence Livermore National Laboratory  
-// Written by Todd Gamblin, tgamblin@llnl.gov.
 // LLNL-CODE-433662
 // All rights reserved.  
 //
@@ -30,11 +29,9 @@
 // ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-#ifndef BAYESIAN_INFORMATION_CRITERION_H
-#define BAYESIAN_INFORMATION_CRITERION_H
 ///
 /// @file bic.h
+/// @author Todd Gamblin tgamblin@llnl.gov
 /// @brief Template function implementations of the Bayesian Information Criterion.
 ///
 /// The Bayesian Information Criterion (BIC) is a criterion for model selection
@@ -53,6 +50,8 @@
 /// <i>Proceedings of the Seventeenth International Conference on Machine Learning</i>, 
 /// San Francisco, CA. June 29-July 2, 2000.  pp 727-734.
 /// 
+#ifndef BAYESIAN_INFORMATION_CRITERION_H
+#define BAYESIAN_INFORMATION_CRITERION_H
 
 #include <stdint.h>
 #include <numeric>
