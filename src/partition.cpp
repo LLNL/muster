@@ -59,7 +59,7 @@ namespace cluster {
   void partition::to_cluster_list(cluster_list& clusters) const {
     clusters.clear();
     clusters.resize(medoid_ids.size());
-    for (size_t object=0; object < cluster_ids.size(); object++) {
+    for (object_id object=0; object < cluster_ids.size(); object++) {
       clusters[cluster_ids[object]].insert(object);
     }
   }
@@ -73,7 +73,7 @@ namespace cluster {
   
   void partition::sort() {
     // first create a mapping from new ids to old ids.
-    vector<size_t> mapping(medoid_ids.size());
+    vector<object_id> mapping(medoid_ids.size());
     generate(mapping.begin(), mapping.end(), sequence());
 
     std::sort(mapping.begin(), mapping.end(), indexed_lt(medoid_ids));
@@ -81,7 +81,7 @@ namespace cluster {
     std::sort(medoid_ids.begin(), medoid_ids.end());
 
     // translate old cluster ids to new ones.
-    for (size_t i=0; i < cluster_ids.size(); i++) {
+    for (object_id i=0; i < cluster_ids.size(); i++) {
       cluster_ids[i] = mapping[cluster_ids[i]];
     }
   }

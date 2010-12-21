@@ -48,8 +48,20 @@
 ///
 namespace cluster {
 
-  typedef size_t medoid_id;       ///< More descriptive type for medoid index
-  typedef size_t object_id;       ///< More descriptive type for object index
+  /// Type for cluster identifiers.  
+  /// 
+  /// In general, this will be an index into the representatives vector in the partition.
+  /// The type is a signed integer type so that clustering algorithms can use their own
+  /// custom identifiers for special values.
+  /// 
+  /// For example, density clustering may have a noise cluster, which does not have a
+  /// representative.  Likewise, some partitions may have values that are not present.
+  /// 
+  typedef int64_t medoid_id;
+
+  /// Type for medoid identifiers.  This is a signed integer type so that clustering
+  /// algorithms may use special object identifiers if they need to.
+  typedef int64_t object_id;
 
   /// 
   /// Explicit representation of a clustering.  Instead of a vecto of representative
@@ -58,6 +70,7 @@ namespace cluster {
   /// to_cluster_list().
   /// 
   typedef std::vector< std::set<object_id> > cluster_list;
+
   
   ///
   /// This represents a partitioning of a data set.  The data set consists of 
@@ -74,6 +87,9 @@ namespace cluster {
   /// explicit representation of the partitioning.
   /// 
   struct partition {
+    static const medoid_id UNCLASSIFIED = -1;
+    static const object_id NULL_OBJECT  = -1;
+    
     /// Gives the index of the object that is the ith medoid.
     /// medoids[i] == index in object array for last call to findClusters()
     std::vector<object_id> medoid_ids;

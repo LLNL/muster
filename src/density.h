@@ -57,10 +57,8 @@ namespace cluster {
   class density : public partition {
   public:
     // Ids of special clusters in partitions created by dbscan.
-    enum {
-      NOISE         = 0,    ///< special id for noise cluster
-      FIRST_CLUSTER = 1     ///< id of first real cluster
-    };
+    static const medoid_id NOISE         = 0;     ///< special id for noise cluster
+    static const medoid_id FIRST_CLUSTER = 1;     ///< id of first real cluster
 
     ///
     /// Constructor.  
@@ -92,24 +90,17 @@ namespace cluster {
 
       // init cluster ids to UNCLASSIFIED_ before we do the density clustering
       cluster_ids.clear();
-      cluster_ids.resize(objects.size(), UNCLASSIFIED_);
+      cluster_ids.resize(objects.size(), UNCLASSIFIED);
 
       // go through the data set and expand each point that's not yet classified.
-      current_cluster_id_ = FIRST_CLUSTER_;
+      current_cluster_id_ = FIRST_CLUSTER;
       for (size_t i = 0; i < objects.size(); i++) {
-        if (cluster_ids[i] == UNCLASSIFIED_) {
+        if (cluster_ids[i] == UNCLASSIFIED) {
           if (expand_cluster(objects, dmetric, i)) {
             medoid_ids.push_back(i);
             current_cluster_id_++;
           }
         }
-      }
-
-      // Get rid of the UNCLASSIFIED_ cluster in the output by shifting all ids down one.
-      // This makes the output sane.  users of this class will use the public cluster ids
-      // instead of the private ones (e.g. NOISE instead of NOISE_)
-      for (size_t i=0; i < objects.size(); i++) {
-        cluster_ids[i]--;
       }
 
       // put a real noise object in as the representative for the noise cluster.
@@ -123,14 +114,6 @@ namespace cluster {
     }
 
   protected:
-    // These cluster ids are use DURING the dbscan algorithm, while there are 
-    // still unclassified points.  We shift to the public ids once the algorithm is done.
-    enum {
-      UNCLASSIFIED_  = 0,  ///< special id for unclassified points
-      NOISE_         = 1,  ///< special id for noise
-      FIRST_CLUSTER_ = 2   ///< id of first real cluster
-    };
-
     double epsilon_;              ///< maximum distance to perform the distance searches
     size_t min_points_;           ///< minimun number of points to consider a region as a cluster
 
@@ -143,7 +126,7 @@ namespace cluster {
       std::list<size_t>::iterator seed_list_iterator;
 
       if (seed_list.size() < min_points_) {
-        cluster_ids[current_object] = NOISE_;
+        cluster_ids[current_object] = NOISE;
         return false;
       }
 
@@ -178,9 +161,9 @@ namespace cluster {
               size_t current_neighbour_neighbour = (*neighbour_seed_list_iterator);
             
 
-              if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED_ ||
-                  cluster_ids[current_neighbour_neighbour] == NOISE_) {
-                if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED_) {
+              if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED ||
+                  cluster_ids[current_neighbour_neighbour] == NOISE) {
+                if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED) {
                   seed_list.push_back(current_neighbour_neighbour);
                 }
                 cluster_ids[current_neighbour_neighbour] = current_cluster_id_;
