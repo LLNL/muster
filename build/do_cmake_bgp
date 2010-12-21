@@ -1,6 +1,10 @@
 #!/bin/sh
 #
-# Sample cmake invocation for building Muster on a BG/P
+# Sample cmake invocation for building Muster on a BlueGene/P machine.
+# Caller can specify a type of build.  Valid build types:
+#     gnu     gnu-static
+#     xl      xl-static
+# Default built type is gnu.
 #
 
 type=gnu
