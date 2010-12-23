@@ -602,7 +602,7 @@ namespace cluster {
     ) {
       double min_distance = DBL_MAX;
       size_t min_id = medoids.size();
-      for (size_t m=0; m < medoids.size(); m++) {
+      for (medoid_id m=0; m < (medoid_id)medoids.size(); m++) {
         double d = dmetric(medoids[m].element, object);
         if (d < min_distance || medoids[m].id == oid) { // prefer actual medoid as closest
           min_distance = d;

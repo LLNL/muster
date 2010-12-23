@@ -55,11 +55,21 @@ namespace cluster {
 
   partition::~partition() { }
 
+  
+  bool partition::is_medoid(object_id oi) const {
+    return in_cluster(oi) && medoid_ids[cluster_ids[oi]] == oi;
+  }
+
+
+  bool partition::in_cluster(object_id oi) const {
+    return (cluster_ids[oi] >= 0 && (size_t)cluster_ids[oi] < medoid_ids.size());
+  }
+
 
   void partition::to_cluster_list(cluster_list& clusters) const {
     clusters.clear();
     clusters.resize(medoid_ids.size());
-    for (object_id object=0; object < cluster_ids.size(); object++) {
+    for (size_t object=0; object < cluster_ids.size(); object++) {
       clusters[cluster_ids[object]].insert(object);
     }
   }
@@ -81,8 +91,20 @@ namespace cluster {
     std::sort(medoid_ids.begin(), medoid_ids.end());
 
     // translate old cluster ids to new ones.
-    for (object_id i=0; i < cluster_ids.size(); i++) {
+    for (size_t i=0; i < cluster_ids.size(); i++) {
       cluster_ids[i] = mapping[cluster_ids[i]];
+    }
+  }
+
+
+  void partition::remove_cluster(medoid_id id) {
+    medoid_ids.erase(medoid_ids.begin() + id);
+    for (size_t i=0; i < cluster_ids.size(); i++) {
+      if (cluster_ids[i] == id) {
+        cluster_ids[i] = UNCLASSIFIED;
+      } else if (cluster_ids[i] > id) {
+        cluster_ids[i]--;
+      }
     }
   }
 
@@ -185,11 +207,10 @@ namespace cluster {
 
   
   void partition::write_members_with_runs(medoid_id m, ostream& out) {
-    object_id o=0;
     bool first = true;
-    while (o < cluster_ids.size()) {
+    for (size_t o=0; o < cluster_ids.size(); o++) {
       if (cluster_ids[o] == m) {
-        object_id start = o++;
+        size_t start = o++;
         while (o < cluster_ids.size() && cluster_ids[o] == m) o++;
         if (!first) out << " ";
         if (o == start+1) {
@@ -199,7 +220,6 @@ namespace cluster {
         }
         first = false;
       }
-      o++;
     }
   }
 

@@ -130,7 +130,7 @@ namespace cluster {
 
   double kmedoids::cost(medoid_id i, object_id h, const dissimilarity_matrix& distance) const {
     double total = 0;
-    for (object_id j = 0; j < cluster_ids.size(); j++) {
+    for (object_id j = 0; j < (object_id)cluster_ids.size(); j++) {
       object_id mi  = medoid_ids[i];                // object id of medoid i
       double    dhj = distance(h, j);               // distance between object h and object j
       
@@ -188,9 +188,9 @@ namespace cluster {
       object_id minObject = 0;
 
       //iterate over each medoid
-      for (medoid_id i=0; i < k; i++) {
+      for (medoid_id i=0; i < (medoid_id)k; i++) {
         //iterate over all non-medoid objects
-        for (object_id h = 0; h < cluster_ids.size(); h++) {
+        for (object_id h = 0; h < (object_id)cluster_ids.size(); h++) {
           if (is_medoid(h)) continue;
 
           //see if the total cost of swapping i & h was less than min

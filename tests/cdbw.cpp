@@ -80,8 +80,6 @@ namespace cluster {
       sum_squares += val * val;
     }
 
-    // cout << "cl_" << cluster_id << " sum_squares = " << sum_squares << endl;
-    
     stdev_ = sqrt(sum_squares/(cluster_points_.size()-1));
   }
 
@@ -109,7 +107,6 @@ namespace cluster {
       representative_id = 0;
       
       for (size_t j = 0; j < cluster_points_.size(); ++j) {
-        // cout << "checking point " << cluster_points[j] << "( " << point_used[j] << ")" << endl;
         if (!point_used[j]) {
           double current_distance = last_representative.distance(points_[cluster_points_[j]]);
           
@@ -186,7 +183,8 @@ namespace cluster {
    ****************************************************************************/
 
 
-  CDbw::CDbw(partition& p, std::vector<point>& points) : p_(p), points_(points) {
+  CDbw::CDbw(partition& p, std::vector<point>& points) 
+    : p_(p), points_(points), cdbw_(0), separation_(0), compactness_(0), cohesion_(0) {
     create_clusters();
   }
 
@@ -196,11 +194,8 @@ namespace cluster {
   /// Compute the CDbw criterion
   ///
   double CDbw::compute(size_t r) {
-    double result;
-    double sep, coh, compact, sc;
-
     // omit the noise cluster from the cluster count.
-    size_t num_clusters = p_.num_clusters() - 1;
+    size_t num_clusters = p_.num_clusters();
 
     // Criterion is not defined when number of clusters is 1
     if (num_clusters == 1) {
@@ -224,38 +219,46 @@ namespace cluster {
 
     compute_rcrs();
   
-    sep         = separation();
-    compact     = compactness_and_intra_density_changes();
-    coh         = cohesion(compact);
-    sc          = sep*compact;
+    separation_  = compute_separation();
+    compactness_ = compactness_and_intra_density_changes();
+    cohesion_    = compute_cohesion(compactness_);
+    cdbw_        = cohesion_*separation_*compactness_;
 
-    result      = coh*sc;
-
-    // DEBUG
-    cout << "-- CDbw --" << endl;
-    cout << "Separation = " << sep << endl;
-    cout << "Compactness = " << compact << endl;
-    cout << "Cohesion = " << coh << endl;
-    cout << "Separation wrt Compactness = " << sc << endl;
-
-    return result;
+    return cdbw_;
   }
+
+
+  double CDbw::cdbw() const { 
+    return cdbw_; 
+  }
+
+  double CDbw::separation() const { 
+    return separation_;
+  }
+
+  double CDbw::compactness() const {
+    return compactness_;
+  }
+
+  double CDbw::cohesion() const {
+    return cohesion_;
+  }
+
 
   ///
   /// Create the 'dbscan_cluster' objects using, so as to manipulate the cluster data easily
   ///
   void CDbw::create_clusters() {
-    size_t num_clusters = p_.num_clusters() - 1;
+    size_t num_clusters = p_.num_clusters();
     for (size_t i=0; i < num_clusters; i++) {
       clusters_.push_back(dbscan_cluster(i, points_));
     }
 
     ann_data_points_ = annAllocPts(p_.size(), 2);
   
-    for (size_t i=density::FIRST_CLUSTER; i < p_.size(); i++) {
-      if (p_.cluster_ids[i] != density::NOISE) {
-        // -1 -> first cluster value == 1
-        clusters_[p_.cluster_ids[i]-1].add_point(i);
+    for (size_t i=0; i < p_.size(); i++) {
+      if (p_.cluster_ids[i] != partition::UNCLASSIFIED) {
+        clusters_[p_.cluster_ids[i]].add_point(i);
       }
       
       ANNpoint current_point = annAllocPt(2);
@@ -268,9 +271,6 @@ namespace cluster {
     
     for (size_t i=0; i < clusters_.size(); i++) {
       clusters_[i].compute_data();
-      // cout << "cl_" << i << " - Size = " << clusters_[i].size();
-      // cout << " Centroid = " << clusters_[i].centroid();
-      // cout << " stdev = " << clusters_[i].stdev() << endl;
     }
   
     kd_tree_ = new ANNkd_tree(ann_data_points_, p_.size(), 2);
@@ -280,8 +280,8 @@ namespace cluster {
   /// Compute RCRs for each pair of clusters
   ///
   void CDbw::compute_rcrs() {
-    for (size_t i = 0; i < clusters_.size(); ++i) {
-      for (size_t j = 0; j < clusters_.size(); ++j) {
+    for (medoid_id i = 0; i < (medoid_id)clusters_.size(); ++i) {
+      for (medoid_id j = 0; j < (medoid_id)clusters_.size(); ++j) {
         if (i != j)
           RCRs_(i,j) = compute_rcrs_i_j(i,j);
       }
@@ -321,26 +321,21 @@ namespace cluster {
       }
     }
 
-    /*
-      cout << "-- Compute RCR btw Cluster " << c_i << " and Cluster " << c_j << " --" << endl;
-      cout << "RCRs set size = " << result.size() << endl; */
-  
     return result;
   }
 
   ///
   /// Compute the separation of the current partition C
   ///
-  double CDbw::separation() {
-    double result;
+  double CDbw::compute_separation() {
     double min_distance_btw_clusters_i_j;
     double sum_min_distance_btw_clusters = 0.0;
     double inter_cluster_density_val = inter_cluster_density();
 
-    for (medoid_id i = 0; i < clusters_.size(); ++i) {
+    for (medoid_id i = 0; i < (medoid_id)clusters_.size(); ++i) {
       min_distance_btw_clusters_i_j = std::numeric_limits<double>::max();
     
-      for (medoid_id j = 0; j < clusters_.size(); ++j) {
+      for (medoid_id j = 0; j < (medoid_id)clusters_.size(); ++j) {
         if (i != j) {
           double distance_btw_clusters = distance_between_clusters(i, j);
         
@@ -352,16 +347,8 @@ namespace cluster {
 
       sum_min_distance_btw_clusters += min_distance_btw_clusters_i_j;
     }
-
-    /*
-      cout << "-- Separation --" << endl;
-      cout << "Sum. Min. Distance btw Clusters = " << sum_min_distance_btw_clusters << endl;
-      cout << "Inter cluster density = " << inter_cluster_density_val << endl;
-    */
   
-    result = (sum_min_distance_btw_clusters / clusters_.size())/(1 + inter_cluster_density_val);
-  
-    return result;
+    return (sum_min_distance_btw_clusters / clusters_.size())/(1 + inter_cluster_density_val);
   }
 
   ///
@@ -371,10 +358,10 @@ namespace cluster {
     double max_density_btw_clusters_i_j;
     double sum_max_density_btw_clusters = 0.0;
 
-    for (medoid_id i = 0; i < clusters_.size(); ++i) {
+    for (medoid_id i = 0; i < (medoid_id)clusters_.size(); ++i) {
       max_density_btw_clusters_i_j = std::numeric_limits<double>::min();
       
-      for (medoid_id j = 0; j < clusters_.size(); ++j) {
+      for (medoid_id j = 0; j < (medoid_id)clusters_.size(); ++j) {
         if (i != j) {
           double density_btw_clusters = density_between_clusters(i,j);
 
@@ -387,11 +374,6 @@ namespace cluster {
       sum_max_density_btw_clusters += max_density_btw_clusters_i_j;
     }
 
-    /*
-      cout << "-- Inter cluster density --" << endl;
-      cout << "Max. Density btw Clusters = " << sum_max_density_btw_clusters << endl;
-    */
-  
     return (sum_max_density_btw_clusters / clusters_.size());
   }
 
@@ -415,17 +397,8 @@ namespace cluster {
       u  = points_[RCR_i_j[p].first];
       u += points_[RCR_i_j[p].second];
       u /= 2.0;
-
-
     
       cardinality_u = cardinality(u, avg_stdev, c_i, c_j);
-
-      /*
-        cout << "cl_" << c_i << " & cl_" << c_j << " ";
-        cout << "vij = " << points[RCR_i_j[p].first] << ", vji = " << points[RCR_i_j[p].second] << ", u = " << u;
-        cout << " avg_stdev = " << avg_stdev;
-        cout << " cardinality = " << cardinality_u << endl;
-      */
 
       sum_densities += ((distance_vi_vj/(2*avg_stdev))*cardinality_u);
     }
@@ -444,7 +417,7 @@ namespace cluster {
   
     // Count just those points that belong to clusters c_i and c_j
     for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
-      size_t cid = p_.cluster_ids[neighbourhood_u[x]]-1;
+      medoid_id cid = p_.cluster_ids[neighbourhood_u[x]];
       if (cid == c_i || cid == c_j) {
         ++number_of_points;
       }
@@ -463,12 +436,6 @@ namespace cluster {
     for (size_t p=0; p < RCR_i_j.size(); ++p) {
       sum_distances += points_[RCR_i_j[p].first].distance(points_[RCR_i_j[p].second]);
     }
-
-    /*
-      cout << "-- Distance btw clusters " << c_i << " and " << c_j << " --" << endl;
-      cout << "Sum distances = " << sum_distances << endl;
-      cout << "RCR_i_j size = " << RCR_i_j.size() << endl;
-    */
   
     return (sum_distances/RCR_i_j.size());
   }
@@ -494,28 +461,20 @@ namespace cluster {
     }
     intra_cluster_density_change_ /= 7;
 
-    // cout << "intra_cluster_density_change = " << intra_cluster_density_change << endl;
-  
     return (sum_intra_densities/8); // 8 -> number of different 's'
   }
 
   double CDbw::intra_cluster_density(double s) {
     double avg_stdev = 0.0;
-    double result;
-
     for (size_t i = 0; i < clusters_.size(); ++i) {
       avg_stdev += clusters_[i].stdev() * clusters_[i].stdev();
     }
-
     avg_stdev = sqrt(avg_stdev/clusters_.size());
 
-    result = density(s)/(clusters_.size()*avg_stdev);
-  
-    return result;
+    return density(s)/(clusters_.size()*avg_stdev);
   }
 
   double CDbw::density(double s) {
-    double result;
     double sum_cardinalities = 0.0;
 
     for (size_t i = 0; i < clusters_.size(); ++i) {
@@ -526,43 +485,27 @@ namespace cluster {
       }
     }
 
-    // cout << "sum_cardinalities = " << sum_cardinalities << endl;
-  
-    result = sum_cardinalities / r_;
-
-    /* DEBUG */
-    // cout << "Density s_" << s << " = " << result << endl;
-
-    return result;
+    return sum_cardinalities / r_;
   }
 
   double CDbw::cardinality(point u, double radix, medoid_id c_i) {
-    size_t number_of_points = 0;
-    double result;
     // Perform the radix search (across all points), using libANN
     vector<size_t> neighbourhood_u = range_query(u, radix);
 
-    // cout << "neighbourhood size = " << neighbourhood_u.size() << endl;
-  
     // Count just those points that belong to cluster c_i
+    size_t number_of_points = 0;
     for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
-      size_t cid = p_.cluster_ids[neighbourhood_u[x]]-1;
+      medoid_id cid = p_.cluster_ids[neighbourhood_u[x]];
       if (cid == c_i) {
         ++number_of_points;
       }
     }
 
-    // cout << "number of points = " << number_of_points << endl;
-
-    result = number_of_points * 1.0/clusters_[c_i].size();
-
-    // cout << "cardinality = " << result << endl;
-
-    return result;
+    return number_of_points * 1.0/clusters_[c_i].size();
   }
 
   /* Cohesion */
-  double CDbw::cohesion(double compact) {
+  double CDbw::compute_cohesion(double compact) {
     return compact / (1 + intra_cluster_density_change_);
   }
 

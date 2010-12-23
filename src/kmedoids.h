@@ -300,13 +300,13 @@ namespace cluster {
       
       // go through and assign each object to nearest medoid, keeping track of total dissimilarity.
       double total_dissimilarity = 0;
-      for (object_id i=0; i < cluster_ids.size(); i++) {
+      for (object_id i=0; i < (object_id)cluster_ids.size(); i++) {
         double    d1, d2;  // smallest, second smallest distance to medoid, respectively
         medoid_id m1, m2;  // index of medoids with distances d1, d2 from object i, respectively
 
         d1 = d2 = DBL_MAX;
         m1 = m2 = medoid_ids.size();
-        for (medoid_id m=0; m < medoid_ids.size(); m++) {
+        for (medoid_id m=0; m < (medoid_id)medoid_ids.size(); m++) {
           double d = distance(i, medoid_ids[m]);
           if (d < d1 || medoid_ids[m] == i) {  // prefer the medoid in case of ties.
             d2 = d1;  m2 = m1;

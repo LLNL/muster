@@ -111,6 +111,12 @@ namespace cluster {
     ANNpointArray       ann_data_points_;
     ANNkd_tree*         kd_tree_;
     double              intra_cluster_density_change_;
+
+    // stored cluster staistics used for cdbw
+    double cdbw_;
+    double separation_;
+    double compactness_;
+    double cohesion_;
       
   public:
       
@@ -119,6 +125,11 @@ namespace cluster {
     ~CDbw();
 
     double compute(size_t r);
+
+    double cdbw() const;
+    double separation() const;
+    double compactness() const;
+    double cohesion() const;
 
   private:
 
@@ -130,7 +141,7 @@ namespace cluster {
     std::vector< std::pair<size_t, size_t> > compute_rcrs_i_j(medoid_id i, medoid_id j);
 
     /* Separation */
-    double separation();
+    double compute_separation();
 
     double inter_cluster_density();
 
@@ -150,7 +161,7 @@ namespace cluster {
     double cardinality(point u, double radix, medoid_id i);
 
     /* Cohesion */
-    double cohesion(double compact);
+    double compute_cohesion(double compact);
 
     /* Range query */
     std::vector<size_t> range_query(point u, double radix);

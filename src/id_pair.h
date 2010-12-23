@@ -39,6 +39,7 @@
 
 #include <mpi.h>
 #include "mpi_bindings.h"
+#include "mpi_utils.h"
 
 #include <cstdlib>
 #include <ostream>
@@ -58,7 +59,7 @@ namespace cluster {
   template <class T>
   struct id_pair {
     T element;    ///< The object wrapped by this id_pair.
-    size_t id;    ///< Id of the rank where element came from.
+    object_id id;    ///< Id of the rank where element came from.
 
     /// Template typedef for declaring vectors of id_pair<T>
     typedef std::vector< id_pair<T> > vector;
@@ -67,18 +68,18 @@ namespace cluster {
     id_pair(const T& elt, size_t _id) : element(elt), id(_id) { }
 
     int packed_size(MPI_Comm comm) const {
-      return element.packed_size(comm) + cmpi_packed_size(1, MPI_SIZE_T, comm);
+      return element.packed_size(comm) + cmpi_packed_size(1, mpi_typeof(id), comm);
     }
 
     void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const {
       element.pack(buf, bufsize, position, comm);
-      MPI_Pack(const_cast<size_t*>(&id), 1, MPI_SIZE_T, buf, bufsize, position, comm);
+      MPI_Pack(const_cast<object_id*>(&id), 1, mpi_typeof(id), buf, bufsize, position, comm);
     }
 
     static id_pair unpack(void *buf, int bufsize, int *position, MPI_Comm comm) {
       T t = T::unpack(buf, bufsize, position, comm);
       size_t id;
-      MPI_Unpack(buf, bufsize, position, &id, 1, MPI_SIZE_T, comm);
+      MPI_Unpack(buf, bufsize, position, &id, 1, mpi_typeof(id), comm);
       return id_pair(t, id);
     }
   };

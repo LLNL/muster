@@ -87,7 +87,10 @@ namespace cluster {
   /// explicit representation of the partitioning.
   /// 
   struct partition {
+    /// Special id for objects not in a particular cluster.
     static const medoid_id UNCLASSIFIED = -1;
+
+    /// object_id not representing a particular object.
     static const object_id NULL_OBJECT  = -1;
     
     /// Gives the index of the object that is the ith medoid.
@@ -107,9 +110,11 @@ namespace cluster {
     virtual ~partition();
 
     /// True if and only if object i is a medoid.
-    bool is_medoid(object_id oi) const {
-      return medoid_ids[cluster_ids[oi]] == oi;
-    }
+    bool is_medoid(object_id oi) const;
+
+    /// True if the object with the specified id is in a cluster.
+    /// That is, it's not unclassified, and it has a representative in medoid_ids.
+    bool in_cluster(object_id oi) const;
 
     /// Creates a list of std::sets from the partition info in 
     /// medoids and cluster_ids.
@@ -133,7 +138,7 @@ namespace cluster {
     /// Write the members of cluster m out to the output stream as object_ids
     template <class OutputIterator>
     void write_members(medoid_id m, OutputIterator out) {
-      for (object_id o=0; o < cluster_ids.size(); o++) {
+      for (object_id o=0; o < (object_id)cluster_ids.size(); o++) {
         if (cluster_ids[o] == m) {
           *out++ = o;
         }
@@ -151,6 +156,9 @@ namespace cluster {
       member_writer(partition *_p, medoid_id _m) : p(_p), m(_m) { }
     };
     member_writer members(medoid_id m) { return member_writer(this, m); }
+
+    /// Removes a cluster from the partition and marks its points as UNCLASSIFIED.
+    virtual void remove_cluster(medoid_id id);
 
   }; // struct partition
 
