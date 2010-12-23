@@ -98,7 +98,7 @@ int main(int argc, char **argv) {
   multi_gather<point> gather(MPI_COMM_WORLD);
   for (int root=0; root < size; root++) {
     vector<int> cur_sources;
-    random_subset(size, (int)ceil(sqrt((double)size)), back_inserter(cur_sources), rng);
+    fast_sample(size, (int)ceil(sqrt((double)size)), back_inserter(cur_sources), rng);
     gather.start(points.begin(), points.end(), cur_sources.begin(), cur_sources.end(), dest, root);
 
     if (rank == root) {

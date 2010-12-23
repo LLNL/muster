@@ -39,22 +39,28 @@
 #define MUSTER_RANDOM_H
 
 #include <sys/time.h>
+#include <tr1/unordered_map>
 
 namespace cluster {
 
   ///
-  /// This is Knuth's algorithm R for taking a sample of indices from
-  /// 0 to numElements.  We sample size indices from this (the superset)
-  /// and put them in the subset's mapping.
+  /// This is Knuth's algorithm R for taking a sample of numElements numbers.
+  /// We sample <code>sample_size</code> indices from [0..numElements) and write them to
+  /// <code>out</code>.
+  ///
+  /// Note that this algorithm scales linaerly with the number of objects sampled from
+  /// (that is, numElements).
+  ///
+  /// @sa fast_sample()
   ///
   /// @param numElements    total number of elements to select from
   /// @param sample_size    number of elements to select
-  /// @param out            destination for selected elements 
+  /// @param out            destination for selected elements, must model output iterator
   /// @param random         model of STL Random Number Generator.
   ///                       must be callable as random(N), returning a random number in [0,N).
   ///
   template <class OutputIterator, class Random>
-  void random_subset(size_t numElements, size_t sample_size, OutputIterator out, Random& random) {
+  void algorithm_r(size_t numElements, size_t sample_size, OutputIterator out, Random& random) {
     size_t first = 0;
     size_t remaining = numElements;
     size_t m = sample_size;
@@ -72,8 +78,46 @@ namespace cluster {
 
 
   ///
-  /// Returns a reasonably distributed seed for random number generators.
-  /// Based on the product of the seconds and usec in gettimeofday().
+  /// This is a fast algorithm for random sampling that scales with the number of elements 
+  /// sampled (sample_size).  Its performance does not depend on the number of elements sampled
+  /// from (numElements), so it will perform better than algorithm R in most cases.
+  ///
+  /// Specifically, this algorithm will perform better when sample_size is small compared to 
+  /// numElements. Algorithm R will perform better when sample_size is a large percentage of
+  /// the elements to be sampled.  Use this algoritm when you need O(sample_size) performance
+  /// and sample_size is constant in the limit with respect to num_elements.
+  ///
+  /// @param numElements    total number of elements to select from
+  /// @param sample_size    number of elements to select
+  /// @param out            destination for selected elements, must model output iterator.
+  /// @param random         model of STL Random Number Generator.
+  ///                       must be callable as random(N), returning a random number in [0,N).
+  ///
+  template <class OutputIterator, class Random>
+  void fast_sample(size_t numElements, size_t sample_size, OutputIterator out, Random& random) {
+    // Map keeps track of numbers whose identities have been swapped.
+    std::tr1::unordered_map<size_t, size_t> swaps;
+    
+    for (size_t s = 0; s < sample_size; s++) {
+      size_t remaining = numElements - s;  // number of elements remaining to be picked
+      size_t pick = random(remaining);     // random pick from remaining elts
+
+      if (swaps.count(pick)) {
+        *out = swaps[pick];
+      } else {
+        *out = pick;
+      }
+      ++out;
+
+      // make as yet unpicked number eligible to be picked next time
+      swaps[pick] = remaining - 1;  
+    }
+  }
+  
+  
+  ///
+  /// Returns a seed for random number generators based on the product
+  /// of sec and usec from gettimeofday().
   ///
   inline long get_time_seed() {
     struct timeval time;
