@@ -102,19 +102,16 @@ namespace cluster {
       size_t remaining = numElements - s;  // number of elements remaining to be picked
       size_t pick = random(remaining);     // random pick from remaining elts
 
-      if (swaps.count(pick)) {
-        *out = swaps[pick];
-      } else {
-        *out = pick;
-      }
+      *out = swaps.count(pick) ? swaps[pick] : pick;
       ++out;
 
-      // make as yet unpicked number eligible to be picked next time
-      swaps[pick] = remaining - 1;  
+      // Make as-yet unpicked number eligible to be picked next time
+      size_t last = remaining - 1;
+      swaps[pick] = swaps.count(last) ? swaps[last] : last;
     }
   }
   
-  
+
   ///
   /// Returns a seed for random number generators based on the product
   /// of sec and usec from gettimeofday().
