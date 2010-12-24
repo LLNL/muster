@@ -43,6 +43,10 @@ check_function_exists(clock_gettime MUSTER_HAVE_CLOCK_GETTIME)
 unset(CMAKE_REQUIRED_LIBRARIES)
 check_function_exists(gettimeofday MUSTER_HAVE_GETTIMEOFDAY)
 
+set(CMAKE_REQUIRED_INCLUDES mach/mach.h mach/mach_time.h)
+unset(CMAKE_REQUIRED_LIBRARIES)
+check_function_exists(mach_absolute_time MUSTER_HAVE_MACH_TIME)
+
 # Configure a header file with all the variables we found.
 configure_file(
   ${PROJECT_SOURCE_DIR}/muster-config.h.in

@@ -83,6 +83,19 @@ timing_t get_time_ns() {
   return (ts.tv_sec * 1000000000ll + ts.tv_nsec);
 }
 
+#elif defined(MUSTER_HAVE_MACH_TIME)
+
+#include <mach/mach.h>
+#include <mach/mach_time.h>
+
+timing_t get_time_ns() {
+  static mach_timebase_info_data_t timebase_info;
+  if (timebase_info.denom == 0) {
+    mach_timebase_info(&timebase_info);
+  }
+  timing_t machtime = mach_absolute_time();
+  return machtime * timebase_info.numer / timebase_info.denom;
+}
 
 #elif defined(MUSTER_HAVE_GETTIMEOFDAY)
 // -------------------------------------------------------- //

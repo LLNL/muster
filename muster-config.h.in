@@ -45,6 +45,9 @@
 // Define if muster uses PMPI tool bindings instead of standard MPI bindings.
 #cmakedefine MUSTER_USE_PMPI
 
+// Define if we have Mac OS X Mach timers.
+#cmakedefine MUSTER_HAVE_MACH_TIME
+
 // Muster version information -- numerical and a version string.
 #define MUSTER_MAJOR_VERSION @MUSTER_MAJOR_VERSION@
 #define MUSTER_MINOR_VERSION @MUSTER_MINOR_VERSION@
