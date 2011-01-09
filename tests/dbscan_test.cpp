@@ -245,13 +245,17 @@ int main(int argc, char **argv) {
   }
 
   if (cdbw) {
-    // Checking the CDbw
+    // Checking the CDbw on everything but the noise.
+    clustering.remove_cluster(density::NOISE);
     CDbw validation(clustering, points.points());
-
     double current_cdbw = validation.compute(10); // 10 representatives per cluster
     timer.record("CDBW");
 
     cout << "CDbw = " << current_cdbw << endl;
+    cout << "  separtion:    " << validation.separation() << endl;
+    cout << "  compactness:  " << validation.compactness() << endl;
+    cout << "  cohesion:     " << validation.cohesion() << endl;
+    cout << "  sep*compact:  " << validation.separation() * validation.compactness() << endl;
   }
   
   // Write timing
