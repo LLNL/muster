@@ -184,7 +184,7 @@ namespace cluster {
           // Generate a set of indices for members of this k-medoids trial
           std::vector<size_t> sample_ids;
           boost::random_number_generator<random_t> rng(random);  // Boost adaptor for STL RNG's
-          random_subset(trials.num_objects, cur_trial.sample_size, std::back_inserter(sample_ids), rng);
+          fast_sample(trials.num_objects, cur_trial.sample_size, std::back_inserter(sample_ids), rng);
 
           // figure out where the sample objects live, ASSUME objects.size() objs per process.
           std::vector<int> sources;

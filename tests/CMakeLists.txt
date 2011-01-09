@@ -1,5 +1,6 @@
-# Support files for tests that don't need to be in the main muster library.
-set(EXTRA_TEST_SOURCES
+# Support library for tests that don't need to be in the main muster library 
+# (or they haven't been moved there yet)
+add_library(test-support STATIC
   point.cpp
   point_set.cpp
   cdbw.cpp)
@@ -7,7 +8,7 @@ set(EXTRA_TEST_SOURCES
 # Simple function to add an executable and link it to the test libraries.
 function(add_test test_name src_name)
   add_executable(${test_name} ${src_name} ${EXTRA_TEST_SOURCES})
-  target_link_libraries(${test_name} muster ANN)
+  target_link_libraries(${test_name} test-support muster ANN)
   if (INSTALL_TESTS)
     install(TARGETS ${test_name} DESTINATION bin)
   endif()
@@ -29,6 +30,7 @@ add_test(convergence-test convergence_test.cpp)
 add_test(write-members-test write_members_test.cpp)
 add_test(bic-test bic_test.cpp)
 add_test(reuse-test reuse_test.cpp)
+add_test(random-test random_test.cpp)
 add_test(dbscan-test dbscan_test.cpp)
 
 add_mpi_test(par-cluster-test par_cluster_test.cpp)

@@ -1,0 +1,6 @@
+#!/bin/sh
+#
+# Sample cmake invocation for building Muster on Mac OS X
+#
+cmake -D CMAKE_INSTALL_PREFIX=${HOME}/opt/muster ..
+
