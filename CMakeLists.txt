@@ -27,6 +27,9 @@ option(INSTALL_TESTS "Do you want to build the test programs?" FALSE)
 # Muster requires boost for matrices and random number generators.
 find_package(Boost REQUIRED)
 
+# This finds a CGAL installation.  CGAL uses CMake and has its own config.
+find_package(CGAL REQUIRED)
+
 # Find the MPI library and set some definitions
 find_package(MPI)
 if (MPI_FOUND)

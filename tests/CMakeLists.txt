@@ -1,14 +1,15 @@
+include(${CGAL_DIR}/UseCGAL.cmake)
+
 # Support library for tests that don't need to be in the main muster library 
 # (or they haven't been moved there yet)
 add_library(test-support STATIC
   point.cpp
-  point_set.cpp
-  cdbw.cpp)
+  point_set.cpp)
 
 # Simple function to add an executable and link it to the test libraries.
 function(add_test test_name src_name)
   add_executable(${test_name} ${src_name} ${EXTRA_TEST_SOURCES})
-  target_link_libraries(${test_name} test-support muster ANN)
+  target_link_libraries(${test_name} test-support muster ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES})
   if (INSTALL_TESTS)
     install(TARGETS ${test_name} DESTINATION bin)
   endif()
@@ -38,9 +39,11 @@ add_mpi_test(par-cluster-speed-test par_cluster_speed_test.cpp)
 add_mpi_test(par-bic-test par_bic_test.cpp)
 add_mpi_test(multi-gather-test multi_gather_test.cpp)
 
+add_test(hull-d-test hull_d_test.cpp)
+
 include_directories(
+  ${CGAL_INCLUDE_DIRS}
   ${PROJECT_SOURCE_DIR}/external
-  ${PROJECT_SOURCE_DIR}/libANN
   ${PROJECT_SOURCE_DIR}/src
   ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}

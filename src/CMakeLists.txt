@@ -2,6 +2,7 @@ set(MUSTER_SOURCES
 	partition.cpp
 	kmedoids.cpp
 	density.cpp
+  cdbw.cpp
   ../external/Timer.cpp
   ../external/timing.cpp)
 
@@ -12,7 +13,9 @@ set(MUSTER_HEADERS
  	dissimilarity.h
  	partition.h
  	bic.h
- 	mpi_bindings.h)
+ 	mpi_bindings.h
+  density.h
+  cdbw.h)
 
 if (MUSTER_HAVE_MPI)
   list(APPEND MUSTER_SOURCES
@@ -29,11 +32,14 @@ if (MUSTER_HAVE_MPI)
 endif()
 
 add_library(muster ${MUSTER_SOURCES})
+target_link_libraries(muster ANN ${CGAL_LIBRARY})
 if (MUSTER_HAVE_MPI)
   target_link_libraries(muster ${MPI_LIBRARIES})
 endif()
 
 include_directories(
+  ${CGAL_INCLUDE_DIRS}
+  ${PROJECT_SOURCE_DIR}/libANN
   ${PROJECT_SOURCE_DIR}/external
   ${Boost_INCLUDE_DIR}
   ${PROJECT_BINARY_DIR}

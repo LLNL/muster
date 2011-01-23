@@ -45,9 +45,14 @@
 #include <stdexcept>
 #include <cfloat>
 
+#include "CGAL/Origin.h"
+#include "CGAL/Convex_hull_d.h"
+
 #include "dissimilarity.h"
 #include "partition.h"
-#include "bic.h"
+#include "cdbw.h"
+
+using namespace CGAL;
 
 namespace cluster {
 
@@ -112,13 +117,75 @@ namespace cluster {
         // TODO: what to do if there is no noise?
       }
     }
+    
+    
+    template <class T, class D, class K>
+    void sdbscan(const std::vector<K::Point_d>& objects, D dmetric, double epsilon, size_t min_points) {
+      typedef typename K::Point_d T;
 
+      // Just run plain density once if sample size is larger than dataset.
+      if (objects.size() <= sample_size_) {
+        dissimilarity_matrix mat;
+        dbscan(objects, dmetric, epsilon, min_points);
+        return;
+      }
+
+      // medoids and clusters for best partition so far.
+      double best_cdbw = 0;
+      partition best_partition;
+
+      //run KMedoids on a sampled subset max_reps times
+      for (size_t i = 0; i < reps_; i++) {
+        // Take a random sample of objects, store sample in a vector
+        std::vector<size_t> sample_to_full;
+        std::vector<T> sample;
+        fast_sample(objects.size(), sample_size, back_inserter(sample_to_full), rng);
+        for (size_t i=0; i < sample_size; i++) {
+          sample.push_back(objects[sample_to_full[i]]);
+        }
+
+        // run dbscan on the subset
+        density subcall;
+        subcall.dbscan(sample, dmetric, epsilon, min_points);
+        subcall.remove_cluster(NOISE);
+        
+        // make convex hulls out of subset clusters
+        std::vector< Convex_hull_d<K> > hulls[subcall.num_clusters()];
+        for (size_t i=0; i < subcall.size(); i++) {
+          if (subcall.cluster_ids[i] != UNCLASSIFIED) {
+            hulls[subcall.cluster_ids[i]].insert(sample[i]);
+          }
+        }
+        
+        // classify full data set based on hulls
+        medoid_ids.clear();
+        cluster_ids.resize(objects.size());
+        for (size_t i=0; i < objects.size(); i++) {
+          cluster_ids[i] = index_of_containing_hull(hulls, objects[i]);
+        }
+
+        // now measure the cdbw of the set.
+        CDbw cdbw_computer(*this, objects);
+        double cdbw = cdbw_computer.compute(10);
+        if (cdbw > best_cdbw) {
+          swap(best_partition);
+          best_cdbw = cdbw;
+        }
+      }
+    }
+
+    void set_sample_size(size_t sample_size);  ///< Sets the sample size for sdbscan.
+    size_t sample_size();                      ///< @return sample size used by sdbscan.
+
+    void set_reps(size_t sample_size);         ///< Sets the repetition count for sdbscan.
+    size_t reps();                             ///< @return repetitions executed by sdbscan.
+    
   protected:
     double epsilon_;              ///< maximum distance to perform the distance searches
     size_t min_points_;           ///< minimun number of points to consider a region as a cluster
-
     size_t current_cluster_id_;   ///< Next cluster id to assign
-
+    size_t sample_size_;          ///< Sample size for sdbscan
+    size_t reps_;                 ///< repetitions for sdbscan
 
     template <class T, class D>
     bool expand_cluster(const std::vector<T>& objects, D dmetric, size_t current_object) {
@@ -194,6 +261,18 @@ namespace cluster {
 
       return result;
     }
+
+    /// Finds which hull in a vector of hulls contains a point.
+    template<class K>
+    medoid_id index_of_containing_hull(const std::vector< Convex_hull_d<K> >& hulls, K::Point_d p) {
+      for (medoid_id i=0; i < (medoid_id)hulls.size(); i++) {
+        if (hulls[i].boundary_side(p) != ON_UNBOUNDED_SIDE) {
+          return i;
+        }
+      }
+      return UNCLASSIFIED;
+    }
+
   }; // class density
 
 } // namespace cluster

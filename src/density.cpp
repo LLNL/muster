@@ -52,10 +52,22 @@ using namespace std;
 namespace cluster {
 
   density::density(size_t num_objects) 
-    : partition(num_objects)
+    : partition(num_objects), sample_size_(40), reps_(5)
   { }
 
 
   density::~density() {  }
+
+
+  /// Sets the sample size for sdbscan.
+  void density::set_sample_size(size_t sample_size) {
+    sample_size_ = sample_size;
+  }
+    
+  /// @return sample size used by sdbscan.
+  size_t density::sample_size() {
+    return sample_size_;
+  }
+
 
 } // namespace cluster  
