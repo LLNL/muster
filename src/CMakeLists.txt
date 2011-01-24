@@ -2,7 +2,6 @@ set(MUSTER_SOURCES
 	partition.cpp
 	kmedoids.cpp
 	density.cpp
-  cdbw.cpp
   ../external/Timer.cpp
   ../external/timing.cpp)
 
