@@ -118,7 +118,7 @@ void get_args(int *argc, char ***argv, int rank) {
 
 vector<point> points;
 kmedoids km;
-par_kmedoids parkm(MPI_COMM_WORLD);
+par_kmedoids<point> parkm(MPI_COMM_WORLD);
 
 
 void print_cluster_info(const cluster::partition& gathered, const dissimilarity_matrix& distance) {

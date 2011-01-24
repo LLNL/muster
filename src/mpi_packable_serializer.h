@@ -30,53 +30,44 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
 ///
-/// @file par_kmedoids.cpp
+/// @file mpi_packable_serializer.h
 /// @author Todd Gamblin tgamblin@llnl.gov
-///
-#include "par_kmedoids.h"
-
-#include <cstdlib>
-#include <stdint.h>
-#include <sys/time.h>
-using namespace std;
-
-#include "random.h"
+/// @brief Simple serializer for classes that already support packed_size, pack, and unpack operations.
+/// 
+#ifndef MUSTER_MPI_PACKABLE_SERIALIZER_H
+#define MUSTER_MPI_PACKABLE_SERIALIZER_H
 
 namespace cluster {
 
-  par_kmedoids::par_kmedoids(MPI_Comm comm) 
-    : par_partition(comm), 
-      total_dissimilarity(numeric_limits<double>::infinity()),
-      best_bic_score(0),
-      init_size(40),
-      max_reps(5),
-      epsilon(1e-15)
-  { }
+  ///
+  /// This is a simple serializer for classes that support pack, packed_size, and unpack
+  /// operations.  The methods here simply delegate to the appropriate methods on T.
+  /// 
+  /// @note that this does NOT work well with polymorphic classes, as it 
+  /// requires that T support a static unpack method.
+  /// 
+  /// @tparam T Type of objects to be serialized.
+  ///   T must support the following operations:
+  ///   - <code>int packed_size(MPI_Comm comm) const</code>
+  ///   - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
+  ///   - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
+  ///
+  template <class T>
+  class mpi_packable_serializer {
+  public:
+    int packed_size(const T& object, MPI_Comm comm) const {
+      return object.packed_size(comm);
+    }
 
+    void pack(const T& object, void *buf, int bufsize, int *position, MPI_Comm comm) const {
+      object.pack(buf, bufsize, position, comm);
+    }
 
-  void par_kmedoids::set_epsilon(double e) {
-    epsilon = e;
-  }
+    void unpack(T& object, void *buf, int bufsize, int *position, MPI_Comm comm) const {
+      object = T::unpack(buf, bufsize, position, comm);
+    }
+  };
 
+}
 
-  double par_kmedoids::average_dissimilarity() {
-    int size;
-    CMPI_Comm_size(comm, &size);
-    return total_dissimilarity / size;
-  }
-
-  double par_kmedoids::bic_score() {
-    return best_bic_score;
-  }
-
-  void par_kmedoids::seed_random_uniform(MPI_Comm comm) {
-    int rank;
-    CMPI_Comm_rank(comm, &rank);
-
-    // same seed on all processes.
-    uint32_t seed = get_time_seed();
-    CMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
-    random.seed(seed);
-  }
-
-} // namespace cluster
+#endif // MUSTER_MPI_PACKABLE_SERIALIZER_H

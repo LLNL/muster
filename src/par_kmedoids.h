@@ -38,6 +38,7 @@
 #define PAR_KMEDOIDS_H
 
 #include <mpi.h>
+#include <limits>
 #include <ostream>
 #include <vector>
 #include <functional>
@@ -53,6 +54,7 @@
 #include "stl_utils.h"
 #include "bic.h"
 #include "mpi_bindings.h"
+#include "mpi_packable_serializer.h"
 
 namespace cluster {
 
@@ -86,7 +88,7 @@ namespace cluster {
   /// vector<point> points;
   /// // ... Each process puts some local points in the vector ...
   /// 
-  /// par_kmedoids parkm(MPI_COMM_WORLD);
+  /// par_kmedoids<point> parkm(MPI_COMM_WORLD);
   /// vector<point> medoids;   // storage for reprsentatives
   /// 
   /// // Run xcapek(), finding a max of 20 clusters among the 2d points.
@@ -108,7 +110,12 @@ namespace cluster {
   /// the representatives, you can omit it from the call.
   /// 
   /// @endcode
+  /// 
+  /// @tparam T           Type of objects to be clustered.
+  /// @tparam Serializer  Serializer for T's.  Defaults to mpi_packable_serializer<T>.  See its 
+  ///                     documentation for info on the required operations.
   ///
+  template <class T, class Serializer = mpi_packable_serializer<T> >
   class par_kmedoids : public par_partition {
   public:
     ///
@@ -117,15 +124,26 @@ namespace cluster {
     ///
     /// par_kmedoids assumes that there is one object to be clustered per process.
     ///
-    par_kmedoids(MPI_Comm comm = MPI_COMM_WORLD);
+    par_kmedoids(MPI_Comm comm = MPI_COMM_WORLD) 
+      : par_partition(comm), 
+        total_dissimilarity(std::numeric_limits<double>::infinity()),
+        best_bic_score(0),
+        init_size(40),
+        max_reps(5),
+        epsilon(1e-15)
+    { }
 
     virtual ~par_kmedoids() { }
 
     /// Get the average dissimilarity of objects w/their medoids for the last run.
-    double average_dissimilarity();
+    double average_dissimilarity() {
+      int size;
+      CMPI_Comm_size(comm, &size);
+      return total_dissimilarity / size;
+    }
 
     /// BIC score for selected clustering
-    double bic_score();
+    double bic_score() { return best_bic_score; } 
 
     ///
     /// Sets max_reps, Max number of times to run PAM with each sampled dataset.
@@ -152,17 +170,15 @@ namespace cluster {
     /// Set tolerance for convergence.  This is relative error, not absolute error.  It will be
     /// multiplied by the mean distance before it is used to test convergence.
     /// Defaults to 1e-15; may need to be higher if there exist clusterings with very similar quality.
-    void set_epsilon(double epsilon);
-
+    void set_epsilon(double e) { epsilon = e; }
 
     ///
     /// Farms out trials of PAM to worker processes then collects medoids from all trials to all processors.
     /// Puts resulting medoids in all_medoids when done.
     ///
-    template <class T, class D>
+    template <class D>
     void run_pam_trials(trial_generator& trials, const std::vector<T>& objects, D dmetric, 
-                        std::vector<typename id_pair<T>::vector>& all_medoids, MPI_Comm comm)
-    {
+                        std::vector<typename id_pair<T, Serializer>::vector>& all_medoids, MPI_Comm comm) {
       int size, rank;
       CMPI_Comm_size(comm, &size);
       CMPI_Comm_rank(comm, &rank);
@@ -171,11 +187,11 @@ namespace cluster {
       std::vector< std::vector<char> > bcast_buffers(all_medoids.size());
       
       for (size_t i=0; trials.has_next(); i++) {
-        int my_k = -1;                        // trial id for local run of kmedoids
-        int my_trial = -1;                    // trial id for local run of kmedoids
-        std::vector<size_t>  my_ids;          // object ids for each of my_objects
-        std::vector<T>       my_objects;      // vector to hold local sample of objects for clustering.
-        multi_gather<T>      gather(comm);    // simultaneous, asynchronous local gathers for collecting samples.
+        int my_k = -1;                               // trial id for local run of kmedoids
+        int my_trial = -1;                           // trial id for local run of kmedoids
+        std::vector<size_t>  my_ids;                 // object ids for each of my_objects
+        std::vector<T>       my_objects;             // vector to hold local sample of objects for clustering.
+        multi_gather<T, Serializer> gather(comm);    // simultaneous, asynchronous local gathers for collecting samples.
         
         // start gathers for each trial to aggregate samples to single worker processes.
         for (int root=0; trials.has_next() && root < size; root++) {
@@ -271,14 +287,9 @@ namespace cluster {
     /// Assumes that objects to be clustered are fully distributed across parallel process, 
     /// with the same number of objects per process.  
     ///
-    /// @tparam T     Type of objects to be clustered.
-    ///               T must support the following operations:
-    ///               - <code>int packed_size(MPI_Comm comm) const</code>
-    ///               - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
-    ///               - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
-    /// @tparam D     Dissimilarity metric type.  
-    ///               D should be callable on (T, T) and should return a double representing 
-    ///               the distance between the two T's.
+    /// @tparam D           Dissimilarity metric type.  
+    ///                     D should be callable on (T, T) and should return a double representing 
+    ///                     the distance between the two T's.
     /// 
     /// @param[in]  objects   Local objects to cluster (ASSUME: currently must be same number per process!)
     /// @param[in]  dmetric   Distance metric to build dissimilarity matrices with
@@ -292,7 +303,7 @@ namespace cluster {
     ///
     /// @see xcapek() for a K-agnostic version of this algorithm.
     ///
-    template <class T, class D>
+    template <class D>
     void capek(const std::vector<T>& objects, D dmetric, size_t k, std::vector<T> *medoids = NULL) 
     {
       int size, rank;
@@ -309,7 +320,7 @@ namespace cluster {
 
       // do parallel work: farms out trials and broadcasts medoids from each trial to
       // all processes.  On completion, medoids from all trials are in all_medoids vector.
-      std::vector<typename id_pair<T>::vector> all_medoids(max_reps);
+      std::vector<typename id_pair<T, Serializer>::vector> all_medoids(max_reps);
       trial_generator trials(k, k, max_reps, init_size, num_objects);
       run_pam_trials(trials, objects, dmetric, all_medoids, comm);
 
@@ -386,14 +397,9 @@ namespace cluster {
     /// but it requires more trials than capek().  In particular, it will run 
     /// (sum(1..max_k) * trials) total trials in parallel on MPI worker processes.
     ///
-    /// @tparam T     Type of objects to be clustered.
-    ///               T must support the following operations:
-    ///                - <code>int packed_size(MPI_Comm comm) const</code>
-    ///                - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
-    ///                - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
-    /// @tparam D     Dissimilarity metric type.  
-    ///               D should be callable on (T, T) and should return a double representing 
-    ///               the distance between the two T's.
+    /// @tparam D           Dissimilarity metric type.  
+    ///                     D should be callable on (T, T) and should return a double representing 
+    ///                     the distance between the two T's.
     /// 
     /// @param[in]  objects         Local objects to cluster (ASSUME: currently must be same number per process!)
     /// @param[in]  dmetric         Distance metric to build dissimilarity matrices with
@@ -405,7 +411,7 @@ namespace cluster {
     /// @return
     /// The best BIC value found, that is, the BIC value of the final clustering.
     ///
-    template <class T, class D>
+    template <class D>
     double xcapek(const std::vector<T>& objects, D dmetric, size_t max_k, size_t dimensionality,
                   std::vector<T> *medoids = NULL) 
     {
@@ -527,6 +533,8 @@ namespace cluster {
     const Timer& get_timer() { return timer; }
 
   protected:
+    Serializer serializer;             ///< Serializer to pack T's for clustering.
+    
     typedef boost::mt19937 random_t;   ///< Type for random number generator used here.
     random_t random;                   ///< Random number distribution to be used for samples
     
@@ -542,18 +550,23 @@ namespace cluster {
     /// Seeds random number generators across all processes with the same number,
     /// taken from the time in microseconds since the epoch on the process 0.
     /// 
-    void seed_random_uniform(MPI_Comm comm);
+    void seed_random_uniform(MPI_Comm comm)  {
+      int rank;
+      CMPI_Comm_rank(comm, &rank);
+      
+      // same seed on all processes.
+      uint32_t seed = get_time_seed();
+      CMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
+      random.seed(seed);
+    }
 
     ///
     /// This packs a vector of packable objects on one process.
-    /// To be packable, T must support these operations:
-    ///    - int packed_size(MPI_Comm comm) const
-    ///    - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-    ///    - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
-    /// Each T in the input vector is packed and put on the back of 
+    /// Each T in the input vector is packed and put on the back of the packed buffer.
+    /// TODO: this assumes MPI packability.  Make it work well with Serializers.
     ///
-    template <class T>
-    void pack_vector(MPI_Comm comm, const std::vector<T>& packables, std::vector<char>& buffer) {
+    template <typename P>
+    void pack_vector(MPI_Comm comm, const std::vector<P>& packables, std::vector<char>& buffer) {
       // figure out size of packed buffer
       int packed_size = 0;
       packed_size += cmpi_packed_size(1, MPI_SIZE_T, comm);  // num packables for trial.
@@ -573,16 +586,17 @@ namespace cluster {
 
     ///
     /// This unpacks a vector of packable objects packed by pack_vector().
+    /// TODO: this assumes MPI packability.  Make it work well with Serializers.
     ///
-    template <class T>
-    void unpack_vector(MPI_Comm comm, const std::vector<char>& buffer, std::vector<T>& packables) {
+    template <typename P>
+    void unpack_vector(MPI_Comm comm, const std::vector<char>& buffer, std::vector<P>& packables) {
       int pos = 0;      
       size_t num_packables;
       CMPI_Unpack((void*)&buffer[0], buffer.size(), &pos, &num_packables, 1, MPI_SIZE_T, comm);
 
       packables.resize(num_packables);
       for (size_t i=0; i < packables.size(); i++) {
-        packables[i] = T::unpack((void*)&buffer[0], buffer.size(), &pos, comm);
+        packables[i] = P::unpack((void*)&buffer[0], buffer.size(), &pos, comm);
       }
     }
 
@@ -596,7 +610,7 @@ namespace cluster {
     /// @param[in] medoids  Vector of medoids to find the closest from.
     /// @param[in] dmetric  Distance metric to assess closeness with.
     ///
-    template <typename T, typename D>
+    template <typename D>
     std::pair<double, size_t> closest_medoid(
       const T& object, object_id oid, const std::vector< id_pair<T> >& medoids, D dmetric
     ) {

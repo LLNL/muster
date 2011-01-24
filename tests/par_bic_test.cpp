@@ -221,7 +221,7 @@ int main(int argc, char **argv) {
 
   double total_mirkin = 0;
   for (size_t iter=0; iter < iterations; iter++) {
-    par_kmedoids parkm;
+    par_kmedoids<point> parkm;
 
     //
     // First we do speed trials of the parallel clustering algorithm.

@@ -39,6 +39,7 @@
 
 #include <mpi.h>
 #include "mpi_bindings.h"
+#include "mpi_packable_serializer.h"
 
 #include <cstdlib>
 #include <ostream>
@@ -55,8 +56,9 @@ namespace cluster {
   /// @tparam T Type of contained element.  
   ///           T Must support MPI pack(), packed_size(), and unpack() methods.
   ///
-  template <class T>
+  template <class T, class Serializer = mpi_packable_serializer<T> >
   struct id_pair {
+    Serializer serializer;
     T element;    ///< The object wrapped by this id_pair.
     size_t id;    ///< Id of the rank where element came from.
 
@@ -67,16 +69,19 @@ namespace cluster {
     id_pair(const T& elt, size_t _id) : element(elt), id(_id) { }
 
     int packed_size(MPI_Comm comm) const {
-      return element.packed_size(comm) + cmpi_packed_size(1, MPI_SIZE_T, comm);
+      return serializer.packed_size(element, comm) + cmpi_packed_size(1, MPI_SIZE_T, comm);
     }
 
     void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const {
-      element.pack(buf, bufsize, position, comm);
+      serializer.pack(element, buf, bufsize, position, comm);
       MPI_Pack(const_cast<size_t*>(&id), 1, MPI_SIZE_T, buf, bufsize, position, comm);
     }
 
+    /// TODO: fix the serialization here! Shouldn't need its own instance of Serializer.
     static id_pair unpack(void *buf, int bufsize, int *position, MPI_Comm comm) {
-      T t = T::unpack(buf, bufsize, position, comm);
+      T t;
+      Serializer serializer;
+      serializer.unpack(t, buf, bufsize, position, comm);
       size_t id;
       MPI_Unpack(buf, bufsize, position, &id, 1, MPI_SIZE_T, comm);
       return id_pair(t, id);

@@ -148,7 +148,7 @@ int main(int argc, char **argv) {
     points.push_back(point(x,y));
   }
 
-  par_kmedoids parkm;
+  par_kmedoids<point> parkm;
   parkm.set_init_size(init_size);
   parkm.set_max_reps(max_reps);
 

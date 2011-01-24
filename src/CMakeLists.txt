@@ -16,7 +16,6 @@ set(MUSTER_HEADERS
 if (MUSTER_HAVE_MPI)
   list(APPEND MUSTER_SOURCES
     par_partition.cpp 
-    par_kmedoids.cpp 
     trial.cpp)
 
   list(APPEND MUSTER_HEADERS

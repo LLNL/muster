@@ -42,6 +42,7 @@
 #include <vector>
 #include <iostream>
 #include "mpi_bindings.h"
+#include "mpi_packable_serializer.h"
 #include <algorithm>
 
 namespace cluster {
@@ -50,15 +51,15 @@ namespace cluster {
   /// Asynchronous, some-to-some gather operation used by parallel clustering algorithms
   /// to simultaneously send members of sample sets to a set of distributed worker processes.
   /// 
-  /// @tparam T Type of objects to be transferred by this multi_gather.
-  ///   Must support the following operations:
-  ///   - <code>int packed_size(MPI_Comm comm) const</code>
-  ///   - <code>void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const</code>
-  ///   - <code>static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)</code>
-  ///
-  /// @see par_kmedoids::run_pam_trials(), which uses this class.
+  /// @tparam T           Type of objects to be transferred by this multi_gather.
+  /// @tparam Serializer  Optionally provide a serializer for T.  By default, Muster uses
+  ///                     mpi_packable_serializer, and T must support the required
+  ///                     packed_size, pack, and unpack operations there.
   /// 
-  template <class T>
+  /// @see par_kmedoids::run_pam_trials(), which uses this class.
+  /// @see mpi_packable_serializer, the default serializer.
+  /// 
+  template <class T, class Serializer = mpi_packable_serializer<T> >
   class multi_gather {
     /// internal struct for buffering sends and recvs.
     struct buffer {
@@ -92,6 +93,7 @@ namespace cluster {
       bool is_send()   { return !dest; }
     };
 
+    Serializer serializer;           ///< Serializer for packing T's
     MPI_Comm comm;                   ///< Communicator on which gather takes place
     int tag;                         ///< tag for communication in multi_gathers.
 
@@ -124,8 +126,8 @@ namespace cluster {
 
       // determine size of local data.
       int packed_size = cmpi_packed_size(1, MPI_SIZE_T, comm);  // num objects
-      for (ObjIterator o=begin_obj; o != end_obj; o++) {       // size of each object
-        packed_size += o->packed_size(comm);
+      for (ObjIterator o=begin_obj; o != end_obj; o++) {        // size of each object
+        packed_size += serializer.packed_size(*o, comm);
       }
 
       buffer *send_buffer = new buffer(packed_size);
@@ -141,7 +143,7 @@ namespace cluster {
       size_t num_objects = distance(begin_obj, end_obj);
       CMPI_Pack(&num_objects, 1, MPI_SIZE_T, send_buffer->buf, send_buffer->size, &pos, comm);
       for (ObjIterator o=begin_obj; o != end_obj; o++) {
-        o->pack(send_buffer->buf, packed_size, &pos, comm);
+        serializer.pack(*o, send_buffer->buf, packed_size, &pos, comm);
       }
 
       if (rank != root) {
@@ -219,7 +221,9 @@ namespace cluster {
 
           CMPI_Unpack(buffers[i]->buf, buffers[i]->size, &pos, &num_objects, 1, MPI_SIZE_T, comm);
           for (size_t o=0; o < num_objects; o++) {
-            buffers[i]->dest->push_back(T::unpack(buffers[i]->buf, buffers[i]->size, &pos, comm));
+            T object;
+            serializer.unpack(object, buffers[i]->buf, buffers[i]->size, &pos, comm);
+            buffers[i]->dest->push_back(object);
           }
         }
         delete buffers[i];
