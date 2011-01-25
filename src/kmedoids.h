@@ -150,7 +150,7 @@ namespace cluster {
       for (size_t i = 0; i < max_reps; i++) {
         // Take a random sample of objects, store sample in a vector
         std::vector<size_t> sample_to_full;
-        fast_sample(objects.size(), sample_size, back_inserter(sample_to_full), rng);
+        algorithm_r(objects.size(), sample_size, back_inserter(sample_to_full), rng);
 
         // Build a distance matrix for PAM
         dissimilarity_matrix distance;
