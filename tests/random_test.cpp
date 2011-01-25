@@ -33,8 +33,10 @@
 /// @file random_test.cpp
 /// @author Todd Gamblin tgamblin@llnl.gov
 /// 
+#include <stdint.h>
 #include <vector>
 #include <iostream>
+#include <algorithm>
 #include <boost/random.hpp>
 #include <boost/numeric/ublas/matrix.hpp>
 
@@ -50,7 +52,7 @@ const size_t reps = 5;
 
 
 int main(int argc, char **argv) {
-  long seed = get_time_seed();
+  uint32_t seed = get_time_seed();
   typedef boost::mt19937 random_t;
   random_t random;
   boost::random_number_generator<random_t> rng(random);
@@ -60,7 +62,8 @@ int main(int argc, char **argv) {
   size_t starts = 5;
 
   // Put labels in the 0th column and 0th row.
-  matrix<timing_t> algorithm_r_timings(endN - startN+1, endN - starts, 0);
+  matrix<timing_t> algorithm_r_timings(endN - startN+1, endN - starts);
+  fill(algorithm_r_timings.begin1(), algorithm_r_timings.end1(), 0);
   vector<size_t> results;
   for (size_t N=startN; N < endN; N++) {
     algorithm_r_timings(N-startN+1, 0) = 1<<N;
