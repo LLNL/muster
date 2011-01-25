@@ -79,9 +79,8 @@ namespace cluster {
 
     /// TODO: fix the serialization here! Shouldn't need its own instance of Serializer.
     static id_pair unpack(void *buf, int bufsize, int *position, MPI_Comm comm) {
-      T t;
       Serializer serializer;
-      serializer.unpack(t, buf, bufsize, position, comm);
+      T t = serializer.unpack(buf, bufsize, position, comm);
       size_t id;
       MPI_Unpack(buf, bufsize, position, &id, 1, MPI_SIZE_T, comm);
       return id_pair(t, id);

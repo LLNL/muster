@@ -221,8 +221,7 @@ namespace cluster {
 
           CMPI_Unpack(buffers[i]->buf, buffers[i]->size, &pos, &num_objects, 1, MPI_SIZE_T, comm);
           for (size_t o=0; o < num_objects; o++) {
-            T object;
-            serializer.unpack(object, buffers[i]->buf, buffers[i]->size, &pos, comm);
+            T object = serializer.unpack(buffers[i]->buf, buffers[i]->size, &pos, comm);
             buffers[i]->dest->push_back(object);
           }
         }

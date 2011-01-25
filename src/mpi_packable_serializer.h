@@ -63,8 +63,8 @@ namespace cluster {
       object.pack(buf, bufsize, position, comm);
     }
 
-    void unpack(T& object, void *buf, int bufsize, int *position, MPI_Comm comm) const {
-      object = T::unpack(buf, bufsize, position, comm);
+    T unpack(void *buf, int bufsize, int *position, MPI_Comm comm) const {
+      return T::unpack(buf, bufsize, position, comm);
     }
   };
 
