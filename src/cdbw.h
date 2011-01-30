@@ -38,7 +38,10 @@
 /// CDbw criterion is a validity approach for density-based clustering algorithms.
 /// It is based on a selection of multiple representatives for each cluster, and
 /// evaluating different density aspect using these representatives.
-///
+/// 
+/// TODO: this implementation currently only works for 2D CDbw.  We probably want to make 
+/// this work for D dimensions, as we may well have high-dimensional data.
+/// 
 /// For more on this technique and the approach, see this paper:
 /// @par
 /// Maria Halkidi and Michalis Vazirgiannis.  <a href="http://www.db-net.aueb.gr/index.php/corporate/content/download/439/2032/version/3/file/PATREC_revised.pdf">
@@ -50,12 +53,11 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <vector>
-using boost::numeric::ublas::matrix;
+#include <deque>
 
 #include <ANN/ANN.h>
 
 #include "density.h"
-
 
 namespace cluster {
 
@@ -125,7 +127,7 @@ namespace cluster {
     void choose_representatives(size_t r)  {
       double max_distance = std::numeric_limits<double>::min();
 
-      deque<bool> point_used (cluster_points_.size(), false);
+      std::deque<bool> point_used (cluster_points_.size(), false);
 
       if (r >= cluster_points_.size()) {
         representatives_ = cluster_points_;
@@ -134,7 +136,7 @@ namespace cluster {
     
       Point& last_representative = centroid_;
     
-      representatives_ = vector<size_t>(r, 0);
+      representatives_ = std::vector<size_t>(r, 0);
   
       size_t representative_id = 0;
       size_t representative_position = 0;
@@ -183,13 +185,13 @@ namespace cluster {
     /// Returns a vector of the representative points shrunken through the centroid with an 's' factor
     ///
     std::vector<Point> shrunk_representatives(double s) {
-      vector<Point> result;
+      std::vector<Point> result;
     
       for (size_t i = 0; i < representatives_.size(); ++i) {
-        point shrunken_point = points_[representatives_[i]];
+        Point shrunken_point = points_[representatives_[i]];
 
-        shrunken_point.x = shrunken_point.x + s*(centroid_.x - shrunken_point.x);
-        shrunken_point.y = shrunken_point.y + s*(centroid_.y - shrunken_point.y);
+        shrunken_point[0] = shrunken_point[0] + s*(centroid_[0] - shrunken_point[0]);
+        shrunken_point[1] = shrunken_point[1] + s*(centroid_[1] - shrunken_point[1]);
 
         result.push_back(shrunken_point);
       }
@@ -220,8 +222,8 @@ namespace cluster {
   class CDbw {
   private:
     partition& p_;
-    std::vector<Point>& points_;
-    std::vector<dbscan_cluster> clusters_;
+    std::vector< Point >& points_;
+    std::vector< dbscan_cluster<Point> > clusters_;
     size_t r_;                              ///< Representatives
       
     boost::numeric::ublas::matrix<std::vector<std::pair<size_t, size_t> > > RCRs_;
@@ -267,7 +269,7 @@ namespace cluster {
       }
     
       r_ = r;
-      RCRs_ = matrix< vector< pair<size_t, size_t> > >(num_clusters, num_clusters);
+      RCRs_ = boost::numeric::ublas::matrix< std::vector< std::pair<size_t, size_t> > >(num_clusters, num_clusters);
 
       for (size_t i = 0; i < num_clusters; i++) {
         clusters_[i].choose_representatives(r_);
@@ -296,7 +298,7 @@ namespace cluster {
     void create_clusters() {
       size_t num_clusters = p_.num_clusters();
       for (size_t i=0; i < num_clusters; i++) {
-        clusters_.push_back(dbscan_cluster(i, points_));
+        clusters_.push_back(dbscan_cluster<Point>(i, points_));
       }
 
       ann_data_points_ = annAllocPts(p_.size(), 2);
@@ -308,8 +310,8 @@ namespace cluster {
       
         ANNpoint current_point = annAllocPt(2);
       
-        current_point[0] = points_[i].x;
-        current_point[1] = points_[i].y;
+        current_point[0] = points_[i][0];
+        current_point[1] = points_[i][1];
       
         ann_data_points_[i] = current_point;
       }
@@ -336,14 +338,14 @@ namespace cluster {
     ///
     /// Compute the RCRs for a single pair of clusters
     ///
-    std::vector< std::pair<size_t, size_t> > compute_rcrs_i_j(medoid_id i, medoid_id j) {
-      vector<pair<size_t, size_t> > result;
+    std::vector<std::pair<size_t, size_t> > compute_rcrs_i_j(medoid_id c_i, medoid_id c_j) {
+      std::vector<std::pair<size_t, size_t> > result;
 
-      vector<size_t>& reps_i = clusters_[c_i].representatives();
-      vector<size_t>& reps_j = clusters_[c_j].representatives();
+      std::vector<size_t>& reps_i = clusters_[c_i].representatives();
+      std::vector<size_t>& reps_j = clusters_[c_j].representatives();
 
-      vector<pair<size_t, size_t> > rcs_i_j;
-      vector<pair<size_t, size_t> > rcs_j_i;
+      std::vector<std::pair<size_t, size_t> > rcs_i_j;
+      std::vector<std::pair<size_t, size_t> > rcs_j_i;
 
       for (size_t v = 0; v < reps_i.size(); ++v) {
         rcs_i_j.push_back(make_pair(reps_i[v],
@@ -426,8 +428,8 @@ namespace cluster {
     ///
     /// Compute the density between a pair of clusters c_i and c_j
     ///
-    double density_between_clusters(medoid_id i, medoid_id j) {
-      vector<pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
+    double density_between_clusters(medoid_id c_i, medoid_id c_j) {
+      std::vector<std::pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
 
       double sum_densities = 0.0;
 
@@ -456,10 +458,10 @@ namespace cluster {
     /// Compute the cardinality of set defined by u as center point and radix, where the points
     /// belong to clusters c_i and c_j
     ///
-    double cardinality(Point u, double radix, medoid_id i, medoid_id j) {
+    double cardinality(Point u, double radix, medoid_id c_i, medoid_id c_j) {
       size_t number_of_points = 0;
       // Perform the radix search (across all points), using libANN
-      vector<size_t> neighbourhood_u = range_query(u, radix);
+      std::vector<size_t> neighbourhood_u = range_query(u, radix);
   
       // Count just those points that belong to clusters c_i and c_j
       for (size_t x = 0; x < neighbourhood_u.size(); ++x) {
@@ -475,9 +477,9 @@ namespace cluster {
     ///
     /// Computes the distance between clusters c_i and c_j
     ///
-    double distance_between_clusters(medoid_id i, medoid_id j) {
+    double distance_between_clusters(medoid_id c_i, medoid_id c_j) {
       double sum_distances = 0.0;
-      vector<pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
+      std::vector<std::pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
 
       for (size_t p=0; p < RCR_i_j.size(); ++p) {
         sum_distances += points_[RCR_i_j[p].first].distance(points_[RCR_i_j[p].second]);
@@ -492,7 +494,7 @@ namespace cluster {
     ///
     double compactness_and_intra_density_changes() {
       double         sum_intra_densities = 0.0;
-      vector<double> intra_densities_values;
+      std::vector<double> intra_densities_values;
   
       for (double s = 0.1; s <= 0.8; s += 0.1) {
         double current_intra_density = intra_cluster_density(s);
@@ -524,7 +526,7 @@ namespace cluster {
       double sum_cardinalities = 0.0;
 
       for (size_t i = 0; i < clusters_.size(); ++i) {
-        vector<Point> shrunk_rep = clusters_[i].shrunk_representatives(s);
+        std::vector<Point> shrunk_rep = clusters_[i].shrunk_representatives(s);
 
         for (size_t j = 0; j < shrunk_rep.size(); ++j) {
           sum_cardinalities += cardinality(shrunk_rep[j], clusters_[i].stdev(), i);
@@ -534,9 +536,9 @@ namespace cluster {
       return sum_cardinalities / r_;
     }
 
-    double cardinality(Point u, double radix, medoid_id i) {
+    double cardinality(Point u, double radix, medoid_id c_i) {
       // Perform the radix search (across all points), using libANN
-      vector<size_t> neighbourhood_u = range_query(u, radix);
+      std::vector<size_t> neighbourhood_u = range_query(u, radix);
 
       // Count just those points that belong to cluster c_i
       size_t number_of_points = 0;
@@ -562,10 +564,10 @@ namespace cluster {
       ANNpoint       ann_query_point = annAllocPt(2);
       ANNidxArray    ann_results;
       size_t         results_size;
-      vector<size_t> result;
+      std::vector<size_t> result;
 
-      ann_query_point[0] = u.x;
-      ann_query_point[1] = u.y;
+      ann_query_point[0] = u[0];
+      ann_query_point[1] = u[1];
 
       double radix2 = radix * radix;
       results_size = kd_tree_->annkFRSearch(ann_query_point, radix2, 0);

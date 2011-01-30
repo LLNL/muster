@@ -45,6 +45,8 @@
 #include <stdexcept>
 #include <cfloat>
 
+#include <boost/random.hpp>
+
 #include "CGAL/Origin.h"
 #include "CGAL/Convex_hull_d.h"
 
@@ -119,10 +121,8 @@ namespace cluster {
     }
     
     
-    template <class T, class D, class K>
-    void sdbscan(const std::vector<K::Point_d>& objects, D dmetric, double epsilon, size_t min_points) {
-      typedef typename K::Point_d T;
-
+    template <class D, class K>
+    void sdbscan(const std::vector<typename K::Point_d>& objects, D dmetric, double epsilon, size_t min_points) {
       // Just run plain density once if sample size is larger than dataset.
       if (objects.size() <= sample_size_) {
         dissimilarity_matrix mat;
@@ -138,9 +138,9 @@ namespace cluster {
       for (size_t i = 0; i < reps_; i++) {
         // Take a random sample of objects, store sample in a vector
         std::vector<size_t> sample_to_full;
-        std::vector<T> sample;
-        fast_sample(objects.size(), sample_size, back_inserter(sample_to_full), rng);
-        for (size_t i=0; i < sample_size; i++) {
+        std::vector<typename K::Point_d> sample;
+        algorithm_r(objects.size(), sample_size, back_inserter(sample_to_full), rng);
+        for (size_t i=0; i < sample_size_; i++) {
           sample.push_back(objects[sample_to_full[i]]);
         }
 
@@ -165,7 +165,7 @@ namespace cluster {
         }
 
         // now measure the cdbw of the set.
-        CDbw cdbw_computer(*this, objects);
+        CDbw<typename K::Point_d> cdbw_computer(*this, objects);
         double cdbw = cdbw_computer.compute(10);
         if (cdbw > best_cdbw) {
           swap(best_partition);
@@ -186,6 +186,14 @@ namespace cluster {
     size_t current_cluster_id_;   ///< Next cluster id to assign
     size_t sample_size_;          ///< Sample size for sdbscan
     size_t reps_;                 ///< repetitions for sdbscan
+
+    typedef boost::mt19937 random_type;                /// Type for RNG used in this algorithm
+    random_type random;                                /// Randomness source for this algorithm
+    
+    /// Adaptor for STL algorithms.
+    typedef boost::random_number_generator<random_type, unsigned long> rng_type;
+    rng_type rng;
+
 
     template <class T, class D>
     bool expand_cluster(const std::vector<T>& objects, D dmetric, size_t current_object) {
@@ -226,7 +234,6 @@ namespace cluster {
                  neighbour_seed_list_iterator != neighbour_seed_list.end();
                  neighbour_seed_list_iterator++) {
               size_t current_neighbour_neighbour = (*neighbour_seed_list_iterator);
-            
 
               if (cluster_ids[current_neighbour_neighbour] == UNCLASSIFIED ||
                   cluster_ids[current_neighbour_neighbour] == NOISE) {
@@ -264,7 +271,7 @@ namespace cluster {
 
     /// Finds which hull in a vector of hulls contains a point.
     template<class K>
-    medoid_id index_of_containing_hull(const std::vector< Convex_hull_d<K> >& hulls, K::Point_d p) {
+    medoid_id index_of_containing_hull(const std::vector< Convex_hull_d<K> >& hulls, typename K::Point_d p) {
       for (medoid_id i=0; i < (medoid_id)hulls.size(); i++) {
         if (hulls[i].boundary_side(p) != ON_UNBOUNDED_SIDE) {
           return i;

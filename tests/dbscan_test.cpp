@@ -247,7 +247,7 @@ int main(int argc, char **argv) {
   if (cdbw) {
     // Checking the CDbw on everything but the noise.
     clustering.remove_cluster(density::NOISE);
-    CDbw validation(clustering, points.points());
+    CDbw<point> validation(clustering, points.points());
     double current_cdbw = validation.compute(10); // 10 representatives per cluster
     timer.record("CDBW");
 
