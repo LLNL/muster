@@ -23,7 +23,9 @@ if (MUSTER_HAVE_MPI)
  	  par_kmedoids.h
  	  multi_gather.h
  	  trial.h
- 	  id_pair.h)
+ 	  id_pair.h
+    ../external/Timer.h
+    ../external/timing.h)
 endif()
 
 add_library(muster ${MUSTER_SOURCES})

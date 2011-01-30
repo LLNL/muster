@@ -12,7 +12,7 @@ Once this is done, you can build and install Muster like this:
     $ tar xzf muster.tar.gz
     $ cd muster
     $ mkdir linux-x86_64 && cd linux-x86_64
-    $ cmake -D CMAKE_INSTALL_PREFIX=/path/to/install/location
+    $ cmake -D CMAKE_INSTALL_PREFIX=/path/to/install/location ..
     $ make
     $ make install
 
@@ -35,7 +35,9 @@ can do this with the ccmake interactive tool:
     $ ccmake ..
 
 Hit 't' to toggle advanced options, and you will be able to edit the 
-particular variables used to guide the MPI build.
+particular variables used to guide the MPI build.  Note that you can 
+also pass any of the MPI variables to cmake on the command line with 
+-D VARIABLE=value.
 
 ------------------------------------------------------------------------------
  External Dependencies
