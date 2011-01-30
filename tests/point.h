@@ -50,7 +50,10 @@
 
 namespace cluster {
   
-  /// Simple 2 dimensional point class for testing medoids algorithms.
+  ///
+  /// Simple 2 dimensional point class for testing algorithms.
+  /// This works with both p.x, p.y notation and with p[0], p[1] notation.
+  ///
   struct point {
   public:
     double x, y;
@@ -116,6 +119,16 @@ namespace cluster {
       p /= divisor;
       return p;
     }
+
+    struct index_out_of_bounds { };
+    double& operator[](size_t index) {
+      switch (index) {
+      case 0:  return x;
+      case 1:  return y;
+      default: throw index_out_of_bounds();
+      }
+    }
+
 
 #ifdef MUSTER_HAVE_MPI
     /// Returns the size of a packed point
