@@ -9,7 +9,7 @@ add_library(test-support STATIC
 # Simple function to add an executable and link it to the test libraries.
 function(add_test test_name src_name)
   add_executable(${test_name} ${src_name} ${EXTRA_TEST_SOURCES})
-  target_link_libraries(${test_name} test-support muster ${CGAL_LIBRARY} ${CGAL_3RD_PARTY_LIBRARIES})
+  target_link_libraries(${test_name} test-support muster ${CGAL_LIBRARY})
   if (INSTALL_TESTS)
     install(TARGETS ${test_name} DESTINATION bin)
   endif()
