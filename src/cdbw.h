@@ -57,24 +57,26 @@
 
 #include <ANN/ANN.h>
 
-#include "density.h"
+#include <CGAL/centroid.h>
+#include <boost/iterator/permutation_iterator.hpp>
 
 namespace cluster {
 
-  template <class Point>
+  template <class Point, class Distance>
   class dbscan_cluster {
   private:
-    std::vector<Point>&  points_;
+    const std::vector<Point> *points_;
     medoid_id            cluster_id_;
     std::vector<size_t>  cluster_points_;
     Point                centroid_;
     std::vector<size_t>  representatives_;
     double               stdev_;
+    Distance             distance_;
 
   public:
 
-    dbscan_cluster(size_t& cluster_id, std::vector<Point>& points)
-      : points_(points), cluster_id_(cluster_id) { }
+    dbscan_cluster(size_t& cluster_id, const std::vector<Point>& points, Distance distance = Distance())
+      : points_(&points), cluster_id_(cluster_id), distance_(distance) { }
 
     dbscan_cluster(const dbscan_cluster& other)
       : points_(other.points_),
@@ -99,21 +101,13 @@ namespace cluster {
         return;
       }
       
-      /* Compute centroid */
-      centroid_ = points_[cluster_points_[0]];
+      centroid_ = CGAL::centroid(boost::make_permutation_iterator(points_->begin(), cluster_points_.begin()),
+                                 boost::make_permutation_iterator(points_->begin(), cluster_points_.end()));
 
-      if (cluster_points_.size() > 1) {
-        for (size_t i = 1; i < cluster_points_.size(); i++) {
-          centroid_ += points_[cluster_points_[i]];
-        }
-        
-        centroid_ /= cluster_points_.size();
-      }
-      
       /* Stdev */
       double sum_squares = 0.0;
       for (size_t i = 0; i < cluster_points_.size(); i++) {
-        double val = centroid_.distance(points_[cluster_points_[i]]);
+        double val = distance_(centroid_, (*points_)[cluster_points_[i]]);
         sum_squares += val * val;
       }
       
@@ -146,7 +140,7 @@ namespace cluster {
       
         for (size_t j = 0; j < cluster_points_.size(); ++j) {
           if (!point_used[j]) {
-            double current_distance = last_representative.distance(points_[cluster_points_[j]]);
+            double current_distance = distance_(last_representative, (*points_)[cluster_points_[j]]);
           
             if (current_distance > max_distance) {
               max_distance            = current_distance;
@@ -158,19 +152,19 @@ namespace cluster {
 
         representatives_[i]                 = representative_id;
         point_used[representative_position] = true;
-        last_representative                 = points_[representative_id];
+        last_representative                 = (*points_)[representative_id];
       }
     }
 
     ///
     /// Returns the closest representative of the given point
     ///
-    size_t closest_representative(Point& p) {
-      double min_distance = p.distance(points_[representatives_[0]]);
+    size_t closest_representative(const Point& p) {
+      double min_distance = distance_(p, (*points_)[representatives_[0]]);
       size_t result       = representatives_[0];
     
       for (size_t i = 1; i < representatives_.size(); i++) {
-        double current_distance = p.distance(points_[representatives_[i]]);
+        double current_distance = distance_(p, (*points_)[representatives_[i]]);
       
         if (current_distance < min_distance) {
           min_distance = current_distance;
@@ -188,12 +182,8 @@ namespace cluster {
       std::vector<Point> result;
     
       for (size_t i = 0; i < representatives_.size(); ++i) {
-        Point shrunken_point = points_[representatives_[i]];
-
-        shrunken_point[0] = shrunken_point[0] + s*(centroid_[0] - shrunken_point[0]);
-        shrunken_point[1] = shrunken_point[1] + s*(centroid_[1] - shrunken_point[1]);
-
-        result.push_back(shrunken_point);
+        Point p((*points_)[representatives_[i]]);
+        result.push_back(p + ((centroid_ - p) * s));
       }
       return result;
     }
@@ -218,12 +208,12 @@ namespace cluster {
   ///
   /// Implementation of CDbw criterion. See paper 
   ///
-  template <class Point>
+  template <class Point, class Distance>
   class CDbw {
   private:
     partition& p_;
-    std::vector< Point >& points_;
-    std::vector< dbscan_cluster<Point> > clusters_;
+    const std::vector< Point >& points_;
+    std::vector< dbscan_cluster<Point, Distance> > clusters_;
     size_t r_;                              ///< Representatives
       
     boost::numeric::ublas::matrix<std::vector<std::pair<size_t, size_t> > > RCRs_;
@@ -237,11 +227,13 @@ namespace cluster {
     double separation_;
     double compactness_;
     double cohesion_;
+    
+    Distance distance_;
       
   public:
       
-    CDbw(partition& p, std::vector<Point>& points)
-      : p_(p), points_(points), cdbw_(0), separation_(0), compactness_(0), cohesion_(0) {
+    CDbw(partition& p, const std::vector<Point>& points, Distance distance = Distance())
+      : p_(p), points_(points), cdbw_(0), separation_(0), compactness_(0), cohesion_(0), distance_(distance) {
       create_clusters();
     }
 
@@ -298,7 +290,7 @@ namespace cluster {
     void create_clusters() {
       size_t num_clusters = p_.num_clusters();
       for (size_t i=0; i < num_clusters; i++) {
-        clusters_.push_back(dbscan_cluster<Point>(i, points_));
+        clusters_.push_back(dbscan_cluster<Point, Distance>(i, points_));
       }
 
       ann_data_points_ = annAllocPts(p_.size(), 2);
@@ -438,14 +430,11 @@ namespace cluster {
       double avg_stdev = sqrt((c_i_stdev * c_i_stdev + c_j_stdev * c_j_stdev) / 2);
 
       for (size_t p = 0; p < RCR_i_j.size(); ++p) {
-        Point  u;
-        double distance_vi_vj = points_[RCR_i_j[p].first].distance(points_[RCR_i_j[p].second]);
+        double distance_vi_vj = distance_(points_[RCR_i_j[p].first], points_[RCR_i_j[p].second]);
         double cardinality_u;
-    
-        u  = points_[RCR_i_j[p].first];
-        u += points_[RCR_i_j[p].second];
-        u /= 2.0;
-    
+
+        Point u = points_[RCR_i_j[p].first] + ((points_[RCR_i_j[p].second] - points_[RCR_i_j[p].first]) / 2.0);
+
         cardinality_u = cardinality(u, avg_stdev, c_i, c_j);
 
         sum_densities += ((distance_vi_vj/(2*avg_stdev))*cardinality_u);
@@ -482,7 +471,7 @@ namespace cluster {
       std::vector<std::pair<size_t, size_t> >& RCR_i_j = RCRs_(c_i, c_j);
 
       for (size_t p=0; p < RCR_i_j.size(); ++p) {
-        sum_distances += points_[RCR_i_j[p].first].distance(points_[RCR_i_j[p].second]);
+        sum_distances += distance_(points_[RCR_i_j[p].first], points_[RCR_i_j[p].second]);
       }
   
       return (sum_distances/RCR_i_j.size());

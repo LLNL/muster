@@ -46,6 +46,7 @@
 #include <cfloat>
 
 #include <boost/random.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include "CGAL/Origin.h"
 #include "CGAL/Convex_hull_d.h"
@@ -53,8 +54,6 @@
 #include "dissimilarity.h"
 #include "partition.h"
 #include "cdbw.h"
-
-using namespace CGAL;
 
 namespace cluster {
 
@@ -121,7 +120,7 @@ namespace cluster {
     }
     
     
-    template <class D, class K>
+    template <class K, class D>
     void sdbscan(const std::vector<typename K::Point_d>& objects, D dmetric, double epsilon, size_t min_points) {
       // Just run plain density once if sample size is larger than dataset.
       if (objects.size() <= sample_size_) {
@@ -139,7 +138,7 @@ namespace cluster {
         // Take a random sample of objects, store sample in a vector
         std::vector<size_t> sample_to_full;
         std::vector<typename K::Point_d> sample;
-        algorithm_r(objects.size(), sample_size, back_inserter(sample_to_full), rng);
+        algorithm_r(objects.size(), sample_size_, back_inserter(sample_to_full), rng);
         for (size_t i=0; i < sample_size_; i++) {
           sample.push_back(objects[sample_to_full[i]]);
         }
@@ -150,10 +149,14 @@ namespace cluster {
         subcall.remove_cluster(NOISE);
         
         // make convex hulls out of subset clusters
-        std::vector< Convex_hull_d<K> > hulls[subcall.num_clusters()];
+        std::vector< boost::shared_ptr< CGAL::Convex_hull_d<K> > > hulls(subcall.num_clusters());
+        for (size_t i=0; i < hulls.size(); i++) {
+          hulls[i].reset(new CGAL::Convex_hull_d<K>(typename K::Point_d().dimension()));
+        }
+
         for (size_t i=0; i < subcall.size(); i++) {
           if (subcall.cluster_ids[i] != UNCLASSIFIED) {
-            hulls[subcall.cluster_ids[i]].insert(sample[i]);
+            hulls[subcall.cluster_ids[i]]->insert(sample[i]);
           }
         }
         
@@ -165,7 +168,7 @@ namespace cluster {
         }
 
         // now measure the cdbw of the set.
-        CDbw<typename K::Point_d> cdbw_computer(*this, objects);
+        CDbw<typename K::Point_d, D> cdbw_computer(*this, objects, dmetric);
         double cdbw = cdbw_computer.compute(10);
         if (cdbw > best_cdbw) {
           swap(best_partition);
@@ -270,10 +273,10 @@ namespace cluster {
     }
 
     /// Finds which hull in a vector of hulls contains a point.
-    template<class K>
-    medoid_id index_of_containing_hull(const std::vector< Convex_hull_d<K> >& hulls, typename K::Point_d p) {
+    template<class CGALHullPtr, class Point>
+    medoid_id index_of_containing_hull(const std::vector< CGALHullPtr >& hulls, Point p) {
       for (medoid_id i=0; i < (medoid_id)hulls.size(); i++) {
-        if (hulls[i].boundary_side(p) != ON_UNBOUNDED_SIDE) {
+        if (hulls[i]->bounded_side(p) != CGAL::ON_UNBOUNDED_SIDE) {
           return i;
         }
       }

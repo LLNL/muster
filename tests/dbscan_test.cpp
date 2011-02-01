@@ -36,22 +36,43 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <math.h>
+
 #include <boost/random/uniform_real.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include "density.h"
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/point_generators_3.h>
+#include <CGAL/basic.h>
+#include <CGAL/Convex_hull_d.h>
+#include <CGAL/Convex_hull_d_traits_3.h>
+#include <CGAL/algorithm.h>
+
 #include "Timer.h"
 #include "point.h"
 #include "point_set.h"
 #include "spherical_clustering_generator.h"
-
 #include "cdbw.h"
 #include "density.h"
 
-using namespace std;
+using namespace CGAL;
 using namespace cluster;
+using namespace std;
+
+typedef Convex_hull_d_traits_3<Exact_predicates_inexact_constructions_kernel>  K;
+typedef K::Point_d P3;
 
 typedef boost::minstd_rand base_generator_type;
+
+/// Distance bt/w two cgal points
+struct cgal_2d_distance {
+  double operator()(const P3& left, const P3& right) const {
+    double dx = left[0] - right[0];
+    double dy = left[1] - right[1];
+    return ::sqrt(dx*dx + dy*dy);
+  }
+};
+
 
 void usage() {
   cerr << "Usage: dbscan-test [-htvc] "
@@ -68,6 +89,7 @@ void usage() {
   cerr << "  -e         Epsilon parameter of DBSCAN algorithm" << endl;
   cerr << "  -m         MinPoints parameter of DBSCAN algorithm" << endl;
   cerr << "  -i         Load points from data file" << endl;
+  cerr << "  -s         Use sampled density clustering." << endl;
   cerr << "  -o         Write out the resulting points and the cluster assignment" << endl;
 
   exit(1);
@@ -85,6 +107,7 @@ static double epsilon;
 static bool   min_points_set = false;
 static size_t min_points;
 
+static bool   sampling  = false;
 static bool   cdbw = false;
 
 static char*  input_file  = NULL;
@@ -114,7 +137,7 @@ void get_args(int *argc, char ***argv) {
     output_file = strdup("dbscan_random_execution.csv");
   }
   
-  while ((c = getopt(*argc, *argv, "htdncr:e:m:i:o:")) != -1) {
+  while ((c = getopt(*argc, *argv, "htdncsr:e:m:i:o:")) != -1) {
     switch (c) {
       case 'h':
         usage();
@@ -128,6 +151,9 @@ void get_args(int *argc, char ***argv) {
         break;
       case 'v':
         verbose = true;
+        break;
+      case 's':
+        sampling = true;
         break;
       case 'n':
         normalize_points = true;
@@ -203,7 +229,6 @@ void generate_random_points() {
 }
 
 
-
 int main(int argc, char **argv) {
   Timer timer;
   density clustering;
@@ -224,12 +249,21 @@ int main(int argc, char **argv) {
     timer.record("Load Input File");
     cout << " READY" << endl;
   }
+  
+  cout << "Converting point_set to CGAL points...";
+  vector<P3> cgal_points;
+  for (size_t i=0; i < points.size(); i++) {
+    cgal_points.push_back(P3(points[i][0], points[i][1], 0));
+  }
 
-  // Points are available in 'points' vector
-  
+  // Points are available in 'cgal_points' vector
   cout << "Clustering Points...";
-  
-  clustering.dbscan(points.points(), point_distance(), epsilon, min_points);
+
+  if (!sampling) {
+    clustering.dbscan(cgal_points, cgal_2d_distance(), epsilon, min_points);
+  } else {
+    clustering.sdbscan<K>(cgal_points, cgal_2d_distance(), epsilon, min_points);
+  }
   timer.record("Clustering");
 
   cout << " READY (Clusters found = " << clustering.num_clusters() << ")" << endl;
@@ -247,7 +281,7 @@ int main(int argc, char **argv) {
   if (cdbw) {
     // Checking the CDbw on everything but the noise.
     clustering.remove_cluster(density::NOISE);
-    CDbw<point> validation(clustering, points.points());
+    CDbw<P3, cgal_2d_distance> validation(clustering, cgal_points);
     double current_cdbw = validation.compute(10); // 10 representatives per cluster
     timer.record("CDBW");
 
