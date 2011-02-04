@@ -10,8 +10,7 @@ set(MUSTER_HEADERS
  	counter.h
  	dissimilarity.h
  	partition.h
- 	bic.h
- 	mpi_bindings.h)
+ 	bic.h)
 
 if (MUSTER_HAVE_MPI)
   list(APPEND MUSTER_SOURCES
@@ -23,7 +22,12 @@ if (MUSTER_HAVE_MPI)
  	  par_kmedoids.h
  	  multi_gather.h
  	  trial.h
- 	  id_pair.h)
+ 	  id_pair.h
+    mpi_bindings.h
+    ../external/Timer.h
+    ../external/timing.h
+    ../external/stl_utils.h
+    ../external/mpi_utils.h) 
 endif()
 
 add_library(muster ${MUSTER_SOURCES})
