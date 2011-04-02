@@ -35,6 +35,7 @@ add_mpi_test(par-cluster-test par_cluster_test.cpp)
 add_mpi_test(par-cluster-speed-test par_cluster_speed_test.cpp)
 add_mpi_test(par-bic-test par_bic_test.cpp)
 add_mpi_test(multi-gather-test multi_gather_test.cpp)
+add_mpi_test(gather-test gather_test.cpp)
 
 include_directories(
   ${PROJECT_SOURCE_DIR}/external

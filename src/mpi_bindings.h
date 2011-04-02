@@ -57,6 +57,8 @@
 #define CMPI_Comm_size PMPI_Comm_size
 #define CMPI_Gather    PMPI_Gather
 #define CMPI_Scatter   PMPI_Scatter
+#define CMPI_Recv      PMPI_Recv
+#define CMPI_Send      PMPI_Send
 #define CMPI_Irecv     PMPI_Irecv
 #define CMPI_Isend     PMPI_Isend
 #define CMPI_Pack      PMPI_Pack
@@ -75,6 +77,8 @@
 #define CMPI_Comm_size MPI_Comm_size
 #define CMPI_Gather    MPI_Gather
 #define CMPI_Scatter   MPI_Scatter
+#define CMPI_Recv      MPI_Recv
+#define CMPI_Send      MPI_Send
 #define CMPI_Irecv     MPI_Irecv
 #define CMPI_Isend     MPI_Isend
 #define CMPI_Pack      MPI_Pack

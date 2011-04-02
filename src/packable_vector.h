@@ -4,8 +4,10 @@
 #include <cstdlib>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include "mpi_utils.h"
+#include "mpi_bindings.h"
 
-namespace muster {
+namespace cluster {
 
   /// Pass this to a shared pointer if you do NOT want it to own its object
   struct null_deleter {
@@ -22,13 +24,16 @@ namespace muster {
     boost::shared_ptr< std::vector<T> > _packables;
 
     packable_vector(std::vector<T> *packables, bool owned = true) {
-      _packables(packables) ;
-        
+      if (owned) {
+        _packables = boost::shared_ptr< std::vector<T> >(packables);
+      } else {
+        _packables = boost::shared_ptr< std::vector<T> >(packables, null_deleter());
+      }
     }
     
 
     packable_vector(const packable_vector& other) : _packables(other._packables) { }
-    packable_vector() : _packables(new vector<T>());
+    packable_vector() : _packables(new std::vector<T>()) { }
 
     ~packable_vector() { }
 
@@ -37,7 +42,8 @@ namespace muster {
     ///
     packable_vector& operator=(const packable_vector& other) {
       if (this == &other) return *this;
-      _packables = other.packables;
+      _packables = other._packables;
+      return *this;
     }
 
     ///
@@ -59,9 +65,9 @@ namespace muster {
     void pack(void *buf, int bufsize, int *pos, MPI_Comm comm) const {
       // pack buffer with medoid objects
       size_t num_packables = _packables->size();
-      CMPI_Pack(&num_packables, 1, MPI_SIZE_T, &buffer[0], packed_size, &pos, comm);
+      CMPI_Pack(&num_packables, 1, MPI_SIZE_T, buf, bufsize, pos, comm);
       for (size_t i=0; i < num_packables; i++) {
-        (*_packables)[i].pack(&buffer[0], packed_size, &pos, comm);
+        (*_packables)[i].pack(buf, bufsize, pos, comm);
       }
     }
 
@@ -70,16 +76,17 @@ namespace muster {
     ///
     static packable_vector unpack(void *buf, int bufsize, int *pos, MPI_Comm comm) {
       size_t num_packables;
-      CMPI_Unpack((void*)&buffer[0], buffer.size(), &pos, &num_packables, 1, MPI_SIZE_T, comm);
+      CMPI_Unpack(buf, bufsize, pos, &num_packables, 1, MPI_SIZE_T, comm);
 
       packable_vector vec;
       vec._packables->resize(num_packables);
-      for (size_t i=0; i < _packables.size(); i++) {
-        (*vec._packables)[i] = T::unpack((void*)&buffer[0], buffer.size(), &pos, comm);
+      for (size_t i=0; i < vec._packables->size(); i++) {
+        (*vec._packables)[i] = T::unpack(buf, bufsize, pos, comm);
       }
+      return vec;
     }
   };
   
-} // namespace muster
+} // namespace cluster
 
 #endif // MUSTER_PACKABLE_VECTOR_H

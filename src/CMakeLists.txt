@@ -1,6 +1,7 @@
 set(MUSTER_SOURCES
 	partition.cpp
 	kmedoids.cpp
+  binomial.cpp
   ../external/Timer.cpp
   ../external/timing.cpp)
 
@@ -10,6 +11,9 @@ set(MUSTER_HEADERS
  	counter.h
  	dissimilarity.h
  	partition.h
+  binomial.h
+  gather.h
+  packable_vector.h
  	bic.h)
 
 if (MUSTER_HAVE_MPI)
