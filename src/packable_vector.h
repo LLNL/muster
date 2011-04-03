@@ -87,6 +87,15 @@ namespace cluster {
     }
   };
   
+  ///
+  /// Tempate function adaptor so we can have type inference when making 
+  /// packable vectors.
+  ///
+  template <class T>
+  packable_vector<T> make_packable_vector(std::vector<T> *vec, bool owned = true) {
+    return packable_vector<T>(vec, owned);
+  }
+  
 } // namespace cluster
 
 #endif // MUSTER_PACKABLE_VECTOR_H

@@ -53,6 +53,9 @@
 #include "stl_utils.h"
 #include "bic.h"
 #include "mpi_bindings.h"
+#include "gather.h"
+#include "packable_vector.h"
+#include "binomial.h"
 
 namespace cluster {
 
@@ -166,9 +169,9 @@ namespace cluster {
       int size, rank;
       CMPI_Comm_size(comm, &size);
       CMPI_Comm_rank(comm, &rank);
-
-      // array for packed medoid arrays from trials -- we'll broadcast from/to here.
-      std::vector< std::vector<char> > bcast_buffers(all_medoids.size());
+      
+      MPI_Group comm_group;
+      CMPI_Comm_group(comm, &comm_group);
       
       for (size_t i=0; trials.has_next(); i++) {
         int my_k = -1;                        // trial id for local run of kmedoids
@@ -217,8 +220,11 @@ namespace cluster {
         gather.finish();
         timer.record("FinishGather");
 
-        // if we're a worker process (we were assigned a trial number) then run PAM on the sample.
-        if (my_trial >= 0) {
+        // we're a worker process if we were assigned a trial number.
+        int is_worker_process = (my_trial >= 0);
+
+        // then run PAM on the samples that we aggregated to workers.
+        if (is_worker_process) {
           kmedoids cluster;
           cluster.set_epsilon(epsilon);
 
@@ -233,36 +239,52 @@ namespace cluster {
             all_medoids[my_trial].push_back(
               make_id_pair(my_objects[cluster.medoid_ids[m]], my_ids[cluster.medoid_ids[m]]));
           }
-          pack_vector(comm, all_medoids[my_trial], bcast_buffers[my_trial]);
-          timer.record("PackForBroadcast");
         }
 
-        // once workers are done clustering, broadcast the medoids from each clustering 
-        // so that all processes have the full all_medoids array.
-        for (size_t trial_id = i * size; trial_id < trials.count(); trial_id++) {
-          int root = trial_id % size;
-
-          // broadcast size and allocate receive buffer where needed
-          size_t packed_size = bcast_buffers[trial_id].size();
-          CMPI_Bcast(&packed_size, 1, MPI_SIZE_T, root, comm);
-          bcast_buffers[trial_id].resize(packed_size);
-
-          // broadcast packed data
-          CMPI_Bcast(&bcast_buffers[trial_id][0], packed_size, MPI_PACKED, root, comm);
+        // create a new communicator for the trials
+        // note that the way we construct this, members of trials have the same rank in trials_comm
+        // and in comm.  So it's safe to gather to zero on trials_comm then bcast from 0 on comm.
+        std::vector<int> trial_ranks;
+        for (int trial_id = i * size; trial_id < trials.count(); trial_id++) {
+          trial_ranks.push_back(trial_id % size);
         }
-        timer.record("Broadcast");
 
-        // now once we're done with the broadcasts, unpack all the data
-        for (size_t trial_id = i * size; trial_id < trials.count(); trial_id++) {
-          if ((size_t)my_trial != trial_id) {
-            unpack_vector(comm, bcast_buffers[trial_id], all_medoids[trial_id]);
-          }
+        MPI_Group trials_group;
+        CMPI_Group_incl(comm_group, trial_ranks.size(), &trial_ranks[0], &trials_group);
+        
+        MPI_Comm trials_comm;
+        CMPI_Comm_create(comm, trials_group, &trials_comm);
+        timer.record("CreateMedoidComm");
+        
+        // Gather the trials to a single process
+        vector<char> packed_medoids;
+        binomial_embedding binomial(trial_ranks.size(), 0);
+        if (is_worker_process) {
+          gather_packed(make_packable_vector(&all_medoids[my_trial], false), packed_medoids,
+                        binomial, trials_comm);
+          CMPI_Comm_free(&trials_comm);
+        }
+        timer.record("GatherTrials");
 
-          // save some space: no longer need packed data here.
-          bcast_buffers[trial_id].clear();
+        // bcast the trials to everyone from rank zero using regular MPI_Bcast on the 
+        // full packed vector.
+        size_t packed_medoids_size = packed_medoids.size();
+        CMPI_Bcast(&packed_medoids_size, 1, MPI_SIZE_T, 0, comm);
+
+        if (rank != 0) packed_medoids.resize(packed_medoids_size);
+        CMPI_Bcast(&packed_medoids[0], packed_medoids_size, MPI_PACKED, 0, comm);
+        timer.record("BroadcastTrials");
+        
+        // unpack the medoids and swap them into their place in the all_medoids array.
+        vector< packable_vector< id_pair<T> > > unpacked_medoids;
+        unpack_binomial(packed_medoids, unpacked_medoids, binomial, comm);
+        for (int trial_id = i * size; trial_id < trials.count(); trial_id++) {
+          unpacked_medoids[trial_id % size]._packables->swap(all_medoids[trial_id]);
         }
         timer.record("UnpackFromBroadcast");
       }
+
+      CMPI_Group_free(&comm_group);
     }
 
     ///

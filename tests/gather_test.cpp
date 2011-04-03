@@ -70,12 +70,29 @@ int main(int argc, char **argv) {
     }
     timer.record("verify");
   }
-  
-  MPI_Finalize();
 
   if (rank == 0 && verbose) {
     cout << "Average Gather time: " << timer["gather"] / size / 1e9 << " sec" << endl;
     cout << "PASSED" << endl;
   }
+
+
+  // verify that everything in this vector is from the correct rank for all roots
+  for (int root = 1; root < size; root++) {
+    all_points.clear();
+    allgather(packable_vector<point>(&my_points, false), all_points, MPI_COMM_WORLD, root);
+    timer.record("allgather");
+
+    verify(all_points, root);
+    timer.record("verify");
+  }
+
+  if (rank == 0 && verbose) {
+    cout << "Average AllGather time: " << timer["allgather"] / size / 1e9 << " sec" << endl;
+    cout << "PASSED" << endl;
+  }
+
+
+  MPI_Finalize();
   return 0;
 }

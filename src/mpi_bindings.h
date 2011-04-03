@@ -51,41 +51,51 @@
 
 #ifdef MUSTER_USE_PMPI
 
-#define CMPI_Allreduce PMPI_Allreduce
-#define CMPI_Bcast     PMPI_Bcast
-#define CMPI_Comm_rank PMPI_Comm_rank
-#define CMPI_Comm_size PMPI_Comm_size
-#define CMPI_Gather    PMPI_Gather
-#define CMPI_Scatter   PMPI_Scatter
-#define CMPI_Recv      PMPI_Recv
-#define CMPI_Send      PMPI_Send
-#define CMPI_Irecv     PMPI_Irecv
-#define CMPI_Isend     PMPI_Isend
-#define CMPI_Pack      PMPI_Pack
-#define CMPI_Pack_size PMPI_Pack_size
-#define CMPI_Reduce    PMPI_Reduce
-#define CMPI_Unpack    PMPI_Unpack
-#define CMPI_Waitsome  PMPI_Waitsome
+#define CMPI_Allreduce   PMPI_Allreduce
+#define CMPI_Bcast       PMPI_Bcast
+#define CMPI_Comm_rank   PMPI_Comm_rank
+#define CMPI_Comm_size   PMPI_Comm_size
+#define CMPI_Gather      PMPI_Gather
+#define CMPI_Scatter     PMPI_Scatter
+#define CMPI_Recv        PMPI_Recv
+#define CMPI_Send        PMPI_Send
+#define CMPI_Irecv       PMPI_Irecv
+#define CMPI_Isend       PMPI_Isend
+#define CMPI_Pack        PMPI_Pack
+#define CMPI_Pack_size   PMPI_Pack_size
+#define CMPI_Reduce      PMPI_Reduce
+#define CMPI_Unpack      PMPI_Unpack
+#define CMPI_Waitsome    PMPI_Waitsome
+#define CMPI_Comm_free   PMPI_Comm_free
+#define CMPI_Comm_group  PMPI_Comm_group
+#define CMPI_Comm_create PMPI_Comm_create
+#define CMPI_Group_incl  PMPI_Group_incl
+#define CMPI_Group_free  PMPI_Group_free
 
 #define cmpi_packed_size pmpi_packed_size
 
 #else  // MUSTER_USE_PMPI
 
-#define CMPI_Allreduce MPI_Allreduce
-#define CMPI_Bcast     MPI_Bcast
-#define CMPI_Comm_rank MPI_Comm_rank
-#define CMPI_Comm_size MPI_Comm_size
-#define CMPI_Gather    MPI_Gather
-#define CMPI_Scatter   MPI_Scatter
-#define CMPI_Recv      MPI_Recv
-#define CMPI_Send      MPI_Send
-#define CMPI_Irecv     MPI_Irecv
-#define CMPI_Isend     MPI_Isend
-#define CMPI_Pack      MPI_Pack
-#define CMPI_Pack_size MPI_Pack_size
-#define CMPI_Reduce    MPI_Reduce
-#define CMPI_Unpack    MPI_Unpack
-#define CMPI_Waitsome  MPI_Waitsome
+#define CMPI_Allreduce   MPI_Allreduce
+#define CMPI_Bcast       MPI_Bcast
+#define CMPI_Comm_rank   MPI_Comm_rank
+#define CMPI_Comm_size   MPI_Comm_size
+#define CMPI_Gather      MPI_Gather
+#define CMPI_Scatter     MPI_Scatter
+#define CMPI_Recv        MPI_Recv
+#define CMPI_Send        MPI_Send
+#define CMPI_Irecv       MPI_Irecv
+#define CMPI_Isend       MPI_Isend
+#define CMPI_Pack        MPI_Pack
+#define CMPI_Pack_size   MPI_Pack_size
+#define CMPI_Reduce      MPI_Reduce
+#define CMPI_Unpack      MPI_Unpack
+#define CMPI_Waitsome    MPI_Waitsome
+#define CMPI_Comm_free   MPI_Comm_free
+#define CMPI_Comm_group  MPI_Comm_group
+#define CMPI_Comm_create MPI_Comm_create
+#define CMPI_Group_incl  MPI_Group_incl
+#define CMPI_Group_free  MPI_Group_free
 
 #define cmpi_packed_size mpi_packed_size
 
