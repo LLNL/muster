@@ -72,13 +72,13 @@ namespace cluster {
 
     void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const {
       element.pack(buf, bufsize, position, comm);
-      MPI_Pack(const_cast<size_t*>(&id), 1, MPI_SIZE_T, buf, bufsize, position, comm);
+      CMPI_Pack(const_cast<size_t*>(&id), 1, MPI_SIZE_T, buf, bufsize, position, comm);
     }
 
     static id_pair unpack(void *buf, int bufsize, int *position, MPI_Comm comm) {
       T t = T::unpack(buf, bufsize, position, comm);
       size_t id;
-      MPI_Unpack(buf, bufsize, position, &id, 1, MPI_SIZE_T, comm);
+      CMPI_Unpack(buf, bufsize, position, &id, 1, MPI_SIZE_T, comm);
       return id_pair(t, id);
     }
   };
