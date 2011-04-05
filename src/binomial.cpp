@@ -4,7 +4,7 @@
 #include "binomial.h"
 using namespace std;
 
-namespace muster {
+namespace cluster {
 
   binomial_embedding::binomial_embedding(int size, int root) 
     : _size(size), _root(root) { }
@@ -34,4 +34,4 @@ namespace muster {
     return -1;
   }
 
-} // namespace muster
+} // namespace cluster

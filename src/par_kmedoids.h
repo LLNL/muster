@@ -257,7 +257,7 @@ namespace cluster {
         timer.record("CreateMedoidComm");
         
         // Gather the trials to a single process
-        vector<char> packed_medoids;
+        std::vector<char> packed_medoids;
         binomial_embedding binomial(trial_ranks.size(), 0);
         if (is_worker_process) {
           gather_packed(make_packable_vector(&all_medoids[my_trial], false), packed_medoids,
@@ -276,7 +276,7 @@ namespace cluster {
         timer.record("BroadcastTrials");
         
         // unpack the medoids and swap them into their place in the all_medoids array.
-        vector< packable_vector< id_pair<T> > > unpacked_medoids;
+        std::vector< packable_vector< id_pair<T> > > unpacked_medoids;
         unpack_binomial(packed_medoids, unpacked_medoids, binomial, comm);
         for (int trial_id = i * size; trial_id < trials.count(); trial_id++) {
           unpacked_medoids[trial_id % size]._packables->swap(all_medoids[trial_id]);
@@ -565,49 +565,6 @@ namespace cluster {
     /// taken from the time in microseconds since the epoch on the process 0.
     /// 
     void seed_random_uniform(MPI_Comm comm);
-
-    ///
-    /// This packs a vector of packable objects on one process.
-    /// To be packable, T must support these operations:
-    ///    - int packed_size(MPI_Comm comm) const
-    ///    - void pack(void *buf, int bufsize, int *position, MPI_Comm comm) const
-    ///    - static T unpack(void *buf, int bufsize, int *position, MPI_Comm comm)
-    /// Each T in the input vector is packed and put on the back of 
-    ///
-    template <class T>
-    void pack_vector(MPI_Comm comm, const std::vector<T>& packables, std::vector<char>& buffer) {
-      // figure out size of packed buffer
-      int packed_size = 0;
-      packed_size += cmpi_packed_size(1, MPI_SIZE_T, comm);  // num packables for trial.
-      for (size_t i=0; i < packables.size(); i++) {          // size of packables.
-        packed_size += packables[i].packed_size(comm);
-      }
-      buffer.resize(packed_size);
-
-      // pack buffer with medoid objects
-      int pos = 0;
-      size_t num_packables = packables.size();
-      CMPI_Pack(&num_packables, 1, MPI_SIZE_T, &buffer[0], packed_size, &pos, comm);
-      for (size_t i=0; i < num_packables; i++) {
-        packables[i].pack(&buffer[0], packed_size, &pos, comm);
-      }
-    }
-
-    ///
-    /// This unpacks a vector of packable objects packed by pack_vector().
-    ///
-    template <class T>
-    void unpack_vector(MPI_Comm comm, const std::vector<char>& buffer, std::vector<T>& packables) {
-      int pos = 0;      
-      size_t num_packables;
-      CMPI_Unpack((void*)&buffer[0], buffer.size(), &pos, &num_packables, 1, MPI_SIZE_T, comm);
-
-      packables.resize(num_packables);
-      for (size_t i=0; i < packables.size(); i++) {
-        packables[i] = T::unpack((void*)&buffer[0], buffer.size(), &pos, comm);
-      }
-    }
-
 
     ///
     /// Find the closest object in the medoids vector to the object passed in.

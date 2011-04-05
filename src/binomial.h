@@ -3,8 +3,6 @@
 
 #include <cstdlib>
 #include <vector>
-using namespace std;
-
 
 class binomial_embedding {
 private:
@@ -17,7 +15,7 @@ public:
 
   int relative_rank(int rank) const;          ///< This permutes ranks in case the root is not zero
   int reverse_relative_rank(int rank) const;  ///< Reverse rank permutation
-  vector<int> children(int rank) const;       ///< Same as get_children, but returns vector.
+  std::vector<int> children(int rank) const;  ///< Same as get_children, but returns vector.
   int parent(int rank) const;                 ///< Get the parent of a particular rank.
   
   int size() const { return _size; }
