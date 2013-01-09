@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////////////////////////////////////////////////////
-// Copyright (c) 2010, Lawrence Livermore National Security, LLC.  
-// Produced at the Lawrence Livermore National Laboratory  
+// Copyright (c) 2010, Lawrence Livermore National Security, LLC.
+// Produced at the Lawrence Livermore National Laboratory
 // LLNL-CODE-433662
-// All rights reserved.  
+// All rights reserved.
 //
-// This file is part of Muster. For details, see http://github.com/tgamblin/muster. 
+// This file is part of Muster. For details, see http://github.com/tgamblin/muster.
 // Please also read the LICENSE file for further information.
 //
 // Redistribution and use in source and binary forms, with or without modification, are
@@ -65,7 +65,7 @@ namespace cluster {
     max_x_ = max(p.x, max_x_);
     min_y_ = min(p.y, min_y_);
     max_y_ = max(p.y, max_y_);
-    
+
   }
 
   void point_set::normalize() {
@@ -105,7 +105,7 @@ namespace cluster {
 
     X = strtod(parts[0].c_str(), &err);
     if (*err) return;
-    
+
     Y = strtod(parts[1].c_str(), &err);
     if (*err) return;
 
@@ -133,21 +133,21 @@ namespace cluster {
     }
   }
 
-
+#ifdef MUSTER_HAVE_MPI
   void scatter(point_set& points, int root, MPI_Comm comm) {
     int rank, size;
     CMPI_Comm_rank(comm, &rank);
     CMPI_Comm_size(comm, &size);
-    
+
     size_t points_per_proc = points.size() / size;
     if (rank == root && (points_per_proc * size != points.size())) {
       cerr << "Size must evenly divide points size." << endl;
       exit(1);
     }
-    
-    CMPI_Scatter(&points[0], points_per_proc, point::mpi_datatype(), 
+
+    CMPI_Scatter(&points[0], points_per_proc, point::mpi_datatype(),
                  &points[0], points_per_proc, point::mpi_datatype(),
                  root, comm);
   }
-
+#endif // MUSTER_HAVE_MPI
 } // namespace cluster
