@@ -18,8 +18,8 @@ set(MUSTER_HEADERS
 
 if (MUSTER_HAVE_MPI)
   list(APPEND MUSTER_SOURCES
-    par_partition.cpp 
-    par_kmedoids.cpp 
+    par_partition.cpp
+    par_kmedoids.cpp
     trial.cpp)
 
   list(APPEND MUSTER_HEADERS
@@ -32,12 +32,16 @@ if (MUSTER_HAVE_MPI)
     ../external/Timer.h
     ../external/timing.h
     ../external/stl_utils.h
-    ../external/mpi_utils.h) 
+    ../external/mpi_utils.h)
 endif()
 
 add_library(muster ${MUSTER_SOURCES})
 if (MUSTER_HAVE_MPI)
   target_link_libraries(muster ${MPI_LIBRARIES})
+endif()
+
+if (MUSTER_HAVE_CLOCK_GETTIME)
+  target_link_libraries(muster rt)
 endif()
 
 include_directories(
@@ -48,6 +52,3 @@ include_directories(
 
 install(FILES ${MUSTER_HEADERS} DESTINATION include)
 install(TARGETS muster DESTINATION lib)
-
-
-
