@@ -71,6 +71,9 @@ namespace cluster {
 
     /// Get the average dissimilarity of objects w/their medoids for the last run.
     double average_dissimilarity() const;
+
+    /// Set random seed.
+    void set_seed(unsigned long seed);
     
     /// Set whether medoids will be sorted by object id after clustering is complete.
     /// Defaults to true.
