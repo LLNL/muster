@@ -45,7 +45,8 @@ using namespace std;
 namespace cluster {
 
   par_kmedoids::par_kmedoids(MPI_Comm comm) 
-    : par_partition(comm), 
+    : par_partition(comm),
+      seed_set(false),
       total_dissimilarity(numeric_limits<double>::infinity()),
       best_bic_score(0),
       init_size(40),
@@ -53,6 +54,10 @@ namespace cluster {
       epsilon(1e-15)
   { }
 
+  void par_kmedoids::set_seed(uint32_t s) {
+      random.seed(s);
+      seed_set = true;
+  }
 
   void par_kmedoids::set_epsilon(double e) {
     epsilon = e;
@@ -77,6 +82,7 @@ namespace cluster {
     uint32_t seed = get_time_seed();
     CMPI_Bcast(&seed, 1, MPI_INT, 0, comm);
     random.seed(seed);
+    seed_set = true;
   }
 
 } // namespace cluster
