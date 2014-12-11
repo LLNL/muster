@@ -46,7 +46,7 @@ using namespace cluster;
 using namespace std;
 
 void usage() {
-  cerr << "Usage: par-cluster-test [-hxv] [-n num-points] [-k clusters] [-i initial-size] [-r reps]" << endl;
+  cerr << "Usage: par-cluster-test [-hxv] [-n num-points] [-k clusters] [-i initial-size] [-r reps] [-s seed]" << endl;
   cerr << "  Compare parallel clustering with sequential clustering." << endl;
   cerr << "Options:" << endl;
   cerr << "  -h         Show this message." << endl;
@@ -60,6 +60,8 @@ void usage() {
   cerr << "               Default is 40." << endl;
   cerr << "  -r         Number of repeated trials per k in CAPEK." << endl;
   cerr << "               Default is 5." << endl;
+  cerr << "  -s         Seed value for random number generator at start of test." << endl;
+  cerr << "               Default will be generated based on gettimeofday, see documentation." << endl;
   exit(1);
 }
 
@@ -69,13 +71,15 @@ size_t init_size = 40;
 size_t max_reps = 5;
 bool use_bic = false;
 bool verbose = false;
+bool use_seed = false;
+size_t seed = 0;
 
 /// Uses getopt to read in arguments.
 void get_args(int *argc, char ***argv, int rank) {
   int c;
   char *err;
 
-  while ((c = getopt(*argc, *argv, "hxn:i:r:k:v")) != -1) {
+  while ((c = getopt(*argc, *argv, "hxn:i:r:k:vs:")) != -1) {
     switch (c) {
     case 'h':
       if (rank == 0) usage();
@@ -103,6 +107,11 @@ void get_args(int *argc, char ***argv, int rank) {
     case 'v':
       verbose = true;
       break;
+    case 's':
+      use_seed = true;
+      seed = strtol(optarg, &err, 0);
+      if (*err) usage();
+      break;
     default:
       if (rank == 0) usage();
       exit(1);
@@ -119,7 +128,6 @@ void get_args(int *argc, char ***argv, int rank) {
 vector<point> points;
 kmedoids km;
 par_kmedoids parkm(MPI_COMM_WORLD);
-
 
 void print_cluster_info(const cluster::partition& gathered, const dissimilarity_matrix& distance) {
   cout << "seq k: " << km.medoid_ids.size()
@@ -159,7 +167,7 @@ int main(int argc, char **argv) {
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   
   get_args(&argc, &argv, rank);
-  
+
   //put 5-pt crosses inthe vector, offset by increasing distances
   point ref(1,1);
   point stencil[] = {
@@ -196,6 +204,9 @@ int main(int argc, char **argv) {
 
   parkm.set_init_size(init_size);
   parkm.set_max_reps(max_reps);
+  if (use_seed) {
+      parkm.set_seed(seed);
+  }
 
   for (size_t k=1; k <= num_clusters; k++) {
     vector<point> medoids;

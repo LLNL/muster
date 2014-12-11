@@ -124,6 +124,11 @@ namespace cluster {
 
     virtual ~par_kmedoids() { }
 
+    /// Set the random seed. If used, must be called on all processes in the MPI_Comm
+    /// with the same seed value. If not, a seed is generated and broadcast to
+    /// the MPI_Comm.
+    void set_seed(uint32_t seed);
+
     /// Get the average dissimilarity of objects w/their medoids for the last run.
     double average_dissimilarity();
 
@@ -321,7 +326,8 @@ namespace cluster {
       CMPI_Comm_size(comm, &size);
       CMPI_Comm_rank(comm, &rank);
 
-      seed_random_uniform(comm); // seed RN generator uniformly across ranks.
+      if (!seed_set)
+        seed_random_uniform(comm); // seed RN generator uniformly across ranks.
 
       // fix things if k is greater than the number of elements, since we can't 
       // ever find that many clusters.
@@ -435,7 +441,8 @@ namespace cluster {
       CMPI_Comm_size(comm, &size);
       CMPI_Comm_rank(comm, &rank);
 
-      seed_random_uniform(comm); // seed RN generator uniformly across ranks.
+      if (!seed_set)
+        seed_random_uniform(comm); // seed RN generator uniformly across ranks.
 
       // fix things if k is greater than the number of elements, since we can't 
       // ever find that many clusters.
@@ -551,6 +558,7 @@ namespace cluster {
   protected:
     typedef boost::mt19937 random_t;   ///< Type for random number generator used here.
     random_t random;                   ///< Random number distribution to be used for samples
+    bool seed_set;                     /// Track whether the random seed has been set
     
     double total_dissimilarity;   ///< Total dissimilarity bt/w objects and medoids for last clustering.
     double best_bic_score;        ///< BIC score for the clustering found.

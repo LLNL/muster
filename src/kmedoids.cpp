@@ -71,6 +71,10 @@ namespace cluster {
     return total_dissimilarity / cluster_ids.size();
   }
 
+  void kmedoids::set_seed(unsigned long s) {
+    random.seed(s);
+  }
+
   void kmedoids::set_sort_medoids(bool sort) {
     sort_medoids = sort;
   }
