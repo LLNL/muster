@@ -39,7 +39,7 @@
 #define MUSTER_RANDOM_H
 
 #include <sys/time.h>
-#include <tr1/unordered_map>
+#include <unordered_map>
 
 namespace cluster {
 
@@ -96,7 +96,7 @@ namespace cluster {
   template <class OutputIterator, class Random>
   void fast_sample(size_t numElements, size_t sample_size, OutputIterator out, Random& random) {
     // Map keeps track of numbers whose identities have been swapped.
-    std::tr1::unordered_map<size_t, size_t> swaps;
+    std::unordered_map<size_t, size_t> swaps;
     
     for (size_t s = 0; s < sample_size; s++) {
       size_t remaining = numElements - s;  // number of elements remaining to be picked
